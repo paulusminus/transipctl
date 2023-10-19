@@ -1,7 +1,7 @@
 jaja = { SOI ~ vps_command ~ EOI }
 name = { ASCII_ALPHANUMERIC+ }
+description = { ASCII_ALPHANUMERIC+ }
 space = _{ " " }
 vps_list = { "list" ~ space* }
-vps_item = { "item" ~ space+ ~ name ~ space* }
-vps_reset = { "reset" ~ space+ ~ name ~ space* }
-vps_command = { "vps" ~ space+ ~ (vps_list | vps_item | vps_reset ) }
+vps_item_action = { ( "item" | "reset" | "lock" | "unlock" | "start" | "stop" ) ~ space+ ~ name ~ space* }
+vps_command = { "vps" ~ space+ ~ ( vps_list | vps_item_action ) }
