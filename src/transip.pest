@@ -1,7 +1,25 @@
-jaja = { SOI ~ vps_command ~ EOI }
-name = { ASCII_ALPHANUMERIC+ }
-description = { ASCII_ALPHANUMERIC+ }
-space = _{ " " }
-vps_list = { "list" ~ space* }
-vps_item_action = { ( "item" | "reset" | "lock" | "unlock" | "start" | "stop" ) ~ space+ ~ name ~ space* }
-vps_command = { "vps" ~ space+ ~ ( vps_list | vps_item_action ) }
+transip = { SOI ~ ( vps_command | invoice_command | dns_command | comment ) ~ EOI }
+
+text = _{ char* }
+char = _{ !( NEWLINE | " " | "\t" ) ~ ANY }
+WHITESPACE = _{ " " }
+comment = { "#" ~ text }
+name = @{ char+ }
+value = @{ char+ }
+
+vps_list = { "list" }
+vps_action = { ("item " | "reset " | "lock " | "unlock " | "start " | "stop " ) }
+vps_item_action = { vps_action ~ name }
+vps_command = { "vps " ~ ( vps_list | vps_item_action ) }
+
+invoice_list = { "list" }
+invoice_action = { ("item " | "pdf ") }
+invoice_item_action = { invoice_action  ~  name }
+invoice_command = { "invoice" ~ ( invoice_list | invoice_item_action ) }
+
+dns_list = { "list" }
+dns_item_action = { ( "item " )  ~ name }
+dns_record_change = { "update " ~ name ~ value }
+dns_record_set_acme_challenge = { "acme-challenge " ~ name ~ value }
+
+dns_command = { "dns" ~ (dns_list | dns_item_action | dns_record_change | dns_record_set_acme_challenge ) }

@@ -1,158 +1,103 @@
-/// This is a test to show if we can make a transipctl
+use pest_derive::Parser;
+use pest::{Parser, iterators::Pair};
+use std::{io::{BufReader, BufRead}, fmt::Debug};
 
-fn split_in_first_rest(s: &str) -> Option<(&str, &str)> {
-    let whatever = s.trim();
-    if let Some(i) = whatever.find(' ') {
-        Some((&s[..i], &s[i..].trim()))
-    }
-    else {
-        None
-    }
-}
+mod error;
 
+#[derive(Parser)]
+#[grammar = "transip.pest"]
+struct TransipCommandParser;
 
-#[derive(thiserror::Error, Debug)]
-enum Error {
-    #[error("Parse product command: {0}")]
-    ParseProductCommand(String),
+#[derive(Debug)]
+struct VpsListCommand;
 
-    #[error("Parse dns command: {0}")]
-    ParseDnsCommand(String),
+#[derive(Debug)]
+struct VpsStartCommand(String);
 
-    #[error("Parse vps command: {0}")]
-    ParseVpsCommand(String),
-}
+#[derive(Debug)]
+struct VpsStopCommand(String);
 
-struct VpsName(String);
+#[derive(Debug)]
+struct VpsResetCommand(String);
 
-struct VpsDescription {
-    name: VpsName,
-    description: String,
-}
+#[derive(Debug)]
+struct VpsItemCommand(String);
 
-struct VpsLocked {
-    name: VpsName,
-    locked: bool,
-}
+#[derive(Debug)]
+struct VpsLockCommand(String);
 
-enum VpsCommand {
-    List,
-    Entry(VpsName),
-    Start(VpsName),
-    Stop(VpsName),
-    Reset(VpsName),
-    Description(VpsDescription),
-    SetLocked(String, bool),
-}
+#[derive(Debug)]
+struct VpsUnlockCommand(String);
 
-impl FromStr for VpsCommand {
-    type Err = Error;
+#[derive(Debug)]
+struct UnknownCommand;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let command = s.trim();
-        if command.to_lowercase() == "list" {
-            return Ok(VpsCommand::List)
+fn parse_vps_command(pair: Pair<'_, Rule>) -> Box<dyn Debug> {
+    let inner = pair.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::vps_list => {
+            Box::new(VpsListCommand)
         }
-        else if command.to_lowercase().starts_with("entry ") {
-            if command[6..].split_ascii_whitespace().count() == 1 {
-                return Ok(VpsCommand::Entry(s[6..].trim().to_owned()));
+        Rule::vps_item_action => {
+            let mut inner = inner.into_inner();
+            let action = inner.next().unwrap().as_str().trim();
+            let name = inner.next().unwrap().as_str().trim().to_owned();
+            if action == "item" {
+                Box::new(VpsItemCommand(name))
+            }
+            else if action == "reset" {
+                Box::new(VpsResetCommand(name))
+            }
+            else if action == "start" {
+                Box::new(VpsStartCommand(name))
+            }
+            else if action == "stop" {
+                Box::new(VpsStopCommand(name))
+            }
+            else if action == "lock" {
+                Box::new(VpsLockCommand(name))
+            }
+            else if action == "unlock" {
+                Box::new(VpsUnlockCommand(name))
+            }
+            else {
+                Box::new(UnknownCommand)
             }
         }
-        else if s.to_lowercase().trim().starts_with("start ") {
-            let name = &s[6..];
-            return Ok(VpsCommand::Start(name.trim().to_owned()));
-        }
-        else if s.to_lowercase().trim().starts_with("stop ") {
-            let name = &s[5..];
-            return Ok(VpsCommand::Stop(name.trim().to_owned()));
-        }
-        else if s.to_lowercase().trim().starts_with("reset ") {
-            let name = &s[5..];
-            return Ok(VpsCommand::Stop(name.trim().to_owned()));
-        }
-        else {
-            return Err(Error::ParseProductCommand(s.to_owned()));
-        }
+        _ => Box::new(UnknownCommand)
     }
 }
-
-enum DnsCommand {
-    List,
-    Entry(String),
-}
-
-
-#[derive(Debug, PartialEq)]
-enum ProductCommand {
-    List,
-    Elements(String),
-}
-
-impl FromStr for ProductCommand {
-    type Err = Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let wrong = Err(Error::ParseProductCommand(s.to_owned()));
-        let iter: Vec<&str> = s.split_ascii_whitespace().collect();
-        if iter.len() == 0 { return wrong; }
-        if iter[0].to_lowercase() == "list" && iter.len() == 1 { 
-            return Ok(ProductCommand::List); 
-        }
-        if iter[0].to_lowercase() == "elements" && iter.len() == 2 { 
-            return Ok(ProductCommand::Elements(iter[1].to_owned())); 
-        }
-        return wrong;
-    }
-}
-
-
-enum Command {
-    Vps(VpsCommand),
-    Dns(DnsCommand),
-    Product(ProductCommand),
-}
-
-use std::str::FromStr;
 
 fn main() {
-    let _command = Command::Product(ProductCommand::List);
-}
-
-
-#[cfg(test)]
-mod test {
-    use crate::ProductCommand;
-    use super::split_in_first_rest;
-
-    #[test]
-    fn product_command_list_ok() {
-        let result = "list".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::List);
-
-        let result = "list ".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::List);
-
-        let result = "   list ".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::List);
-    }
-
-    #[test]
-    fn product_command_elements_ok() {
-        let result = "elements vps".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::Elements("vps".to_owned()));
-
-        let result = " elements kubernetes".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::Elements("kubernetes".to_owned()));
-
-        let result = "elements  key".parse::<ProductCommand>().unwrap();
-        assert_eq!(result, ProductCommand::Elements("key".to_owned()));
-    }
-
-
-    #[test]
-    fn find_first_space() {
-        let (first, rest) = split_in_first_rest("list testen maar").unwrap();
-        assert_eq!(first, "list");
-        assert_eq!(rest, "testen maar");
-
+    let mut lines = BufReader::new(std::io::stdin()).lines();
+    while let Some(line_result) = lines.next() {
+        if let Ok(line) = line_result {
+            if let Ok(pairs) = TransipCommandParser::parse(Rule::transip, line.as_str()) {
+                for pair in pairs {
+                    let inner = pair.into_inner().next().unwrap();
+                    match inner.as_rule() {
+                        Rule::comment => {
+                            println!("comment: {}", inner.as_str());
+                        }
+                        Rule::dns_command => {
+                            println!("dns: {}", inner.as_str());
+                        }
+                        Rule::vps_command => {
+                            println!("{:#?}", parse_vps_command(inner));
+                        }
+                        Rule::invoice_command => {
+                            println!("invoice: {}", inner.as_str());
+                        }
+                        _ => {
+                            println!("Does not match");
+                        }
+                    }
+                }
+            }
+            else {
+                println!("Cannot parse");
+            }
+        }
+        
     }
 }
