@@ -488,18 +488,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "test-json"
-version = "0.1.0"
-dependencies = [
- "pest",
- "pest_derive",
- "serde",
- "serde_json",
- "thiserror",
- "transip",
-]
-
-[[package]]
 name = "thiserror"
 version = "1.0.49"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -580,6 +568,18 @@ dependencies = [
  "thiserror",
  "tracing",
  "ureq",
+]
+
+[[package]]
+name = "transipctl"
+version = "0.1.0"
+dependencies = [
+ "pest",
+ "pest_derive",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "transip",
 ]
 
 [[package]]

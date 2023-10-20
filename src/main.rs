@@ -2,18 +2,12 @@ use error::Error;
 use pest_derive::Parser;
 use pest::{Parser, iterators::Pair};
 use serde::Serialize;
-use std::{io::{BufReader, BufRead}, fmt::Debug};
-use transip::{configuration_from_environment, Client};
+use std::{io::{BufReader, BufRead, Read}, fmt::Debug, fs::OpenOptions, process::exit};
+use transip::{configuration_from_environment, Client, api::vps::TransipApiVps};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 mod error;
-mod vps_command;
-
-pub trait Execute {
-    type ApiResult;
-    fn execute(&self, client: &mut Client) -> Result<Self::ApiResult>;
-}
 
 #[derive(Parser)]
 #[grammar = "transip.pest"]
@@ -35,35 +29,42 @@ fn execute_vps_command(pair: Pair<'_, Rule>, client: &mut Client) -> Result<Stri
     let inner = pair.into_inner().next().unwrap();
     match inner.as_rule() {
         Rule::vps_list => {
-            vps_command::VpsListCommand.execute(client)
+            client.vps_list()
+            .map_err(Error::from)
             .and_then(to_json)
         }
         Rule::vps_item_action => {
             let mut inner = inner.into_inner();
             let action = inner.next().unwrap().as_str().trim();
-            let name = inner.next().unwrap().as_str().trim().to_owned();
+            let name = inner.next().unwrap().as_str().trim();
             if action == "item" {
-                vps_command::VpsItemCommand(name).execute(client)
+                client.vps(name)
+                .map_err(Error::from)
                 .and_then(to_json)
             }
             else if action == "reset" {
-                vps_command::VpsResetCommand(name).execute(client)
+                client.vps_reset(&name)
+                .map_err(Error::from)
                 .map(unit_to_string)
             }
             else if action == "start" {
-                vps_command::VpsStartCommand(name).execute(client)
+                client.vps_start(name)
+                .map_err(Error::from)
                 .map(unit_to_string)
             }
             else if action == "stop" {
-                vps_command::VpsStopCommand(name).execute(client)
+                client.vps_stop(name)
+                .map_err(Error::from)
                 .map(unit_to_string)
             }
             else if action == "lock" {
-                vps_command::VpsLockCommand(name).execute(client)
+                client.vps_set_is_locked(name, true)
+                .map_err(Error::from)
                 .map(unit_to_string)
             }
             else if action == "unlock" {
-                vps_command::VpsUnlockCommand(name).execute(client)
+                client.vps_set_is_locked(name, false)
+                .map_err(Error::from)
                 .map(unit_to_string)
             }
             else {
@@ -76,7 +77,24 @@ fn execute_vps_command(pair: Pair<'_, Rule>, client: &mut Client) -> Result<Stri
 }
 
 fn main() -> Result<()> {
-    let mut lines = BufReader::new(std::io::stdin()).lines();
+    let input: Option<Box<dyn Read>> =
+        if let Some(file_name) = std::env::args().nth(1) {
+            if let Ok(file) = OpenOptions::new().read(true).open(file_name) {
+                Some(Box::new(file))
+            }
+            else {
+                None
+            }
+        }
+        else {
+            Some(Box::new(std::io::stdin()))
+        };
+
+    if input.is_none() {
+        exit(1);
+    }
+
+    let mut lines = BufReader::new(input.unwrap()).lines();
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
     while let Some(line_result) = lines.next() {
         if let Ok(line) = line_result {
