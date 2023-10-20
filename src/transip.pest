@@ -15,11 +15,11 @@ vps_command = { "vps " ~ ( vps_list | vps_item_action ) }
 invoice_list = { "list" }
 invoice_action = { ("item " | "pdf ") }
 invoice_item_action = { invoice_action  ~  name }
-invoice_command = { "invoice" ~ ( invoice_list | invoice_item_action ) }
+invoice_command = { "invoice " ~ ( invoice_list | invoice_item_action ) }
 
 dns_list = { "list" }
 dns_item_action = { ( "item " )  ~ name }
 dns_record_change = { "update " ~ name ~ value }
 dns_record_set_acme_challenge = { "acme-challenge " ~ name ~ value }
-
-dns_command = { "dns" ~ (dns_list | dns_item_action | dns_record_change | dns_record_set_acme_challenge ) }
+dns_record_delete_acme_challenge = { "acme-challenge-delete " ~ name }
+dns_command = { "dns" ~ (dns_list | dns_item_action | dns_record_change | dns_record_set_acme_challenge | dns_record_delete_acme_challenge) }

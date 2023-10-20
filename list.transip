@@ -1,2 +1,3 @@
 #!/usr/bin/transipctl
 vps item paulusminus-vps3
+#vps lock paulusminus-vps3
