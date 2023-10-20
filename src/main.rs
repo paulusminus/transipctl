@@ -7,9 +7,30 @@ use transip::{configuration_from_environment, Client};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
+pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
+
+pub trait Report {
+    fn report(self);
+}
+
+impl Report for Result<String> {
+    fn report(self) {
+        match self {
+            Ok(s) => {
+                if !s.is_empty() {
+                    println!("{}", s);
+                }
+            }
+            Err(error) => {
+                eprintln!("Error: {}", error);
+            }
+        }
+    }
+}
+
 mod error;
 mod input;
-mod vps_command;
+pub mod command;
 
 #[derive(Parser)]
 #[grammar = "transip.pest"]
@@ -22,7 +43,6 @@ fn to_json<T: Serialize>(t: T) -> Result<String> {
 fn unit_to_string(_: ()) -> String {
     String::new()
 }
-
 
 fn main() -> Result<()> {
     let input: Input = std::env::args().try_into()?;
@@ -42,13 +62,13 @@ fn main() -> Result<()> {
                         println!("dns: {}", inner.as_str());
                     }
                     Rule::vps_command => {
-                        let s = vps_command::execute(inner, &mut client)?;
-                        if !s.is_empty() {
-                            println!("{}", s);
-                        }
+                        command::vps::execute(inner, &mut client).report();
                     }
                     Rule::invoice_command => {
-                        println!("invoice: {}", inner.as_str());
+                        command::invoice::execute(inner, &mut client).report()
+                    }
+                    Rule::product_command => {
+                        command::product::execute(inner, &mut client).report();
                     }
                     _ => {
                         println!("Does not match");

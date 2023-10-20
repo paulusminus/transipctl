@@ -11,6 +11,9 @@ pub enum Error {
     #[error("Parse vps command: {0}")]
     ParseVpsCommand(String),
 
+    #[error("Parse invoice command: {0}")]
+    ParseInvoiceCommand(String),
+
     #[error("Api: {0}")]
     Api(#[from] transip::Error),
 
