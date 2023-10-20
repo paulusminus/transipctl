@@ -1,8 +1,10 @@
 [package]
-name = "transipctl"
+authors = ["Paul Min"]
 description = "Tool for manipulating and querying record on Transip Api"
 edition = "2021"
 license = "MIT"
+name = "transipctl"
+repository = "https://github.com/paulusminus/transipctl"
 version = "0.1.0"
 
 [dependencies]
