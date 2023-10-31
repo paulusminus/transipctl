@@ -28,9 +28,9 @@ impl Report for Result<String> {
     }
 }
 
+pub mod command;
 mod error;
 mod input;
-pub mod command;
 
 #[derive(Parser)]
 #[grammar = "transip.pest"]
@@ -58,15 +58,16 @@ fn main() -> Result<()> {
                     Rule::comment => {
                         // println!("comment: {}", inner.as_str());
                     }
+                    Rule::domain_command => {
+                        command::domain::execute(inner, &mut client).report();
+                    }
                     Rule::dns_command => {
                         println!("dns: {}", inner.as_str());
                     }
                     Rule::vps_command => {
                         command::vps::execute(inner, &mut client).report();
                     }
-                    Rule::invoice_command => {
-                        command::invoice::execute(inner, &mut client).report()
-                    }
+                    Rule::invoice_command => command::invoice::execute(inner, &mut client).report(),
                     Rule::product_command => {
                         command::product::execute(inner, &mut client).report();
                     }

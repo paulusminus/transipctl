@@ -1,4 +1,4 @@
-transip = { SOI ~ ( vps_command | invoice_command | dns_command | product_command | comment ) ~ EOI }
+transip = { SOI ~ ( vps_command | invoice_command | dns_command | product_command | domain_command | comment ) ~ EOI }
 
 text = _{ char* }
 char = _{ !( NEWLINE | " " | "\t" ) ~ ANY }
@@ -27,3 +27,7 @@ dns_command = { "dns " ~ ( dns_list | dns_item_action | dns_record_change | dns_
 product_list = { "list" }
 product_elements = { "elements " ~ name }
 product_command = { "product " ~ ( product_list | product_elements ) }
+
+domain_list = { "list " }
+domain_item = { "item" ~ name }
+domain_command = { "domain " ~ ( domain_list | domain_item ) }

@@ -1,9 +1,12 @@
 use pest::iterators::Pair;
-use transip::{Client, api::account::AccountApi};
+use transip::{api::account::AccountApi, Client};
 
-use crate::{Result, Rule, error::{ErrorExt, Error}, to_json};
+use crate::{
+    error::{Error, ErrorExt},
+    to_json, Result, Rule,
+};
 
-pub fn execute(pair: Pair<'_, Rule> , client: &mut Client) -> Result<String> {
+pub fn execute(pair: Pair<'_, Rule>, client: &mut Client) -> Result<String> {
     let commandline = pair.as_str().to_owned();
     let inner = pair.into_inner().next().unwrap();
     match inner.as_rule() {

@@ -1,6 +1,9 @@
+use crate::{
+    error::{Error, ErrorExt},
+    to_json, unit_to_string, Result, Rule,
+};
 use pest::iterators::Pair;
-use transip::{Client, api::vps::VpsApi};
-use crate::{error::{Error, ErrorExt}, to_json, unit_to_string, Result, Rule};
+use transip::{api::vps::VpsApi, Client};
 
 pub fn execute(pair: Pair<'_, Rule>, client: &mut Client) -> Result<String> {
     let commandline = pair.as_str().to_owned();
