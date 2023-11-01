@@ -1,4 +1,5 @@
 use command::TransipCommand;
+use error::ErrorExt;
 use execution::Execution;
 use input::Input;
 use pest_derive::Parser;
@@ -24,9 +25,12 @@ fn main() -> Result<()> {
         if line.trim().is_empty() {
             break;
         }
-        match line.parse::<TransipCommand>() {
-            Ok(command) => command.execute(&mut client),
-            Err(error) => eprintln!("Error: {}", error)
+        match line
+            .parse::<TransipCommand>()
+            .and_then(|command| command.execute(&mut client).err_into())
+        {
+            Ok(result) => println!("{}", result),
+            Err(error) => eprintln!("Error: {}", error),
         }
     }
     Ok(())
