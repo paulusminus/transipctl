@@ -1,0 +1,4 @@
+#!/usr/bin/transipctl
+
+dns acme-challenge-delete paulmin.nl
+
