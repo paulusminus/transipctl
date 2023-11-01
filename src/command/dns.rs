@@ -21,11 +21,11 @@ impl<'a> TryFrom<Pair<'a, Rule>> for DnsCommand {
                 let name = inner.into_inner().next().unwrap().as_str().to_owned();
                 Ok(DnsCommand::List(name))
             }
-            Rule::dns_record_delete_acme_challenge => {
+            Rule::dns_delete_acme_challenge => {
                 let name = inner.into_inner().next().unwrap().as_str().to_owned();
                 Ok(DnsCommand::DeleteAcmeChallenge(name))
             }
-            Rule::dns_record_set_acme_challenge => {
+            Rule::dns_set_acme_challenge => {
                 let mut inner = inner.into_inner();
                 let name = inner.next().unwrap().as_str().to_owned();
                 let value = inner.next().unwrap().as_str().to_owned();
