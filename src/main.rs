@@ -28,8 +28,9 @@ impl Report for Result<String> {
     }
 }
 
-pub mod command;
+mod command;
 mod error;
+mod execution;
 mod input;
 
 #[derive(Parser)]
@@ -55,25 +56,13 @@ fn main() -> Result<()> {
             for pair in pairs {
                 let inner = pair.into_inner().next().unwrap();
                 match inner.as_rule() {
-                    Rule::comment => {
-                        // println!("comment: {}", inner.as_str());
-                    }
-                    Rule::domain_command => {
-                        command::domain::execute(inner, &mut client).report();
-                    }
-                    Rule::dns_command => {
-                        println!("dns: {}", inner.as_str());
-                    }
-                    Rule::vps_command => {
-                        command::vps::execute(inner, &mut client).report();
-                    }
+                    Rule::comment => (),
+                    Rule::domain_command => command::domain::execute(inner, &mut client).report(),
+                    Rule::dns_command => command::dns::execute(inner, &mut client).report(),
+                    Rule::vps_command => command::vps::execute(inner, &mut client).report(),
                     Rule::invoice_command => command::invoice::execute(inner, &mut client).report(),
-                    Rule::product_command => {
-                        command::product::execute(inner, &mut client).report();
-                    }
-                    _ => {
-                        println!("Does not match");
-                    }
+                    Rule::product_command => command::product::execute(inner, &mut client).report(),
+                    _ => println!("Does not match"),
                 }
             }
         } else {
@@ -81,4 +70,14 @@ fn main() -> Result<()> {
         }
     }
     Ok(())
+}
+
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn unit_to_string() {
+        let s = serde_json::to_string_pretty(&()).unwrap();
+        assert_eq!(s, String::new());
+    }
 }

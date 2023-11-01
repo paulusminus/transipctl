@@ -1,9 +1,20 @@
-use crate::Result;
+use strum::ParseError;
+
+use crate::{Result, Rule};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("Strum: {0}")]
+    Strum(#[from] ParseError),
+
+    #[error("Parse transip command: {0}")]
+    ParseTransipCommand(String),
+
     #[error("Parse product command: {0}")]
     ParseProductCommand(String),
+
+    #[error("Parse domain command: {0}")]
+    ParseDomainCommand(String),
 
     #[error("Parse dns command: {0}")]
     ParseDnsCommand(String),
@@ -22,6 +33,9 @@ pub enum Error {
 
     #[error("IO: {0}")]
     IO(#[from] std::io::Error),
+
+    #[error("Parsing: {0}")]
+    Pest(#[from] pest::error::Error<Rule>)
 }
 
 pub trait ErrorExt<T, E> {
