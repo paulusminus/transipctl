@@ -1,4 +1,4 @@
 #!/usr/bin/transipctl
 
-vps list
-#vps lock paulusminus-vps3
+dns acme-challenge-set paulmin.nl dlkjfkeig
+
