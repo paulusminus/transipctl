@@ -35,7 +35,7 @@ pub enum Error {
     IO(#[from] std::io::Error),
 
     #[error("Parsing: {0}")]
-    Pest(#[from] pest::error::Error<Rule>)
+    Pest(#[from] Box<pest::error::Error<Rule>>),
 }
 
 pub trait ErrorExt<T, E> {

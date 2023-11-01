@@ -11,8 +11,8 @@ pub struct Input {
 }
 
 impl Input {
-    pub fn lines(self) -> impl Iterator<Item = std::result::Result<String, std::io::Error>> {
-        BufReader::new(self.reader).lines()
+    pub fn lines(self) -> impl Iterator<Item = String> {
+        BufReader::new(self.reader).lines().flatten()
     }
 }
 

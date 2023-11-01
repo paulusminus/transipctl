@@ -2,16 +2,18 @@ use std::str::FromStr;
 
 use pest::Parser;
 
-use crate::{error::{Error, ErrorExt}, TransipCommandParser, Rule};
+use crate::{error::Error, Rule, TransipCommandParser};
 
-use self::{domain::DomainCommand, dns::DnsCommand, vps::VpsCommand, invoice::InvoiceCommand, product::ProductCommand};
+use self::{
+    dns::DnsCommand, domain::DomainCommand, invoice::InvoiceCommand, product::ProductCommand,
+    vps::VpsCommand,
+};
 
-pub mod domain;
 pub mod dns;
+pub mod domain;
 pub mod invoice;
 pub mod product;
 pub mod vps;
-
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
@@ -27,9 +29,10 @@ impl FromStr for TransipCommand {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut pairs = TransipCommandParser::parse(Rule::transip, s)
-        .err_into()?;
-        let pair = pairs.nth(0).ok_or(Error::ParseTransipCommand(s.to_owned()))?;
+        let mut pairs = TransipCommandParser::parse(Rule::transip, s).map_err(Box::new)?;
+        let pair = pairs
+            .nth(0)
+            .ok_or(Error::ParseTransipCommand(s.to_owned()))?;
         let inner = pair.into_inner().next().unwrap();
         match inner.as_rule() {
             Rule::comment => Ok(TransipCommand::Comment(inner.as_str().to_owned())),
@@ -38,14 +41,21 @@ impl FromStr for TransipCommand {
             Rule::vps_command => VpsCommand::try_from(inner).map(TransipCommand::Vps),
             Rule::invoice_command => InvoiceCommand::try_from(inner).map(TransipCommand::Invoice),
             Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
-            _ => Err(Error::ParseTransipCommand(s.to_owned()))
+            _ => Err(Error::ParseTransipCommand(s.to_owned())),
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::command::{TransipCommand, domain::DomainCommand, dns::DnsCommand, product::ProductCommand, vps::{VpsCommand, VpsAction}, invoice::{InvoiceCommand, InvoiceAction}};
+    use crate::command::{
+        dns::DnsCommand,
+        domain::DomainCommand,
+        invoice::{InvoiceAction, InvoiceCommand},
+        product::ProductCommand,
+        vps::{VpsAction, VpsCommand},
+        TransipCommand,
+    };
 
     #[test]
     fn comment() {
@@ -97,9 +107,10 @@ mod test {
         let commandline = "dns acme-challenge-set paulmin.nl (83jgljfg";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Dns(
-                DnsCommand::SetAcmeChallenge("paulmin.nl".to_owned(), "(83jgljfg".to_owned())
-            )
+            TransipCommand::Dns(DnsCommand::SetAcmeChallenge(
+                "paulmin.nl".to_owned(),
+                "(83jgljfg".to_owned()
+            ))
         );
     }
 
@@ -108,9 +119,7 @@ mod test {
         let commandline = "vps list";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Vps(
-                VpsCommand::List,
-            )
+            TransipCommand::Vps(VpsCommand::List,)
         );
     }
 
@@ -119,9 +128,7 @@ mod test {
         let commandline = "vps item iuerit";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Vps(
-                VpsCommand::Action("iuerit".to_owned(), VpsAction::Item)
-            )
+            TransipCommand::Vps(VpsCommand::Action("iuerit".to_owned(), VpsAction::Item))
         );
     }
 
@@ -130,9 +137,7 @@ mod test {
         let commandline = "invoice list";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Invoice(
-                InvoiceCommand::List,
-            )
+            TransipCommand::Invoice(InvoiceCommand::List,)
         );
     }
 
@@ -141,9 +146,10 @@ mod test {
         let commandline = "invoice item 38374";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Invoice(
-                InvoiceCommand::Action("38374".to_owned(), InvoiceAction::Item)
-            )
+            TransipCommand::Invoice(InvoiceCommand::Action(
+                "38374".to_owned(),
+                InvoiceAction::Item
+            ))
         );
     }
 
@@ -161,9 +167,7 @@ mod test {
         let commandline = "product elements 37465";
         assert_eq!(
             commandline.parse::<TransipCommand>().unwrap(),
-            TransipCommand::Product(
-                ProductCommand::Elements("37465".to_owned())    
-            ),
+            TransipCommand::Product(ProductCommand::Elements("37465".to_owned())),
         );
     }
 }

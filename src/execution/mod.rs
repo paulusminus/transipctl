@@ -1,7 +1,23 @@
 use serde::Serialize;
-use transip::{Client, api::{vps::VpsApi, general::GeneralApi, account::AccountApi, domain::DomainApi, dns::{DnsApi, DnsEntry}}};
+use transip::{
+    api::{
+        account::AccountApi,
+        dns::{DnsApi, DnsEntry},
+        domain::DomainApi,
+        general::GeneralApi,
+        vps::VpsApi,
+    },
+    Client,
+};
 
-use crate::command::{TransipCommand, dns::DnsCommand, domain::DomainCommand, invoice::{InvoiceCommand, InvoiceAction}, product::ProductCommand, vps::{VpsCommand, VpsAction}};
+use crate::command::{
+    dns::DnsCommand,
+    domain::DomainCommand,
+    invoice::{InvoiceAction, InvoiceCommand},
+    product::ProductCommand,
+    vps::{VpsAction, VpsCommand},
+    TransipCommand,
+};
 
 pub trait Execution {
     fn execute(&self, client: &mut Client);
@@ -24,14 +40,21 @@ impl Execution for DnsCommand {
     fn execute(&self, client: &mut Client) {
         match self {
             Self::DeleteAcmeChallenge(name) => {
-                DnsApi::dns_entry_delete_all(client, name, DnsEntry::is_acme_challenge).json_report()
-            },
+                DnsApi::dns_entry_delete_all(client, name, DnsEntry::is_acme_challenge)
+                    .json_report()
+            }
             Self::List(name) => DnsApi::dns_entry_list(client, name).json_report(),
             Self::SetAcmeChallenge(name, value) => {
                 DnsApi::dns_entry_delete_all(client, name, DnsEntry::is_acme_challenge)
-                .and_then(|_| DnsApi::dns_entry_insert(client, name, DnsEntry::new_acme_challenge(60, value)))
-                .json_report()
-            },
+                    .and_then(|_| {
+                        DnsApi::dns_entry_insert(
+                            client,
+                            name,
+                            DnsEntry::new_acme_challenge(60, value),
+                        )
+                    })
+                    .json_report()
+            }
         }
     }
 }
@@ -48,12 +71,10 @@ impl Execution for DomainCommand {
 impl Execution for InvoiceCommand {
     fn execute(&self, client: &mut Client) {
         match self {
-            Self::Action(name, action ) => {
-                match action {
-                    InvoiceAction::Item => client.invoice(name).json_report(),
-                    InvoiceAction::Pdf => client.invoice_pdf(name).json_report(),
-                }
-            }
+            Self::Action(name, action) => match action {
+                InvoiceAction::Item => client.invoice(name).json_report(),
+                InvoiceAction::Pdf => client.invoice_pdf(name).json_report(),
+            },
             Self::List => client.invoice_list().json_report(),
         }
     }
@@ -83,24 +104,22 @@ impl<T: Serialize> JsonReport for std::result::Result<T, transip::Error> {
             }
             Err(error) => {
                 eprintln!("Error: {}", error);
-            },
-        }  
+            }
+        }
     }
 }
 
 impl Execution for VpsCommand {
     fn execute(&self, client: &mut Client) {
         match self {
-            Self::Action(name, action) => {
-                match action {
-                    VpsAction::Item => client.vps_list().json_report(),
-                    VpsAction::Lock => client.vps_set_is_locked(name, true).json_report(),
-                    VpsAction::Reset => client.vps_reset(name).json_report(),
-                    VpsAction::Start => client.vps_start(name).json_report(),
-                    VpsAction::Stop => client.vps_stop(name).json_report(),
-                    VpsAction::Unlock => client.vps_set_is_locked(name, false).json_report(),
-                }
-            }
+            Self::Action(name, action) => match action {
+                VpsAction::Item => client.vps_list().json_report(),
+                VpsAction::Lock => client.vps_set_is_locked(name, true).json_report(),
+                VpsAction::Reset => client.vps_reset(name).json_report(),
+                VpsAction::Start => client.vps_start(name).json_report(),
+                VpsAction::Stop => client.vps_stop(name).json_report(),
+                VpsAction::Unlock => client.vps_set_is_locked(name, false).json_report(),
+            },
             Self::List => client.vps_list().json_report(),
         }
     }
