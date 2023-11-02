@@ -1,0 +1,3 @@
+#!/usr/bin/transipctl
+
+dns list paulmin.nl
