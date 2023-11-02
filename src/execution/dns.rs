@@ -1,12 +1,12 @@
 use super::{Execution, ToJson};
-use crate::{command::dns::DnsCommand, error::Error};
+use crate::{command::dns::DnsCommand, Result};
 use transip::{
     api::dns::{DnsApi, DnsEntry},
     Client,
 };
 
 impl Execution for DnsCommand {
-    fn execute(&self, client: &mut Client) -> Result<String, Error> {
+    fn execute(&self, client: &mut Client) -> Result<String> {
         match self {
             Self::DeleteAcmeChallenge(name) => {
                 DnsApi::dns_entry_delete_all(client, name, DnsEntry::is_acme_challenge)

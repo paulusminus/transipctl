@@ -3,7 +3,7 @@ use strum::EnumString;
 
 use crate::{
     error::{Error, ErrorExt},
-    Rule,
+    Result, Rule,
 };
 
 use super::parameter;
@@ -26,7 +26,7 @@ pub enum InvoiceCommand {
 impl<'a> TryFrom<Pair<'a, Rule>> for InvoiceCommand {
     type Error = Error;
 
-    fn try_from(pair: Pair<'a, Rule>) -> std::result::Result<Self, Self::Error> {
+    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
         let commandline = pair.as_str().to_owned();
         let inner = pair.into_inner().next().unwrap();
         match inner.as_rule() {

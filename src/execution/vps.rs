@@ -2,13 +2,13 @@ use transip::{api::vps::VpsApi, Client};
 
 use crate::{
     command::vps::{VpsAction, VpsCommand},
-    error::Error,
+    Result,
 };
 
 use super::{Execution, ToJson};
 
 impl Execution for VpsCommand {
-    fn execute(&self, client: &mut Client) -> Result<String, Error> {
+    fn execute(&self, client: &mut Client) -> Result<String> {
         match self {
             Self::Action(name, action) => match action {
                 VpsAction::Item => client.vps(name).and_then_json(),

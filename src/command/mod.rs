@@ -4,7 +4,7 @@ use pest::{iterators::Pair, Parser};
 
 use crate::{
     error::{Error, ErrorExt},
-    Rule, TransipCommandParser,
+    Result, Rule, TransipCommandParser,
 };
 
 use self::{
@@ -31,7 +31,7 @@ pub enum TransipCommand {
 impl FromStr for TransipCommand {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         let mut pairs = TransipCommandParser::parse(Rule::transip, s).map_err(Box::new)?;
         let pair = pairs
             .nth(0)
@@ -49,7 +49,7 @@ impl FromStr for TransipCommand {
     }
 }
 
-fn parameter(pair: Pair<'_, Rule>) -> Result<String, Error> {
+fn parameter(pair: Pair<'_, Rule>) -> Result<String> {
     match pair.as_rule() {
         Rule::env => {
             let name = pair

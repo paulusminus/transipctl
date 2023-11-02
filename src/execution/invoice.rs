@@ -2,13 +2,13 @@ use transip::{api::account::AccountApi, Client};
 
 use crate::{
     command::invoice::{InvoiceAction, InvoiceCommand},
-    error::Error,
+    Result,
 };
 
 use super::{Execution, ToJson};
 
 impl Execution for InvoiceCommand {
-    fn execute(&self, client: &mut Client) -> Result<String, Error> {
+    fn execute(&self, client: &mut Client) -> Result<String> {
         match self {
             Self::Action(name, action) => match action {
                 InvoiceAction::Item => client.invoice(name).and_then_json(),
