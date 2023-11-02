@@ -19,7 +19,7 @@ pub trait ToJson {
 impl<T: Serialize> ToJson for Result<T, transip::Error> {
     fn and_then_json(self) -> Result<String, Error> {
         self.err_into()
-            .and_then(|t| serde_json::to_string_pretty(&t).err_into())
+            .and_then(|t| serde_yaml::to_string(&t).err_into())
     }
 }
 

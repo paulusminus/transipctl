@@ -30,3 +30,25 @@ cargo install transipctl
 - invoice pdf \<invoicenumber\>
 - product list
 - product elements \<productname\>
+
+## Environment variable usage
+
+You can use a enviroment variable to specify domainname, acme-challenge, invoicenumer or productname.
+
+
+### Example 1
+
+```bash
+#!/usr/bin/transipctl
+
+dns acme-challenge-delete ${CERTBOT_DOMAIN}
+```
+
+### Example 2
+
+```bash
+#!/usr/bin/transipctl
+
+dns acme-challenge-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
+```
+
