@@ -1,6 +1,9 @@
 use transip::{api::account::AccountApi, Client};
 
-use crate::{command::invoice::{InvoiceAction, InvoiceCommand}, error::Error};
+use crate::{
+    command::invoice::{InvoiceAction, InvoiceCommand},
+    error::Error,
+};
 
 use super::{Execution, ToJson};
 

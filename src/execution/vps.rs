@@ -1,6 +1,9 @@
 use transip::{api::vps::VpsApi, Client};
 
-use crate::{command::vps::{VpsAction, VpsCommand}, error::Error};
+use crate::{
+    command::vps::{VpsAction, VpsCommand},
+    error::Error,
+};
 
 use super::{Execution, ToJson};
 
