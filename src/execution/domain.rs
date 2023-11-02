@@ -1,8 +1,6 @@
-use transip::{api::domain::DomainApi, Client};
-
-use crate::{command::domain::DomainCommand, Result};
-
 use super::{Execution, ToJson};
+use crate::{command::domain::DomainCommand, Result};
+use transip::{api::domain::DomainApi, Client};
 
 impl Execution for DomainCommand {
     fn execute(&self, client: &mut Client) -> Result<String> {

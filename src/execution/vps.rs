@@ -1,11 +1,9 @@
-use transip::{api::vps::VpsApi, Client};
-
+use super::{Execution, ToJson};
 use crate::{
     command::vps::{VpsAction, VpsCommand},
     Result,
 };
-
-use super::{Execution, ToJson};
+use transip::{api::vps::VpsApi, Client};
 
 impl Execution for VpsCommand {
     fn execute(&self, client: &mut Client) -> Result<String> {

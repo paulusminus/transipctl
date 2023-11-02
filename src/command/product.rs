@@ -1,8 +1,6 @@
-use pest::iterators::Pair;
-
-use crate::{error::Error, Result, Rule};
-
 use super::parameter;
+use crate::{error::Error, Result, Rule};
+use pest::iterators::Pair;
 
 pub type ProductName = String;
 
@@ -21,9 +19,8 @@ impl<'a> TryFrom<Pair<'a, Rule>> for ProductCommand {
         match inner.as_rule() {
             Rule::product_list => Ok(ProductCommand::List),
             Rule::product_elements => {
-                let mut inner = inner.into_inner();
-                let name = parameter(inner.next().unwrap())?;
-                Ok(ProductCommand::Elements(name.to_owned()))
+                let name = parameter(inner.into_inner().next().unwrap())?;
+                Ok(ProductCommand::Elements(name))
             }
             _ => Err(Error::ParseInvoiceCommand(commandline)),
         }

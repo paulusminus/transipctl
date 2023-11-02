@@ -1,7 +1,6 @@
+use super::parameter;
 use crate::{error::Error, Result, Rule};
 use pest::iterators::Pair;
-
-use super::parameter;
 
 pub type DomainName = String;
 
@@ -22,7 +21,7 @@ impl<'a> TryFrom<Pair<'a, Rule>> for DomainCommand {
             Rule::domain_item => {
                 let mut inner = inner.into_inner();
                 let name = parameter(inner.next().unwrap())?;
-                Ok(DomainCommand::Item(name.to_owned()))
+                Ok(DomainCommand::Item(name))
             }
             _ => Err(Error::ParseDomainCommand(commandline)),
         }

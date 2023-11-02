@@ -1,5 +1,6 @@
 ![build-badge](https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg)
-![mit-badge](https://img.shields.io/badge/license-MIT-blue.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![crates.io](https://img.shields.io/crates/d/transipctl)
 
 # transipctl
 

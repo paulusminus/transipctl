@@ -1,8 +1,6 @@
-use transip::{api::general::GeneralApi, Client};
-
-use crate::{command::product::ProductCommand, Result};
-
 use super::{Execution, ToJson};
+use crate::{command::product::ProductCommand, Result};
+use transip::{api::general::GeneralApi, Client};
 
 impl Execution for ProductCommand {
     fn execute(&self, client: &mut Client) -> Result<String> {

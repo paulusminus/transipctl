@@ -1,7 +1,6 @@
+use super::parameter;
 use crate::{error::Error, Result, Rule};
 use pest::iterators::Pair;
-
-use super::parameter;
 
 pub type DomainName = String;
 

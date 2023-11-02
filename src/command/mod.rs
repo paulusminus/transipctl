@@ -1,16 +1,13 @@
-use std::str::FromStr;
-
-use pest::{iterators::Pair, Parser};
-
-use crate::{
-    error::{Error, ErrorExt},
-    Result, Rule, TransipCommandParser,
-};
-
 use self::{
     dns::DnsCommand, domain::DomainCommand, invoice::InvoiceCommand, product::ProductCommand,
     vps::VpsCommand,
 };
+use crate::{
+    error::{Error, ErrorExt},
+    Result, Rule, TransipCommandParser,
+};
+use pest::{iterators::Pair, Parser};
+use std::str::FromStr;
 
 pub mod dns;
 pub mod domain;

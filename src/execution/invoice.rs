@@ -1,11 +1,9 @@
-use transip::{api::account::AccountApi, Client};
-
+use super::{Execution, ToJson};
 use crate::{
     command::invoice::{InvoiceAction, InvoiceCommand},
     Result,
 };
-
-use super::{Execution, ToJson};
+use transip::{api::account::AccountApi, Client};
 
 impl Execution for InvoiceCommand {
     fn execute(&self, client: &mut Client) -> Result<String> {

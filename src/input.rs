@@ -1,10 +1,9 @@
+use crate::{error::Error, Result};
 use std::{
     env::Args,
     fs::OpenOptions,
     io::{BufRead, BufReader, Read},
 };
-
-use crate::{error::Error, Result};
 
 pub struct Input {
     pub reader: Box<dyn Read>,

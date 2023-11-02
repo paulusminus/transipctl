@@ -41,7 +41,7 @@ impl<'a> TryFrom<Pair<'a, Rule>> for VpsCommand {
                 action
                     .parse::<VpsAction>()
                     .map_err(|_| Error::ParseVpsCommand(commandline))
-                    .map(|action| VpsCommand::Action(name.to_owned(), action))
+                    .map(|action| VpsCommand::Action(name, action))
             }
             _ => Err(Error::ParseVpsCommand(commandline)),
         }

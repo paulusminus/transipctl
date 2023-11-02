@@ -28,7 +28,7 @@ fn main() -> Result<()> {
                 .and_then(|command| command.execute(&mut client).err_into())
             {
                 Ok(result) => {
-                    if result.as_str() != "null\n" {
+                    if !result.as_str().starts_with("null") {
                         println!("{}", result)
                     }
                 }

@@ -1,12 +1,10 @@
-use pest::iterators::Pair;
-use strum::EnumString;
-
+use super::parameter;
 use crate::{
     error::{Error, ErrorExt},
     Result, Rule,
 };
-
-use super::parameter;
+use pest::iterators::Pair;
+use strum::EnumString;
 
 #[derive(Debug, PartialEq, EnumString)]
 #[strum(serialize_all = "lowercase")]
