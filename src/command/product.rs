@@ -2,6 +2,8 @@ use pest::iterators::Pair;
 
 use crate::{error::Error, Rule};
 
+use super::parameter;
+
 pub type ProductName = String;
 
 #[derive(Debug, PartialEq)]
@@ -20,7 +22,7 @@ impl<'a> TryFrom<Pair<'a, Rule>> for ProductCommand {
             Rule::product_list => Ok(ProductCommand::List),
             Rule::product_elements => {
                 let mut inner = inner.into_inner();
-                let name = inner.next().unwrap().as_str().trim();
+                let name = parameter(inner.next().unwrap())?;
                 Ok(ProductCommand::Elements(name.to_owned()))
             }
             _ => Err(Error::ParseInvoiceCommand(commandline)),

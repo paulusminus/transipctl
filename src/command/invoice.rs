@@ -6,6 +6,8 @@ use crate::{
     Rule,
 };
 
+use super::parameter;
+
 #[derive(Debug, PartialEq, EnumString)]
 #[strum(serialize_all = "lowercase")]
 pub enum InvoiceAction {
@@ -32,11 +34,11 @@ impl<'a> TryFrom<Pair<'a, Rule>> for InvoiceCommand {
             Rule::invoice_item_action => {
                 let mut inner = inner.into_inner();
                 let action = inner.next().unwrap().as_str().trim();
-                let name = inner.next().unwrap().as_str().trim();
+                let name = parameter(inner.next().unwrap())?;
                 action
                     .parse::<InvoiceAction>()
                     .err_into()
-                    .map(|action| Self::Action(name.to_owned(), action))
+                    .map(|action| Self::Action(name, action))
             }
             _ => Err(Error::ParseInvoiceCommand(commandline)),
         }

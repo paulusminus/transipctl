@@ -4,7 +4,6 @@ text = _{ char* }
 char = _{ !( NEWLINE | " " | "\t" ) ~ ANY }
 WHITESPACE = _{ " " }
 comment = { "#" ~ text }
-name = @{ char+ }
 value = @{ char+ }
 
 env_begin = _{ "${" }
@@ -20,18 +19,18 @@ vps_command = { "vps " ~ ( vps_list | vps_item_action ) }
 
 invoice_list = { "list" }
 invoice_action = { ("item " | "pdf ") }
-invoice_item_action = { invoice_action  ~  name }
+invoice_item_action = { invoice_action  ~  parameter }
 invoice_command = { "invoice " ~ ( invoice_list | invoice_item_action ) }
 
-dns_list = { "list " ~ name }
-dns_set_acme_challenge = { "acme-challenge-set " ~ name ~ value }
-dns_delete_acme_challenge = { "acme-challenge-delete " ~ name }
+dns_list = { "list " ~ parameter }
+dns_set_acme_challenge = { "acme-challenge-set " ~ parameter ~ parameter }
+dns_delete_acme_challenge = { "acme-challenge-delete " ~ parameter }
 dns_command = { "dns " ~ ( dns_list | dns_set_acme_challenge | dns_delete_acme_challenge ) }
 
 product_list = { "list" }
-product_elements = { "elements " ~ name }
+product_elements = { "elements " ~ parameter }
 product_command = { "product " ~ ( product_list | product_elements ) }
 
 domain_list = { "list" }
-domain_item = { "item" ~ name }
+domain_item = { "item" ~ parameter }
 domain_command = { "domain " ~ ( domain_list | domain_item ) }
