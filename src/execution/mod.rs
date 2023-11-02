@@ -36,3 +36,14 @@ impl Execution for TransipCommand {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::ToJson;
+
+    #[test]
+    fn serde_yaml() {
+        let s = Ok(()).and_then_json().unwrap();
+        assert_eq!(s.as_str(), "null\n")
+    }
+}
