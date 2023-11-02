@@ -7,9 +7,15 @@ comment = { "#" ~ text }
 name = @{ char+ }
 value = @{ char+ }
 
+env_begin = _{ "${" }
+env_end = _{ "}"}
+env = @{ env_begin ~ (UPPERCASE | "_")+ ~ env_end }
+
+parameter = _{ (env | value) }
+
 vps_list = { "list" }
 vps_action = { ("item " | "reset " | "lock " | "unlock " | "start " | "stop " ) }
-vps_item_action = { vps_action ~ name }
+vps_item_action = { vps_action ~ parameter }
 vps_command = { "vps " ~ ( vps_list | vps_item_action ) }
 
 invoice_list = { "list" }

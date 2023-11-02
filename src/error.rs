@@ -1,3 +1,5 @@
+use std::env::VarError;
+
 use strum::ParseError;
 
 use crate::{Result, Rule};
@@ -36,6 +38,9 @@ pub enum Error {
 
     #[error("Parsing: {0}")]
     Pest(#[from] Box<pest::error::Error<Rule>>),
+
+    #[error("Variable: {0}")]
+    Var(#[from] VarError),
 }
 
 pub trait ErrorExt<T, E> {

@@ -1,6 +1,11 @@
-use crate::{error::Error, Rule};
+use crate::{
+    error::{Error, ErrorExt},
+    Rule,
+};
 use pest::iterators::Pair;
 use strum::EnumString;
+
+use super::parameter;
 
 pub type VpsName = String;
 
@@ -32,13 +37,27 @@ impl<'a> TryFrom<Pair<'a, Rule>> for VpsCommand {
             Rule::vps_item_action => {
                 let mut inner = inner.into_inner();
                 let action = inner.next().unwrap().as_str().trim();
-                let name = inner.next().unwrap().as_str().trim();
+                let name = parameter(inner.next().unwrap())?;
                 action
                     .parse::<VpsAction>()
                     .map_err(|_| Error::ParseVpsCommand(commandline))
                     .map(|action| VpsCommand::Action(name.to_owned(), action))
             }
             _ => Err(Error::ParseVpsCommand(commandline)),
+        }
+    }
+}
+
+pub struct Parameter(String);
+
+impl<'a> TryFrom<Pair<'a, Rule>> for Parameter {
+    type Error = Error;
+
+    fn try_from(pair: Pair<'a, Rule>) -> Result<Self, Self::Error> {
+        match pair.as_rule() {
+            Rule::value => Ok(Parameter(pair.as_str().to_owned())),
+            Rule::env => std::env::var(pair.as_str()).err_into().map(Parameter),
+            _ => Err(Error::ParseTransipCommand("Failure".to_owned())),
         }
     }
 }

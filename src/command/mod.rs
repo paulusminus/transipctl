@@ -1,8 +1,11 @@
 use std::str::FromStr;
 
-use pest::Parser;
+use pest::{iterators::Pair, Parser};
 
-use crate::{error::Error, Rule, TransipCommandParser};
+use crate::{
+    error::{Error, ErrorExt},
+    Rule, TransipCommandParser,
+};
 
 use self::{
     dns::DnsCommand, domain::DomainCommand, invoice::InvoiceCommand, product::ProductCommand,
@@ -43,6 +46,23 @@ impl FromStr for TransipCommand {
             Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
             _ => Err(Error::ParseTransipCommand(s.to_owned())),
         }
+    }
+}
+
+fn parameter<'a>(pair: Pair<'a, Rule>) -> Result<String, Error> {
+    match pair.as_rule() {
+        Rule::env => {
+            let name = pair
+                .as_str()
+                .strip_prefix("${")
+                .unwrap()
+                .strip_suffix("}")
+                .unwrap();
+
+            std::env::var(&name).err_into()
+        }
+        Rule::value => Ok(pair.as_str().to_owned()),
+        _ => Err(Error::ParseVpsCommand(pair.as_str().to_owned())),
     }
 }
 

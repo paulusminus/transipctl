@@ -103,7 +103,7 @@ impl Execution for VpsCommand {
     fn execute(&self, client: &mut Client) -> Result<String, transip::Error> {
         match self {
             Self::Action(name, action) => match action {
-                VpsAction::Item => client.vps_list().and_then_json(),
+                VpsAction::Item => client.vps(name).and_then_json(),
                 VpsAction::Lock => client.vps_set_is_locked(name, true).and_then_json(),
                 VpsAction::Reset => client.vps_reset(name).and_then_json(),
                 VpsAction::Start => client.vps_start(name).and_then_json(),
