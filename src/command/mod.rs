@@ -49,17 +49,17 @@ impl FromStr for TransipCommand {
     }
 }
 
-fn parameter<'a>(pair: Pair<'a, Rule>) -> Result<String, Error> {
+fn parameter(pair: Pair<'_, Rule>) -> Result<String, Error> {
     match pair.as_rule() {
         Rule::env => {
             let name = pair
                 .as_str()
                 .strip_prefix("${")
                 .unwrap()
-                .strip_suffix("}")
+                .strip_suffix('}')
                 .unwrap();
 
-            std::env::var(&name).err_into()
+            std::env::var(name).err_into()
         }
         Rule::value => Ok(pair.as_str().to_owned()),
         _ => Err(Error::ParseVpsCommand(pair.as_str().to_owned())),
