@@ -634,6 +634,7 @@ version = "0.1.3"
 dependencies = [
  "serde",
  "serde_json",
+ "serde_yaml",
  "transip",
  "transip-command",
 ]
@@ -646,8 +647,8 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "thiserror",
- "transip",
  "transip-command",
+ "transip-command-execute",
 ]
 
 [[package]]

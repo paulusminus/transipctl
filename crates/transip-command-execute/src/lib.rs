@@ -1,6 +1,8 @@
 use serde::{Serialize, Serializer};
 use transip::Configuration;
 use transip_command::{TransipCommand, DnsCommand, DomainCommand, InvoiceCommand, InvoiceAction, ProductCommand, VpsCommand, VpsAction};
+pub use transip::configuration_from_environment;
+pub use transip::Error;
 
 pub struct Client {
     inner: transip::Client,
@@ -39,11 +41,6 @@ impl TryFrom<Box<dyn Configuration>> for Client {
         transip::Client::try_from(configuration)
         .map(|client| Client { inner: client })
     }
-}
-
-pub enum Output {
-    Json,
-    Yaml,
 }
 
 impl Client {
@@ -150,6 +147,5 @@ impl Client {
             TransipCommand::Product(command) => self.execute_product(command, s),
             TransipCommand::Vps(command) => self.execute_vps(command, s),
         }
-
     }
 }

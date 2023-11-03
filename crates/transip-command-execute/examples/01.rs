@@ -22,8 +22,11 @@ fn main() {
     let command_delete_challenge = COMMAND_DELETE_CHALLENGE.parse::<TransipCommand>()
         .expect("Parse failed");
 
-    let mut s = serde_json::Serializer::pretty(stdout());
-    client.execute(command_dns_list, &mut s);
+    // let mut json = serde_json::Serializer::pretty(stdout());
+
+    let mut yaml = serde_yaml::Serializer::new(stdout());
+
+    client.execute(command_dns_list, &mut yaml);
     // client.execute(command_add_challenge, &mut s);
-    client.execute(command_delete_challenge, &mut s);
+    client.execute(command_delete_challenge, &mut yaml);
 }

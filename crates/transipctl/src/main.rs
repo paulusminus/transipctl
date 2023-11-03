@@ -1,7 +1,6 @@
-use error::ErrorExt;
 use input::Input;
-use std::process::exit;
-use transip::{configuration_from_environment, Client};
+use std::{process::exit, io::stdout};
+use transip_command_execute::{configuration_from_environment, Client};
 use transip_command::TransipCommand;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
@@ -9,7 +8,6 @@ pub type Result<T> = std::result::Result<T, error::Error>;
 pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
 
 mod error;
-mod execution;
 mod input;
 
 fn arg_version() {
@@ -26,19 +24,15 @@ fn main() -> Result<()> {
     arg_version();
     let input: Input = std::env::args().try_into()?;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
+    let mut s = serde_yaml::Serializer::new(stdout());
     for (line_number, line) in input.lines().enumerate() {
         if !line.trim().is_empty() {
-            match line
-                .parse::<TransipCommand>()
-                .err_into()
-                .and_then(|command| execution::execute(command, &mut client).err_into())
+            match line.parse::<TransipCommand>()
             {
-                Ok(result) => {
-                    if !result.as_str().starts_with("null") {
-                        println!("{}", result)
-                    }
+                Ok(command) => {
+                    client.execute(command, &mut s);
                 }
-                Err(error) => eprintln!("Error {} executing line {}", error, line_number + 1),
+                Err(error) => eprintln!("Error {} parsing line {}", error, line_number + 1),
             }
         }
     }
