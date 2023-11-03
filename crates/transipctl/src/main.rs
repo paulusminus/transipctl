@@ -1,11 +1,9 @@
-use std::process::exit;
-
-use command::TransipCommand;
 use error::ErrorExt;
-use execution::Execution;
 use input::Input;
 use pest_derive::Parser;
+use std::process::exit;
 use transip::{configuration_from_environment, Client};
+use transip_command::TransipCommand;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
@@ -21,9 +19,10 @@ mod input;
 struct TransipCommandParser;
 
 fn arg_version() {
-    if std::env::args().enumerate().any(|(i, s)| {
-        i > 0 && ["--version", "-v"].contains(&s.as_str())
-    }) {
+    if std::env::args()
+        .enumerate()
+        .any(|(i, s)| i > 0 && ["--version", "-v"].contains(&s.as_str()))
+    {
         println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         exit(0);
     }
@@ -37,7 +36,8 @@ fn main() -> Result<()> {
         if !line.trim().is_empty() {
             match line
                 .parse::<TransipCommand>()
-                .and_then(|command| command.execute(&mut client).err_into())
+                .err_into()
+                .and_then(|command| execution::execute(command, &mut client).err_into())
             {
                 Ok(result) => {
                     if !result.as_str().starts_with("null") {

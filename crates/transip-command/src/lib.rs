@@ -1,22 +1,22 @@
-use self::{
-    dns::DnsCommand, domain::DomainCommand, invoice::InvoiceCommand, product::ProductCommand,
-    vps::VpsCommand,
-};
-use crate::{
-    error::{Error, ErrorExt},
-};
+use dns::DnsCommand;
+use domain::DomainCommand;
+use error::ErrorExt;
+use invoice::InvoiceCommand;
 use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
+use product::ProductCommand;
 use std::str::FromStr;
+use vps::VpsCommand;
 
-pub type Result<T> = std::result::Result<T, error::Error>;
+pub use error::Error;
+pub type Result<T> = std::result::Result<T, Error>;
 
-mod dns;
-mod domain;
-mod invoice;
-mod product;
-mod vps;
+pub mod dns;
+pub mod domain;
 mod error;
+pub mod invoice;
+pub mod product;
+pub mod vps;
 
 #[derive(Parser)]
 #[grammar = "transip.pest"]

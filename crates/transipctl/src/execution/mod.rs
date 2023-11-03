@@ -1,7 +1,8 @@
 use serde::Serialize;
 use transip::Client;
+use transip_command::TransipCommand;
 
-use crate::{command::TransipCommand, error::ErrorExt, Result};
+use crate::{error::ErrorExt, Result};
 
 pub mod dns;
 pub mod domain;
@@ -24,16 +25,14 @@ pub trait Execution {
     fn execute(&self, client: &mut Client) -> Result<String>;
 }
 
-impl Execution for TransipCommand {
-    fn execute(&self, client: &mut Client) -> Result<String> {
-        match self {
-            Self::Comment(_comment) => Ok(()).and_then_json(),
-            Self::Dns(command) => command.execute(client),
-            Self::Domain(command) => command.execute(client),
-            Self::Invoice(command) => command.execute(client),
-            Self::Product(command) => command.execute(client),
-            Self::Vps(command) => command.execute(client),
-        }
+pub fn execute(command: TransipCommand, client: &mut Client) -> Result<String> {
+    match command {
+        TransipCommand::Comment(_comment) => Ok(()).and_then_json(),
+        TransipCommand::Dns(command) => dns::execute(command, client),
+        TransipCommand::Domain(command) => domain::execute(command, client),
+        TransipCommand::Invoice(command) => invoice::execute(command, client),
+        TransipCommand::Product(command) => product::execute(command, client),
+        TransipCommand::Vps(command) => vps::execute(command, client),
     }
 }
 

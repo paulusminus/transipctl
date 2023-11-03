@@ -640,6 +640,7 @@ dependencies = [
  "strum",
  "thiserror",
  "transip",
+ "transip-command",
 ]
 
 [[package]]

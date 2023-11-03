@@ -1,6 +1,6 @@
+use crate::{Result, Rule};
 use std::env::VarError;
 use strum::ParseError;
-use crate::{Result, Rule};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {

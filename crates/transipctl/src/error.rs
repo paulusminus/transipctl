@@ -44,6 +44,9 @@ pub enum Error {
 
     #[error("Variable: {0}")]
     Var(#[from] VarError),
+
+    #[error("Command: {0}")]
+    Command(#[from] transip_command::Error),
 }
 
 pub trait ErrorExt<T, E> {
