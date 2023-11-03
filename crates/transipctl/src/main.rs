@@ -1,3 +1,5 @@
+use std::process::exit;
+
 use command::TransipCommand;
 use error::ErrorExt;
 use execution::Execution;
@@ -18,7 +20,17 @@ mod input;
 #[grammar = "transip.pest"]
 struct TransipCommandParser;
 
+fn arg_version() {
+    if std::env::args().enumerate().any(|(i, s)| {
+        i > 0 && ["--version", "-v"].contains(&s.as_str())
+    }) {
+        println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        exit(0);
+    }
+}
+
 fn main() -> Result<()> {
+    arg_version();
     let input: Input = std::env::args().try_into()?;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
     for (line_number, line) in input.lines().enumerate() {

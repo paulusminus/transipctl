@@ -16,8 +16,21 @@ cargo install transipctl
 
 ## Examples of using transipctl in script files
 
-- [script delete acme challenge](https://raw.githubusercontent.com/paulusminus/transipctl/main/acme-challenge-delete.transip)
-- [script set acme challenge](https://raw.githubusercontent.com/paulusminus/transipctl/main/acme-challenge-set.transip)
+### Example script delete acme challenge
+
+```bash
+#!/usr/bin/transipctl
+
+dns acme-challenge-delete paulmin.nl
+```
+
+### Example script set acme challenge
+
+```bash
+#!/usr/bin/transipctl
+
+dns acme-challenge-set paulmin.nl dlkjfkeig
+```
 
 ## Commands
 

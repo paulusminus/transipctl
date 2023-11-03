@@ -619,6 +619,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "transip-command"
+version = "0.1.2"
+dependencies = [
+ "pest",
+ "pest_derive",
+ "strum",
+ "thiserror",
+]
+
+[[package]]
 name = "transipctl"
 version = "0.1.2"
 dependencies = [
