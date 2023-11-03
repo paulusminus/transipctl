@@ -1,8 +1,7 @@
+use crate::{error::ErrorExt, Result};
 use serde::Serialize;
 use transip::Client;
 use transip_command::TransipCommand;
-
-use crate::{error::ErrorExt, Result};
 
 pub mod dns;
 pub mod domain;
@@ -19,10 +18,6 @@ impl<T: Serialize> ToJson for std::result::Result<T, transip::Error> {
         self.err_into()
             .and_then(|t| serde_yaml::to_string(&t).err_into())
     }
-}
-
-pub trait Execution {
-    fn execute(&self, client: &mut Client) -> Result<String>;
 }
 
 pub fn execute(command: TransipCommand, client: &mut Client) -> Result<String> {

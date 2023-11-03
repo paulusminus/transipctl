@@ -1,5 +1,5 @@
-use std::env::VarError;
 use crate::Result;
+use std::env::VarError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
