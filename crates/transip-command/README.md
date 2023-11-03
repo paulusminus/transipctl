@@ -1,16 +1,16 @@
 ![build-badge](https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![crates.io](https://img.shields.io/crates/d/transipctl-command)
+![crates.io](https://img.shields.io/crates/d/transip-command)
 
-# transipctl-command
+# transip-command
 
-transipctl-command is a library that can parse a string and turn it in a command.
+transip-command is a library that can parse a string and turn it in a command.
 
 
 ## Installation
 
 ```bash
-cargo install transipctl-command
+cargo install transip-command
 ```
 
 ## Commands
@@ -30,3 +30,6 @@ cargo install transipctl-command
 
 You can use a enviroment variable to specify domainname, acme-challenge, invoicenumer or productname.
 
+### Example
+
+- domain item ${DOMAIN_NAME}

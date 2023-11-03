@@ -1,7 +1,8 @@
 use super::parameter;
 use crate::{
     error::{Error, ErrorExt},
-    Result, Rule,
+    parse::Rule,
+    Result,
 };
 use pest::iterators::Pair;
 use strum::EnumString;
@@ -17,7 +18,35 @@ pub type InvoiceNumber = String;
 
 #[derive(Debug, PartialEq)]
 pub enum InvoiceCommand {
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{InvoiceCommand, TransipCommand};
+    ///
+    /// let commandline = "invoice list";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Invoice(InvoiceCommand::List),
+    /// );
+    /// ```
     List,
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{InvoiceCommand, InvoiceAction, TransipCommand};
+    ///
+    /// let commandline = "invoice item 938474";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Invoice(
+    ///         InvoiceCommand::Action(
+    ///             "938474".to_owned(),
+    ///             InvoiceAction::Item,
+    ///         )
+    ///     ),
+    /// );
+    /// ```
     Action(InvoiceNumber, InvoiceAction),
 }
 

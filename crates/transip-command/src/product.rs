@@ -1,12 +1,39 @@
 use super::parameter;
-use crate::{error::Error, Result, Rule};
+use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
 
 pub type ProductName = String;
 
 #[derive(Debug, PartialEq)]
 pub enum ProductCommand {
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{ProductCommand, TransipCommand};
+    ///
+    /// let commandline = "product list";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Product(ProductCommand::List),
+    /// );
+    /// ```
     List,
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{ProductCommand, TransipCommand};
+    ///
+    /// let commandline = "product elements haip-basic-contract";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Product(
+    ///         ProductCommand::Elements(
+    ///             "haip-basic-contract".to_owned(),
+    ///         )
+    ///     ),
+    /// );
+    /// ```
     Elements(ProductName),
 }
 

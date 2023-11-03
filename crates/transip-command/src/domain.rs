@@ -1,12 +1,39 @@
 use super::parameter;
-use crate::{error::Error, Result, Rule};
+use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
 
 pub type DomainName = String;
 
 #[derive(Debug, PartialEq)]
 pub enum DomainCommand {
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{DomainCommand, TransipCommand};
+    ///
+    /// let commandline = "domain list";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Domain(DomainCommand::List),
+    /// );
+    /// ```
     List,
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{DomainCommand, TransipCommand};
+    ///
+    /// let commandline = "domain item oiwerhy.nl";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Domain(
+    ///         DomainCommand::Item(
+    ///             "oiwerhy.nl".to_owned(),
+    ///         )
+    ///     ),
+    /// );
+    /// ```
     Item(DomainName),
 }
 

@@ -1,4 +1,4 @@
-use crate::{Result, Rule};
+use crate::{parse::Rule, Result};
 use std::env::VarError;
 use strum::ParseError;
 

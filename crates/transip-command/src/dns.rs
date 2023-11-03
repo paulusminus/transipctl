@@ -1,25 +1,61 @@
 use super::parameter;
-use crate::{error::Error, Result, Rule};
+use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
 
 pub type DomainName = String;
 
 #[derive(Debug, PartialEq)]
 pub enum DnsCommand {
-    List(DomainName),
-
     /// # Example
-    /// 
+    ///
     /// ```
     /// use transip_command::{DnsCommand, TransipCommand};
     ///
-    /// let commandline = "dns acme-challenge-delete lkdfjf";
+    /// let commandline = "dns list lkdjfie.nl";
     /// assert_eq!(
     ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Dns(DnsCommand::DeleteAcmeChallenge("lkdfjf".to_owned())),
+    ///     TransipCommand::Dns(
+    ///         DnsCommand::List(
+    ///             "lkdjfie.nl".to_owned()
+    ///         )
+    ///     ),
+    /// );
+    /// ```
+    List(DomainName),
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{DnsCommand, TransipCommand};
+    ///
+    /// let commandline = "dns acme-challenge-delete lkdfjf.nl";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Dns(
+    ///         DnsCommand::DeleteAcmeChallenge(
+    ///             "lkdfjf.nl".to_owned()
+    ///         )
+    ///     ),
     /// );
     /// ```
     DeleteAcmeChallenge(DomainName),
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{DnsCommand, TransipCommand};
+    ///
+    /// let commandline = "dns acme-challenge-set lkdfjf.nl oe8rtg";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Dns(
+    ///         DnsCommand::SetAcmeChallenge(
+    ///             "lkdfjf.nl".to_owned(),
+    ///             "oe8rtg".to_owned(),
+    ///         )
+    ///     ),
+    /// );
+    /// ```
     SetAcmeChallenge(DomainName, String),
 }
 

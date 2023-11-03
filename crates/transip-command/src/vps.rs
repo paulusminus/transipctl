@@ -1,6 +1,7 @@
 use crate::{
     error::{Error, ErrorExt},
-    Result, Rule,
+    parse::Rule,
+    Result,
 };
 use pest::iterators::Pair;
 use strum::EnumString;
@@ -22,7 +23,35 @@ pub enum VpsAction {
 
 #[derive(Debug, PartialEq)]
 pub enum VpsCommand {
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{VpsCommand, TransipCommand};
+    ///
+    /// let commandline = "vps list";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Vps(VpsCommand::List),
+    /// );
+    /// ```
     List,
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::{TransipCommand, VpsAction, VpsCommand};
+    ///
+    /// let commandline = "vps reset vps9374";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Vps(
+    ///         VpsCommand::Action(
+    ///             "vps9374".to_owned(),
+    ///             VpsAction::Reset,
+    ///         )
+    ///     ),
+    /// );
+    /// ```
     Action(VpsName, VpsAction),
 }
 
