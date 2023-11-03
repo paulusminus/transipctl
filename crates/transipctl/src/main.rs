@@ -1,7 +1,7 @@
 use input::Input;
-use std::{process::exit, io::stdout};
-use transip_command_execute::{configuration_from_environment, Client};
+use std::{io::stdout, process::exit};
 use transip_command::TransipCommand;
+use transip_command_execute::{configuration_from_environment, Client};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
@@ -27,8 +27,7 @@ fn main() -> Result<()> {
     let mut s = serde_yaml::Serializer::new(stdout());
     for (line_number, line) in input.lines().enumerate() {
         if !line.trim().is_empty() {
-            match line.parse::<TransipCommand>()
-            {
+            match line.parse::<TransipCommand>() {
                 Ok(command) => {
                     client.execute(command, &mut s);
                 }
