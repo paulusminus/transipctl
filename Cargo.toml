@@ -2,9 +2,12 @@
 members = ["crates/*"]
 resolver = "2"
 
+[profile.release]
+strip = true
+
 [workspace.package]
 authors = ["Paul Min"]
-description = "Tool for manipulating and querying records on Transip Api"
+description = "Tool for manipulating and querying records on Transip Api Endpoint"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/paulusminus/transipctl"

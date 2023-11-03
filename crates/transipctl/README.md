@@ -6,7 +6,7 @@
 
 transipctl is an executable that processes lines with transip api commands. It can take input from a file or stdin.
 
-It uses the [transip](https://crates.io/crates/transip) library crate.
+It uses the [transip](https://crates.io/crates/transip) and [transip-command](https://crates.io/crates/transip-command) library crates.
 
 ## Installation
 
@@ -32,7 +32,7 @@ dns acme-challenge-delete paulmin.nl
 dns acme-challenge-set paulmin.nl dlkjfkeig
 ```
 
-
+## Examples of environment variables in script files
 
 ### Example 1
 
