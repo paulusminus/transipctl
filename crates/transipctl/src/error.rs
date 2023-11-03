@@ -1,14 +1,8 @@
 use std::env::VarError;
-
-use strum::ParseError;
-
-use crate::{Result, Rule};
+use crate::Result;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("Strum: {0}")]
-    Strum(#[from] ParseError),
-
     #[error("Parse transip command: {0}")]
     ParseTransipCommand(String),
 
@@ -38,9 +32,6 @@ pub enum Error {
 
     #[error("IO: {0}")]
     IO(#[from] std::io::Error),
-
-    #[error("Parsing: {0}")]
-    Pest(#[from] Box<pest::error::Error<Rule>>),
 
     #[error("Variable: {0}")]
     Var(#[from] VarError),

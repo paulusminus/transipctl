@@ -632,12 +632,9 @@ dependencies = [
 name = "transipctl"
 version = "0.1.2"
 dependencies = [
- "pest",
- "pest_derive",
  "serde",
  "serde_json",
  "serde_yaml",
- "strum",
  "thiserror",
  "transip",
  "transip-command",

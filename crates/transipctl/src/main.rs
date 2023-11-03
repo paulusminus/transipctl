@@ -1,6 +1,5 @@
 use error::ErrorExt;
 use input::Input;
-use pest_derive::Parser;
 use std::process::exit;
 use transip::{configuration_from_environment, Client};
 use transip_command::TransipCommand;
@@ -9,14 +8,9 @@ pub type Result<T> = std::result::Result<T, error::Error>;
 
 pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
 
-mod command;
 mod error;
 mod execution;
 mod input;
-
-#[derive(Parser)]
-#[grammar = "transip.pest"]
-struct TransipCommandParser;
 
 fn arg_version() {
     if std::env::args()
