@@ -1,7 +1,7 @@
 use super::ToJson;
 use crate::Result;
 use transip::{api::general::GeneralApi, Client};
-use transip_command::product::ProductCommand;
+use transip_command::ProductCommand;
 
 pub fn execute(command: ProductCommand, client: &mut Client) -> Result<String> {
     match command {

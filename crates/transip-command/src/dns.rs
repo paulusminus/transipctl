@@ -7,6 +7,18 @@ pub type DomainName = String;
 #[derive(Debug, PartialEq)]
 pub enum DnsCommand {
     List(DomainName),
+
+    /// # Example
+    /// 
+    /// ```
+    /// use transip_command::{DnsCommand, TransipCommand};
+    ///
+    /// let commandline = "dns acme-challenge-delete lkdfjf";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Dns(DnsCommand::DeleteAcmeChallenge("lkdfjf".to_owned())),
+    /// );
+    /// ```
     DeleteAcmeChallenge(DomainName),
     SetAcmeChallenge(DomainName, String),
 }

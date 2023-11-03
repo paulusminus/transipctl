@@ -1,7 +1,7 @@
 use super::ToJson;
 use crate::Result;
 use transip::{api::account::AccountApi, Client};
-use transip_command::invoice::{InvoiceAction, InvoiceCommand};
+use transip_command::{InvoiceAction, InvoiceCommand};
 
 pub fn execute(command: InvoiceCommand, client: &mut Client) -> Result<String> {
     match command {

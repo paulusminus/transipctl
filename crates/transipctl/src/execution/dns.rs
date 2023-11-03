@@ -4,7 +4,7 @@ use transip::{
     api::dns::{DnsApi, DnsEntry},
     Client,
 };
-use transip_command::dns::DnsCommand;
+use transip_command::DnsCommand;
 
 pub fn execute(command: DnsCommand, client: &mut Client) -> Result<String> {
     match command {

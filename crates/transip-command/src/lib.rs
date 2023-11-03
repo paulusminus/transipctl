@@ -1,22 +1,24 @@
-use dns::DnsCommand;
-use domain::DomainCommand;
+#![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
+
+pub use dns::DnsCommand;
+pub use domain::DomainCommand;
 use error::ErrorExt;
-use invoice::InvoiceCommand;
+pub use invoice::{InvoiceAction, InvoiceCommand};
 use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
-use product::ProductCommand;
+pub use product::ProductCommand;
 use std::str::FromStr;
-use vps::VpsCommand;
+pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub mod dns;
+mod dns;
 pub mod domain;
 mod error;
-pub mod invoice;
-pub mod product;
-pub mod vps;
+mod invoice;
+mod product;
+mod vps;
 
 #[derive(Parser)]
 #[grammar = "transip.pest"]
@@ -24,11 +26,27 @@ struct TransipCommandParser;
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
+    /// # Example
+    /// 
+    /// ```
+    /// use transip_command::TransipCommand;
+    ///
+    /// let commandline = "# lkasjkfiekf";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Comment(commandline.to_owned()),
+    /// );
+    /// ```
     Comment(String),
+
     Domain(domain::DomainCommand),
+
     Dns(dns::DnsCommand),
+
     Invoice(invoice::InvoiceCommand),
+
     Product(product::ProductCommand),
+
     Vps(vps::VpsCommand),
 }
 

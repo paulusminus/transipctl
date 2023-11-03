@@ -1,7 +1,7 @@
 use super::ToJson;
 use crate::Result;
 use transip::{api::vps::VpsApi, Client};
-use transip_command::vps::{VpsAction, VpsCommand};
+use transip_command::{VpsAction, VpsCommand};
 
 pub fn execute(command: VpsCommand, client: &mut Client) -> Result<String> {
     match command {

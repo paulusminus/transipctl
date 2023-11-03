@@ -32,22 +32,6 @@ dns acme-challenge-delete paulmin.nl
 dns acme-challenge-set paulmin.nl dlkjfkeig
 ```
 
-## Commands
-
-- dns list \<domainname\>
-- dns acme-challenge-delete \<domainname\>
-- dns acme-challenge-set \<domainname\> \<acme-challenge\>
-- domain list
-- domain item \<domainname\>
-- invoice list
-- invoice item \<invoicenumber\>
-- invoice pdf \<invoicenumber\>
-- product list
-- product elements \<productname\>
-
-## Environment variable usage
-
-You can use a enviroment variable to specify domainname, acme-challenge, invoicenumer or productname.
 
 
 ### Example 1
