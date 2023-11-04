@@ -26,7 +26,7 @@ macro_rules! execute_out {
                 }
             }
             Err(error) => eprintln!("Error: {error}"),
-        } 
+        }
     };
 }
 
@@ -42,17 +42,13 @@ fn execute(client: &mut Client, command: &TransipCommand, out: Out) {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut client: Client = configuration_from_environment()
-        .and_then(Client::try_from)?;
+    let mut client: Client = configuration_from_environment().and_then(Client::try_from)?;
 
-    let command_dns_list = COMMAND_DNS_LIST
-        .parse::<TransipCommand>()?;
+    let command_dns_list = COMMAND_DNS_LIST.parse::<TransipCommand>()?;
 
-    let command_add_challenge = COMMAND_ADD_CHALLENGE
-        .parse::<TransipCommand>()?;
+    let command_add_challenge = COMMAND_ADD_CHALLENGE.parse::<TransipCommand>()?;
 
-    let command_delete_challenge = COMMAND_DELETE_CHALLENGE
-        .parse::<TransipCommand>()?;
+    let command_delete_challenge = COMMAND_DELETE_CHALLENGE.parse::<TransipCommand>()?;
 
     execute(&mut client, &command_dns_list, Out::Json);
     execute(&mut client, &command_dns_list, Out::Yaml);
