@@ -1,4 +1,4 @@
-name: Debian Package
+name: Build rpm and deb package
 
 on:
   push:
@@ -13,13 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
+    - name: Install cargo-generate-rpm
+      run: cargo install cargo-generate-rpm
     - name: Install cargo deb
       run: cargo install cargo-deb
     - uses: actions/checkout@v4
     - name: Build for x86_64
+      run: cargo build --release
+    - name: Generate rpm
+      run: cargo generate-rpm -p crates/transipctl
+    - name: Build debian package
       run: cargo deb -p transipctl
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "target/debian/*.deb"
+        artifacts: "target/generate-rpm/*.rpm,target/debian/*.deb"
