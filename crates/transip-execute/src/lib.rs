@@ -23,17 +23,12 @@ impl<T: Serialize> Report for Result<T, transip::Error> {
             Ok(result) => {
                 if size_of::<T>() == 0 {
                     Ok(())
-                }
-                else {
-                   if let Err(_) = result.serialize(s) {
-                        return Err(Error::ApiTest);
-                   }
-                   Ok(())
+                } else {
+                    result.serialize(s).unwrap();
+                    Ok(())
                 }
             }
-            Err(error) => {
-                Err(error)
-            }
+            Err(error) => Err(error),
         }
     }
 }
@@ -47,14 +42,18 @@ impl TryFrom<Box<dyn Configuration>> for Client {
 }
 
 impl Client {
-    fn execute_dns(&mut self, command: &DnsCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    fn execute_dns(
+        &mut self,
+        command: &DnsCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         use transip::api::dns::{DnsApi, DnsEntry};
         match command {
             DnsCommand::DeleteAcmeChallenge(name) => self
                 .inner
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
                 .report(s),
-            DnsCommand::List(name) => self.inner.dns_entry_list(&name).report(s),
+            DnsCommand::List(name) => self.inner.dns_entry_list(name).report(s),
             DnsCommand::SetAcmeChallenge(name, challenge) => self
                 .inner
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
@@ -66,77 +65,69 @@ impl Client {
         }
     }
 
-    fn execute_domain(&mut self, command: &DomainCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    fn execute_domain(
+        &mut self,
+        command: &DomainCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         use transip::api::domain::DomainApi;
         match command {
-            DomainCommand::Item(name) => {
-                self.inner.domain_item(name).report(s)
-            }
-            DomainCommand::List => {
-                self.inner.domain_list().report(s)
-            }
+            DomainCommand::Item(name) => self.inner.domain_item(name).report(s),
+            DomainCommand::List => self.inner.domain_list().report(s),
         }
     }
 
-    fn execute_invoice(&mut self, command: &InvoiceCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    fn execute_invoice(
+        &mut self,
+        command: &InvoiceCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         use transip::api::account::AccountApi;
         match command {
             InvoiceCommand::Action(number, action) => match action {
-                InvoiceAction::Item => {
-                    self.inner.invoice(number).report(s)
-                }
-                InvoiceAction::Pdf => {
-                    self.inner.invoice_pdf(number).report(s)
-                }
+                InvoiceAction::Item => self.inner.invoice(number).report(s),
+                InvoiceAction::Pdf => self.inner.invoice_pdf(number).report(s),
             },
-            InvoiceCommand::List => {
-                self.inner.invoice_list().report(s)
-            }
+            InvoiceCommand::List => self.inner.invoice_list().report(s),
         }
     }
 
-    fn execute_product(&mut self, command: &ProductCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    fn execute_product(
+        &mut self,
+        command: &ProductCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         use transip::api::general::GeneralApi;
         match command {
-            ProductCommand::Elements(elements) => {
-                self.inner.product_elements(elements).report(s)
-            }
-            ProductCommand::List => {
-                self.inner.products().report(s)
-            }
+            ProductCommand::Elements(elements) => self.inner.product_elements(elements).report(s),
+            ProductCommand::List => self.inner.products().report(s),
         }
     }
 
-    fn execute_vps(&mut self, command: &VpsCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    fn execute_vps(
+        &mut self,
+        command: &VpsCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         use transip::api::vps::VpsApi;
         match command {
             VpsCommand::Action(name, action) => match action {
-                VpsAction::Item => {
-                    self.inner.vps(name).report(s)
-                }
-                VpsAction::Lock => {
-                    self.inner.vps_set_is_locked(name, true).report(s)
-                }
-                VpsAction::Reset => {
-                    self.inner.vps_reset(name).report(s)
-                }
-                VpsAction::Start => {
-                    self.inner.vps_start(name).report(s)
-                }
-                VpsAction::Stop => {
-                    self.inner.vps_stop(name).report(s)
-                }
-                VpsAction::Unlock => {
-                    self.inner.vps_set_is_locked(name, false).report(s)
-                }
+                VpsAction::Item => self.inner.vps(name).report(s),
+                VpsAction::Lock => self.inner.vps_set_is_locked(name, true).report(s),
+                VpsAction::Reset => self.inner.vps_reset(name).report(s),
+                VpsAction::Start => self.inner.vps_start(name).report(s),
+                VpsAction::Stop => self.inner.vps_stop(name).report(s),
+                VpsAction::Unlock => self.inner.vps_set_is_locked(name, false).report(s),
             },
-            VpsCommand::List => {
-                self.inner.vps_list().report(s)
-            }
+            VpsCommand::List => self.inner.vps_list().report(s),
         }
     }
 
-    pub fn execute(&mut self, command: &TransipCommand, s: impl Serializer) -> Result<(), transip::Error> {
+    pub fn execute(
+        &mut self,
+        command: &TransipCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
         match command {
             TransipCommand::Comment(_) => Ok(()),
             TransipCommand::Dns(command) => self.execute_dns(command, s),

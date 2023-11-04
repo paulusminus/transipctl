@@ -28,17 +28,15 @@ fn main() -> Result<()> {
         let mut s = serde_yaml::Serializer::new(Vec::with_capacity(128));
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
-                Ok(command) => {
-                    match client.execute(&command, &mut s) {
-                        Ok(_) => {
-                            let s = String::from_utf8(s.into_inner().unwrap()).unwrap();
-                            println!("{}", s);
-                        }
-                        Err(error) => {
-                            eprintln!("Error executing command {:#?}: {}", command, error);
-                        }
+                Ok(command) => match client.execute(&command, &mut s) {
+                    Ok(_) => {
+                        let s = String::from_utf8(s.into_inner().unwrap()).unwrap();
+                        println!("{}", s);
                     }
-                }
+                    Err(error) => {
+                        eprintln!("Error executing command {:#?}: {}", command, error);
+                    }
+                },
                 Err(error) => eprintln!("Error {} parsing line {}", error, line_number + 1),
             }
         }
