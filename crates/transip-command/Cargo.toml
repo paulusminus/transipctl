@@ -1,7 +1,7 @@
 [package]
 name = "transip-command"
 authors.workspace = true
-description = "Parse a string and return a command"
+description = "Parse a string and return a transip command"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
