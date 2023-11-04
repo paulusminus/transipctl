@@ -1,5 +1,5 @@
 use input::Input;
-use std::{io::stdout, process::exit};
+use std::process::exit;
 use transip_command::TransipCommand;
 use transip_execute::{configuration_from_environment, Client};
 
@@ -24,12 +24,20 @@ fn main() -> Result<()> {
     arg_version();
     let input: Input = std::env::args().try_into()?;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
-    let mut s = serde_yaml::Serializer::new(stdout());
     for (line_number, line) in input.lines().enumerate() {
+        let mut s = serde_yaml::Serializer::new(Vec::with_capacity(128));
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => {
-                    client.execute(command, &mut s);
+                    match client.execute(&command, &mut s) {
+                        Ok(_) => {
+                            let s = String::from_utf8(s.into_inner().unwrap()).unwrap();
+                            println!("{}", s);
+                        }
+                        Err(error) => {
+                            eprintln!("Error executing command {:#?}: {}", command, error);
+                        }
+                    }
                 }
                 Err(error) => eprintln!("Error {} parsing line {}", error, line_number + 1),
             }
