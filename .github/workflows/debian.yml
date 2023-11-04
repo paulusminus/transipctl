@@ -1,14 +1,18 @@
-name: Rust
+name: Debian Package
 
-on: workflow_dispatch
+on:
+  push:
+    tags:
+      - '*'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Install cargo deb
@@ -22,3 +26,6 @@ jobs:
       run: cargo test --verbose
     - name: Build for x86_64
       run: cargo deb -p transipctl
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "transipctl/target/release/*.deb"
