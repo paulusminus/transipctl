@@ -1,15 +1,18 @@
 ![build-badge](https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![crates.io](https://img.shields.io/crates/d/transip-command-execute)
+![crates.io](https://img.shields.io/crates/d/transip-execute)
 
-# transip-command-execute
+# transip-execute
 
-transip-command-execute is a library that executes commands on the Transip Api Endpoint
+transip-execute is a library that executes commands on the Transip Api Endpoint.
+It uses the [transip-command](https://crates.io/crates/transip-command) and the [transip](https://crates.io/crates/transip) libraries.
 
 
-## Installation
+## Usage
+
+Set environment variables needed to configure the Client. See [transip](https://crates.io/crates/transip)
 
 ```bash
-cargo install transip-command-execute
+cargo add transip-execute
 ```
 

@@ -1,3 +1,5 @@
+use std::mem::size_of;
+
 use serde::{Serialize, Serializer};
 pub use transip::configuration_from_environment;
 use transip::Configuration;
@@ -13,26 +15,21 @@ pub struct Client {
 
 trait Report {
     fn report(self, s: impl Serializer);
-    fn report_error(self);
 }
 
 impl<T: Serialize> Report for Result<T, transip::Error> {
     fn report(self, s: impl Serializer) {
         match self {
             Ok(result) => {
-                if let Err(error) = result.serialize(s) {
-                    eprintln!("Error: {}", error)
+                if size_of::<T>() > 0 {
+                    if let Err(error) = result.serialize(s) {
+                        eprintln!("Error: {}", error)
+                    }    
                 }
             }
             Err(error) => {
                 eprintln!("Error: {}", error)
             }
-        }
-    }
-
-    fn report_error(self) {
-        if let Err(error) = self {
-            eprintln!("Error: {error}");
         }
     }
 }
@@ -52,7 +49,7 @@ impl Client {
             DnsCommand::DeleteAcmeChallenge(name) => self
                 .inner
                 .dns_entry_delete_all(&name, DnsEntry::is_acme_challenge)
-                .report_error(),
+                .report(s),
             DnsCommand::List(name) => self.inner.dns_entry_list(&name).report(s),
             DnsCommand::SetAcmeChallenge(name, challenge) => self
                 .inner
@@ -61,7 +58,7 @@ impl Client {
                     self.inner
                         .dns_entry_insert(&name, DnsEntry::new_acme_challenge(60, &challenge))
                 })
-                .report_error(),
+                .report(s),
         }
     }
 
@@ -114,19 +111,19 @@ impl Client {
                     self.inner.vps(&name).report(s);
                 }
                 VpsAction::Lock => {
-                    self.inner.vps_set_is_locked(&name, true).report_error();
+                    self.inner.vps_set_is_locked(&name, true).report(s);
                 }
                 VpsAction::Reset => {
-                    self.inner.vps_reset(&name).report_error();
+                    self.inner.vps_reset(&name).report(s);
                 }
                 VpsAction::Start => {
-                    self.inner.vps_start(&name).report_error();
+                    self.inner.vps_start(&name).report(s);
                 }
                 VpsAction::Stop => {
-                    self.inner.vps_stop(&name).report_error();
+                    self.inner.vps_stop(&name).report(s);
                 }
                 VpsAction::Unlock => {
-                    self.inner.vps_set_is_locked(&name, false).report_error();
+                    self.inner.vps_set_is_locked(&name, false).report(s);
                 }
             },
             VpsCommand::List => {
