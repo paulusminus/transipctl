@@ -18,14 +18,8 @@ jobs:
     - name: Install cargo deb
       run: cargo install cargo-deb
     - uses: actions/checkout@v4
-    - name: Format
-      run: cargo fmt --check
-    - name: Clippy
-      run: cargo clippy -- -D warnings
-    - name: Run tests
-      run: cargo test --verbose
     - name: Build for x86_64
       run: cargo deb -p transipctl
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "transipctl/target/release/*.deb"
+        artifacts: "transipctl/target/debian/*.deb"
