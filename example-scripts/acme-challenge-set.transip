@@ -1,3 +1,0 @@
-#!/usr/bin/transipctl
-
-dns acme-challenge-set paulmin.nl dlkjfkeig

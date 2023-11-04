@@ -9,7 +9,9 @@ version.workspace = true
 
 [package.metadata.generate-rpm]
 assets = [
-    { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" }
+    { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
+    { source = "scripts/certbot-challenge-delete.transip", dest = "/usr/bin/certbot-challenge-delete.transip", mode = "755" },
+    { source = "scripts/certbot-challenge-set.transip", dest = "/usr/bin/certbot-challenge-set.transip", mode = "755" },
 ]
 
 [dependencies]
