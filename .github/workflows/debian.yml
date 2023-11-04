@@ -1,6 +1,6 @@
 name: Rust
 
-on: workflow_call
+on: workflow_dispatch
 
 env:
   CARGO_TERM_COLOR: always
