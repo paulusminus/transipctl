@@ -24,7 +24,7 @@ impl<T: Serialize> Report for Result<T, transip::Error> {
                 if size_of::<T>() > 0 {
                     if let Err(error) = result.serialize(s) {
                         eprintln!("Error: {}", error)
-                    }    
+                    }
                 }
             }
             Err(error) => {
