@@ -2,7 +2,7 @@ use std::io::stdout;
 
 use transip::configuration_from_environment;
 use transip_command::TransipCommand;
-use transip_command_execute::Client;
+use transip_execute::Client;
 
 const COMMAND_DNS_LIST: &str = "dns list paulmin.nl";
 // const COMMAND_ADD_CHALLENGE: &str = "dns acme-challenge-set paulmin.nl 89823875";
@@ -25,7 +25,6 @@ fn main() {
         .expect("Parse failed");
 
     // let mut json = serde_json::Serializer::pretty(stdout());
-
     let mut yaml = serde_yaml::Serializer::new(stdout());
 
     client.execute(command_dns_list, &mut yaml);

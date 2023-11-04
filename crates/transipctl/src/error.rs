@@ -22,7 +22,7 @@ pub enum Error {
     ParseInvoiceCommand(String),
 
     #[error("Transip Api: {0}")]
-    TransipApi(#[from] transip_command_execute::Error),
+    TransipApi(#[from] transip_execute::Error),
 
     #[error("Json: {0}")]
     Json(#[from] serde_json::Error),
