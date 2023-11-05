@@ -11,7 +11,7 @@ version.workspace = true
 assets = [
     ["target/release/transipctl", "/usr/bin/", "755"],
     ["scripts/*", "/usr/bin/", "755"],
-    ["crates/transipctl/README.md", "/usr/share/doc/transipctl", "644"],
+    ["README.md", "/usr/share/doc/transipctl/", "644"],
 ]
 
 [package.metadata.generate-rpm]
