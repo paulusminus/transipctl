@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::parameter;
 use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
@@ -35,6 +37,15 @@ pub enum DomainCommand {
     /// );
     /// ```
     Item(DomainName),
+}
+
+impl Display for DomainCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DomainCommand::Item(item) => write!(f, "item {}", item),
+            DomainCommand::List => write!(f, "list"),
+        }
+    }
 }
 
 impl<'a> TryFrom<Pair<'a, Rule>> for DomainCommand {

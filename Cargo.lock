@@ -603,9 +603,9 @@ dependencies = [
 
 [[package]]
 name = "transip"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "749be2c806676949ab60c68a9ce35cfd3fd0c726f7267efbdaa1c3848a2ca833"
+checksum = "f2a253fffb389db4d8599ccf4a40350a6aa428ce6c475f4de212c1b593bfa5fa"
 dependencies = [
  "base64",
  "chrono",

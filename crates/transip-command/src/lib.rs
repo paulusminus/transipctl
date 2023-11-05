@@ -7,7 +7,7 @@ pub use invoice::{InvoiceAction, InvoiceCommand};
 use parse::{Rule, TransipCommandParser};
 use pest::{iterators::Pair, Parser};
 pub use product::ProductCommand;
-use std::str::FromStr;
+use std::{str::FromStr, fmt::Display};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
@@ -64,6 +64,19 @@ impl FromStr for TransipCommand {
             Rule::invoice_command => InvoiceCommand::try_from(inner).map(TransipCommand::Invoice),
             Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
             _ => Err(Error::ParseTransipCommand(s.to_owned())),
+        }
+    }
+}
+
+impl Display for TransipCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TransipCommand::Comment(comment) => write!(f, "{}", comment),
+            TransipCommand::Dns(command) => write!(f, "dns {}", command),
+            TransipCommand::Domain(command) => write!(f, "domain {}", command),
+            TransipCommand::Invoice(command) => write!(f, "invoice {}", command),
+            TransipCommand::Product(command) => write!(f, "product {}", command),
+            TransipCommand::Vps(command) => write!(f, "vps {}", command),
         }
     }
 }

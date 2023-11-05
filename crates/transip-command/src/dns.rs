@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::parameter;
 use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
@@ -59,6 +61,16 @@ pub enum DnsCommand {
     SetAcmeChallenge(DomainName, String),
 }
 
+impl Display for DnsCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DnsCommand::DeleteAcmeChallenge(name) => write!(f, "acme-challenge-delete {}", name),
+            DnsCommand::List(name) => write!(f, "list {}", name),
+            DnsCommand::SetAcmeChallenge(name, challenge) => write!(f, "acme-challenge-set {} {}", name, challenge),
+        }
+    }
+}
+
 impl<'a> TryFrom<Pair<'a, Rule>> for DnsCommand {
     type Error = Error;
 
@@ -82,5 +94,28 @@ impl<'a> TryFrom<Pair<'a, Rule>> for DnsCommand {
             }
             _ => Err(Error::ParseDnsCommand(commandline)),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::DnsCommand;
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            DnsCommand::List("paulmin.nl".to_owned()).to_string(),
+            "list paulmin.nl".to_owned(),
+        );
+
+        assert_eq!(
+            DnsCommand::DeleteAcmeChallenge("paulmin.nl".to_owned()).to_string(),
+            "acme-challenge-delete paulmin.nl".to_owned(),
+        );
+
+        assert_eq!(
+            DnsCommand::SetAcmeChallenge("paulmin.nl".to_owned(), "hallo".to_owned()).to_string(),
+            "acme-challenge-set paulmin.nl hallo".to_owned(),
+        );
     }
 }

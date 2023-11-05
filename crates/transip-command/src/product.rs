@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::parameter;
 use crate::{error::Error, parse::Rule, Result};
 use pest::iterators::Pair;
@@ -35,6 +37,15 @@ pub enum ProductCommand {
     /// );
     /// ```
     Elements(ProductName),
+}
+
+impl Display for ProductCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ProductCommand::Elements(name) => write!(f, "elements {}", name),
+            ProductCommand::List => write!(f, "list"),
+        }
+    }
 }
 
 impl<'a> TryFrom<Pair<'a, Rule>> for ProductCommand {

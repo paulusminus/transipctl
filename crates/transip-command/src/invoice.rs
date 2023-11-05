@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::parameter;
 use crate::{
     error::{Error, ErrorExt},
@@ -5,9 +7,9 @@ use crate::{
     Result,
 };
 use pest::iterators::Pair;
-use strum::EnumString;
+use strum::{EnumString, Display};
 
-#[derive(Debug, PartialEq, EnumString)]
+#[derive(Debug, PartialEq, EnumString, Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum InvoiceAction {
     Item,
@@ -26,7 +28,9 @@ pub enum InvoiceCommand {
     /// let commandline = "invoice list";
     /// assert_eq!(
     ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Invoice(InvoiceCommand::List),
+    ///     TransipCommand::Invoice(
+    ///         InvoiceCommand::List
+    ///     ),
     /// );
     /// ```
     List,
@@ -48,6 +52,15 @@ pub enum InvoiceCommand {
     /// );
     /// ```
     Action(InvoiceNumber, InvoiceAction),
+}
+
+impl Display for InvoiceCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InvoiceCommand::Action(number, action) => write!(f, "{} {}", action, number),
+            InvoiceCommand::List => write!(f, "list"),
+        }
+    }
 }
 
 impl<'a> TryFrom<Pair<'a, Rule>> for InvoiceCommand {

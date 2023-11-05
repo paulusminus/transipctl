@@ -1,17 +1,19 @@
+use std::fmt::Display;
+
 use crate::{
     error::{Error, ErrorExt},
     parse::Rule,
     Result,
 };
 use pest::iterators::Pair;
-use strum::EnumString;
+use strum::{EnumString, Display};
 
 use super::parameter;
 
 pub type VpsName = String;
 
-#[derive(Debug, PartialEq, EnumString)]
-#[strum(ascii_case_insensitive)]
+#[derive(Debug, PartialEq, EnumString, Display)]
+#[strum(serialize_all = "lowercase")]
 pub enum VpsAction {
     Item,
     Lock,
@@ -53,6 +55,15 @@ pub enum VpsCommand {
     /// );
     /// ```
     Action(VpsName, VpsAction),
+}
+
+impl Display for VpsCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VpsCommand::Action(name, action) => write!(f, "{} {}", action, name),
+            VpsCommand::List => write!(f, "list"),
+        }
+    }
 }
 
 impl<'a> TryFrom<Pair<'a, Rule>> for VpsCommand {
