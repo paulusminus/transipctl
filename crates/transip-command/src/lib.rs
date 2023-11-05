@@ -75,9 +75,15 @@ impl FromStr for TransipCommand {
             Rule::domain_command => DomainCommand::try_from(inner).map(TransipCommand::Domain),
             Rule::invoice_command => InvoiceCommand::try_from(inner).map(TransipCommand::Invoice),
             Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
-            Rule::sleep_command => {
-                Ok(TransipCommand::Sleep(inner.into_inner().next().unwrap().as_str().parse::<u64>().unwrap()))
-            }
+            Rule::sleep_command => Ok(TransipCommand::Sleep(
+                inner
+                    .into_inner()
+                    .next()
+                    .unwrap()
+                    .as_str()
+                    .parse::<u64>()
+                    .unwrap(),
+            )),
             Rule::vps_command => VpsCommand::try_from(inner).map(TransipCommand::Vps),
             _ => Err(Error::ParseTransipCommand(s.to_owned())),
         }

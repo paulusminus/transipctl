@@ -135,7 +135,7 @@ impl Client {
             TransipCommand::Invoice(command) => self.execute_invoice(command, s),
             TransipCommand::Product(command) => self.execute_product(command, s),
             TransipCommand::Sleep(timeout) => {
-                std::thread::sleep(Duration::from_secs(timeout.clone()));
+                std::thread::sleep(Duration::from_secs(*timeout));
                 Ok(())
             }
             TransipCommand::Vps(command) => self.execute_vps(command, s),
