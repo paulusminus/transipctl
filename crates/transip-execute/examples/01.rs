@@ -30,13 +30,15 @@ macro_rules! execute_out {
     };
 }
 
-fn execute(client: &mut Client, command: &TransipCommand, out: Out) {
-    match out {
-        Out::Json => {
-            execute_out!(serde_json::Serializer::pretty, client, command, println);
-        }
-        Out::Yaml => {
-            execute_out!(serde_yaml::Serializer::new, client, command, print);
+impl Out {
+    fn execute(&self, client: &mut Client, command: &TransipCommand) {
+        match self {
+            Out::Json => {
+                execute_out!(serde_json::Serializer::pretty, client, command, println);
+            }
+            Out::Yaml => {
+                execute_out!(serde_yaml::Serializer::new, client, command, print);
+            }
         }
     }
 }
@@ -48,10 +50,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let command_add_challenge = COMMAND_ADD_CHALLENGE.parse::<TransipCommand>()?;
     let command_delete_challenge = COMMAND_DELETE_CHALLENGE.parse::<TransipCommand>()?;
 
-    execute(&mut client, &command_dns_list, Out::Json);
-    execute(&mut client, &command_dns_list, Out::Yaml);
-    execute(&mut client, &command_delete_challenge, Out::Json);
-    execute(&mut client, &command_add_challenge, Out::Json);
+    Out::Json.execute(&mut client, &command_dns_list);
+    Out::Yaml.execute(&mut client, &command_dns_list);
+    Out::Json.execute(&mut client, &command_delete_challenge);
+    Out::Json.execute(&mut client, &command_add_challenge);
 
     Ok(())
 }

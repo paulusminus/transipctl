@@ -7,6 +7,13 @@ name = "transipctl"
 repository.workspace = true
 version.workspace = true
 
+[package.metadata.deb]
+assets = [
+    ["target/release/transipctl", "/usr/bin/", "755"],
+    ["scripts/*", "/usr/bin/", "755"],
+    ["crates/transipctl/README.md", "/usr/share/doc/transipctl", "644"],
+]
+
 [package.metadata.generate-rpm]
 assets = [
     { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
