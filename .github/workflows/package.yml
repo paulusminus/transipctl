@@ -14,11 +14,12 @@ jobs:
     permissions:
       contents: write
     steps:
+    - uses: actions/checkout@v4
+    - uses: Swatinem/rust-cache@v2
     - name: Install cargo-generate-rpm
       run: cargo install cargo-generate-rpm
     - name: Install cargo deb
       run: cargo install cargo-deb
-    - uses: actions/checkout@v4
     - name: Build for x86_64
       run: cargo build --release
     - name: Generate rpm
