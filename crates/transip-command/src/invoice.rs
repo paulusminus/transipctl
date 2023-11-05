@@ -7,7 +7,7 @@ use crate::{
     Result,
 };
 use pest::iterators::Pair;
-use strum::{EnumString, Display};
+use strum::{Display, EnumString};
 
 #[derive(Debug, PartialEq, EnumString, Display)]
 #[strum(serialize_all = "lowercase")]

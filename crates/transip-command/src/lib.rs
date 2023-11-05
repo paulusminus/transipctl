@@ -7,7 +7,7 @@ pub use invoice::{InvoiceAction, InvoiceCommand};
 use parse::{Rule, TransipCommandParser};
 use pest::{iterators::Pair, Parser};
 pub use product::ProductCommand;
-use std::{str::FromStr, fmt::Display};
+use std::{fmt::Display, str::FromStr};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;

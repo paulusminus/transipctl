@@ -66,7 +66,9 @@ impl Display for DnsCommand {
         match self {
             DnsCommand::AcmeChallengeDelete(name) => write!(f, "acme-challenge-delete {}", name),
             DnsCommand::List(name) => write!(f, "list {}", name),
-            DnsCommand::AcmeChallengeSet(name, challenge) => write!(f, "acme-challenge-set {} {}", name, challenge),
+            DnsCommand::AcmeChallengeSet(name, challenge) => {
+                write!(f, "acme-challenge-set {} {}", name, challenge)
+            }
         }
     }
 }
