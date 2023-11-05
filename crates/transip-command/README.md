@@ -26,6 +26,7 @@ cargo install transip-command
 - invoice pdf \<invoicenumber\>
 - product list
 - product elements \<productname\>
+- sleep \<number-of-seconds\>
 
 ## Environment variable usage
 

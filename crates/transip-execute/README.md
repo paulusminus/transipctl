@@ -6,14 +6,16 @@
 # transip-execute
 
 transip-execute is a library that executes commands on the Transip Api Endpoint.
-It uses the [transip-command](https://crates.io/crates/transip-command) and the [transip](https://crates.io/crates/transip) libraries.
+It uses the [`transip-command`] and the [`transip`] crates.
 
 
 ## Usage
 
-Set environment variables needed to configure the Client. See [transip](https://crates.io/crates/transip)
+Set environment variables needed to configure the Client. See [`transip`] documentation.
 
 ```bash
 cargo add transip-execute
 ```
 
+[`transip-command`]: https://crates.io/crates/transip-command
+[`transip`]: https://crates.io/crates/transip
