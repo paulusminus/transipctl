@@ -25,13 +25,16 @@ fn main() -> Result<()> {
     let input: Input = std::env::args().try_into()?;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
     for (line_number, line) in input.lines().enumerate() {
-        let mut s = serde_yaml::Serializer::new(Vec::with_capacity(128));
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut s = serde_yaml::Serializer::new(&mut buffer);
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => match client.execute(&command, &mut s) {
                     Ok(_) => {
-                        let s = String::from_utf8(s.into_inner().unwrap()).unwrap();
-                        println!("{}", s);
+                        let s = String::from_utf8(buffer).unwrap();
+                        if s.len() > 0 {
+                            print!("{}", s);
+                        }
                     }
                     Err(error) => {
                         eprintln!("Error executing command {:#?}: {}", command, error);
