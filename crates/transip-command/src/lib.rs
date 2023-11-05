@@ -45,6 +45,19 @@ pub enum TransipCommand {
     Product(product::ProductCommand),
 
     Vps(vps::VpsCommand),
+
+    /// # Example
+    ///
+    /// ```
+    /// use transip_command::TransipCommand;
+    ///
+    /// let commandline = "sleep 5";
+    /// assert_eq!(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Sleep(5),
+    /// );
+    /// ```
+    Sleep(u64),
 }
 
 impl FromStr for TransipCommand {
@@ -58,11 +71,14 @@ impl FromStr for TransipCommand {
         let inner = pair.into_inner().next().unwrap();
         match inner.as_rule() {
             Rule::comment => Ok(TransipCommand::Comment(inner.as_str().to_owned())),
-            Rule::domain_command => DomainCommand::try_from(inner).map(TransipCommand::Domain),
             Rule::dns_command => DnsCommand::try_from(inner).map(TransipCommand::Dns),
-            Rule::vps_command => VpsCommand::try_from(inner).map(TransipCommand::Vps),
+            Rule::domain_command => DomainCommand::try_from(inner).map(TransipCommand::Domain),
             Rule::invoice_command => InvoiceCommand::try_from(inner).map(TransipCommand::Invoice),
             Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
+            Rule::sleep_command => {
+                Ok(TransipCommand::Sleep(inner.into_inner().next().unwrap().as_str().parse::<u64>().unwrap()))
+            }
+            Rule::vps_command => VpsCommand::try_from(inner).map(TransipCommand::Vps),
             _ => Err(Error::ParseTransipCommand(s.to_owned())),
         }
     }
@@ -76,6 +92,7 @@ impl Display for TransipCommand {
             TransipCommand::Domain(command) => write!(f, "domain {}", command),
             TransipCommand::Invoice(command) => write!(f, "invoice {}", command),
             TransipCommand::Product(command) => write!(f, "product {}", command),
+            TransipCommand::Sleep(timeout) => write!(f, "sleep {}", timeout),
             TransipCommand::Vps(command) => write!(f, "vps {}", command),
         }
     }

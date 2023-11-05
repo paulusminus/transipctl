@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::{mem::size_of, time::Duration};
 
 use serde::{Serialize, Serializer};
 pub use transip::configuration_from_environment;
@@ -134,6 +134,10 @@ impl Client {
             TransipCommand::Domain(command) => self.execute_domain(command, s),
             TransipCommand::Invoice(command) => self.execute_invoice(command, s),
             TransipCommand::Product(command) => self.execute_product(command, s),
+            TransipCommand::Sleep(timeout) => {
+                std::thread::sleep(Duration::from_secs(timeout.clone()));
+                Ok(())
+            }
             TransipCommand::Vps(command) => self.execute_vps(command, s),
         }
     }

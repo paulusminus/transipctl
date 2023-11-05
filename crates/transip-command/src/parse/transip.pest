@@ -1,10 +1,11 @@
-transip = { SOI ~ ( vps_command | invoice_command | dns_command | product_command | domain_command | comment ) ~ EOI }
+transip = { SOI ~ ( vps_command | invoice_command | dns_command | product_command | domain_command | comment | sleep_command ) ~ EOI }
 
 text = _{ char* }
 char = _{ !( NEWLINE | " " | "\t" ) ~ ANY }
 WHITESPACE = _{ " " }
 comment = { "#" ~ text }
 value = @{ char+ }
+number = @{ ASCII_DIGIT+ }
 
 env_begin = _{ "${" }
 env_end = _{ "}"}
@@ -34,3 +35,5 @@ product_command = { "product " ~ ( product_list | product_elements ) }
 domain_list = { "list" }
 domain_item = { "item " ~ parameter }
 domain_command = { "domain " ~ ( domain_list | domain_item ) }
+
+sleep_command = { "sleep " ~ number}
