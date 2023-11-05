@@ -19,7 +19,7 @@ assets = [
     { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
     { source = "scripts/certbot-challenge-delete.transip", dest = "/usr/bin/certbot-challenge-delete.transip", mode = "755" },
     { source = "scripts/certbot-challenge-set.transip", dest = "/usr/bin/certbot-challenge-set.transip", mode = "755" },
-    { source = "README.md", dest = "/usr/share/doc/transipctl/README.md", mode = "644" },
+    { source = "crates/transipctl/README.md", dest = "/usr/share/doc/transipctl/README.md", mode = "644" },
 ]
 
 [dependencies]
