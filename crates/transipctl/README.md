@@ -13,6 +13,8 @@ It uses the [transip](https://crates.io/crates/transip) and [transip-command](ht
 cargo install transipctl
 ```
 
+If you want to install transipctl for all users you can find a debian or rpm package on [`github-releases`].
+
 ## Examples of using transipctl in script files
 
 ### Example script delete acme challenge
@@ -51,3 +53,4 @@ dns acme-challenge-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 
 [`build-badge`]: https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg
 [`mit-badge`]: https://img.shields.io/badge/License-MIT-yellow.svg
+[`github-releases`]: https://github.com/paulusminus/transipctl/releases/latest/
