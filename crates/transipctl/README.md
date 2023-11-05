@@ -1,6 +1,5 @@
-![build-badge](https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![crates.io](https://img.shields.io/crates/d/transipctl)
+![`build-badge`]
+[![`mit-badge`]](https://opensource.org/licenses/MIT)
 
 # transipctl
 
@@ -50,3 +49,5 @@ dns acme-challenge-delete ${CERTBOT_DOMAIN}
 dns acme-challenge-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 ```
 
+[`build-badge`]: https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg
+[`mit-badge`]: https://img.shields.io/badge/License-MIT-yellow.svg

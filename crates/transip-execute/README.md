@@ -1,6 +1,5 @@
 ![build-badge](https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![crates.io](https://img.shields.io/crates/d/transip-execute)
 ![docs.rs](https://img.shields.io/docsrs/transip-execute)
 
 # transip-execute
