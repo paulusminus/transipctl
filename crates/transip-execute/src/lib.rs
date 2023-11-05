@@ -49,12 +49,12 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::dns::{DnsApi, DnsEntry};
         match command {
-            DnsCommand::DeleteAcmeChallenge(name) => self
+            DnsCommand::AcmeChallengeDelete(name) => self
                 .inner
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
                 .report(s),
             DnsCommand::List(name) => self.inner.dns_entry_list(name).report(s),
-            DnsCommand::SetAcmeChallenge(name, challenge) => self
+            DnsCommand::AcmeChallengeSet(name, challenge) => self
                 .inner
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
                 .and_then(|_| {
