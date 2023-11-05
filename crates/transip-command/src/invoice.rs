@@ -84,3 +84,23 @@ impl<'a> TryFrom<Pair<'a, Rule>> for InvoiceCommand {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{InvoiceAction, InvoiceCommand};
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            InvoiceCommand::Action("98234".to_owned(), InvoiceAction::Item).to_string(),
+            "item 98234".to_owned(),
+        );
+
+        assert_eq!(
+            InvoiceCommand::Action("98234".to_owned(), InvoiceAction::Pdf).to_string(),
+            "pdf 98234".to_owned(),
+        );
+
+        assert_eq!(InvoiceCommand::List.to_string(), "list".to_owned(),);
+    }
+}

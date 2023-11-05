@@ -101,3 +101,18 @@ impl<'a> TryFrom<Pair<'a, Rule>> for Parameter {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{VpsAction, VpsCommand};
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            VpsCommand::Action("vps2".to_owned(), VpsAction::Start).to_string(),
+            "start vps2".to_owned(),
+        );
+
+        assert_eq!(VpsCommand::List.to_string(), "list".to_owned(),);
+    }
+}

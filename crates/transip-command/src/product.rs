@@ -64,3 +64,18 @@ impl<'a> TryFrom<Pair<'a, Rule>> for ProductCommand {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::ProductCommand;
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            ProductCommand::Elements("haip-basic-contract".to_owned()).to_string(),
+            "elements haip-basic-contract".to_owned(),
+        );
+
+        assert_eq!(ProductCommand::List.to_string(), "list".to_string(),);
+    }
+}

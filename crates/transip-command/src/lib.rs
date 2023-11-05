@@ -97,3 +97,41 @@ fn parameter(pair: Pair<'_, Rule>) -> Result<String> {
         _ => Err(Error::ParseVpsCommand(pair.as_str().to_owned())),
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::TransipCommand;
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            TransipCommand::Comment("# lksadjf".to_owned()).to_string(),
+            "# lksadjf".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned())).to_string(),
+            "dns list paulmin.nl".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::Domain(crate::DomainCommand::List).to_string(),
+            "domain list".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::Invoice(crate::InvoiceCommand::List).to_string(),
+            "invoice list".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::Product(crate::ProductCommand::List).to_string(),
+            "product list".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::Vps(crate::VpsCommand::List).to_string(),
+            "vps list".to_owned(),
+        );
+    }
+}

@@ -65,3 +65,18 @@ impl<'a> TryFrom<Pair<'a, Rule>> for DomainCommand {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::DomainCommand;
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            DomainCommand::Item("paulmin.nl".to_owned()).to_string(),
+            "item paulmin.nl".to_owned(),
+        );
+
+        assert_eq!(DomainCommand::List.to_string(), "list".to_owned(),);
+    }
+}
