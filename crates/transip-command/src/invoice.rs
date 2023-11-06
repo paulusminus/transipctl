@@ -1,5 +1,5 @@
-use std::{fmt::Display, str::FromStr};
 use crate::{error::Error, str_extension::StrExtension};
+use std::{fmt::Display, str::FromStr};
 use strum::{Display, EnumString};
 
 const LIST: &str = "list";
@@ -71,7 +71,7 @@ impl FromStr for InvoiceCommand {
                 return Ok(InvoiceCommand::Action(invoice_number.to_owned(), action));
             }
         }
-        
+
         Err(Error::ParseInvoiceCommand(s.to_owned()))
     }
 }

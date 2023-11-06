@@ -32,7 +32,7 @@ fn main() -> Result<()> {
                 Ok(command) => match client.execute(&command, &mut s) {
                     Ok(_) => {
                         let s = String::from_utf8(buffer).unwrap();
-                        if s.len() > 0 {
+                        if !s.is_empty() {
                             print!("{}", s);
                         }
                     }

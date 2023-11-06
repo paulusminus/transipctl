@@ -1,12 +1,11 @@
+use crate::{check_environment, error::Error, str_extension::StrExtension};
 use std::{fmt::Display, str::FromStr};
-use crate::{error::Error, str_extension::StrExtension, check_environment};
 
 pub type DomainName = String;
 
 const ACME_VALIDATION_DELETE: &str = "acme-validation-delete";
 const ACME_VALIDATION_SET: &str = "acme-validation-set";
 const LIST: &str = "list";
-
 
 #[derive(Debug, PartialEq)]
 pub enum DnsCommand {
@@ -30,12 +29,12 @@ pub enum DnsCommand {
     /// # Example
     ///
     /// ```
-    /// use transip_command::{DnsCommand, TransipCommand2};
+    /// use transip_command::{DnsCommand, TransipCommand};
     ///
     /// let commandline = "dns acme-validation-delete lkdfjf.nl";
     /// assert_eq!(
-    ///     commandline.parse::<TransipCommand2>().unwrap(),
-    ///     TransipCommand2::Dns(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Dns(
     ///         DnsCommand::AcmeValidationDelete(
     ///             "lkdfjf.nl".to_owned()
     ///         )
@@ -47,12 +46,12 @@ pub enum DnsCommand {
     /// # Example
     ///
     /// ```
-    /// use transip_command::{DnsCommand, TransipCommand2};
+    /// use transip_command::{DnsCommand, TransipCommand};
     ///
     /// let commandline = "dns acme-validation-set lkdfjf.nl oe8rtg";
     /// assert_eq!(
-    ///     commandline.parse::<TransipCommand2>().unwrap(),
-    ///     TransipCommand2::Dns(
+    ///     commandline.parse::<TransipCommand>().unwrap(),
+    ///     TransipCommand::Dns(
     ///         DnsCommand::AcmeValidationSet(
     ///             "lkdfjf.nl".to_owned(),
     ///             "oe8rtg".to_owned(),
@@ -66,7 +65,9 @@ pub enum DnsCommand {
 impl Display for DnsCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DnsCommand::AcmeValidationDelete(name) => write!(f, "{} {}", ACME_VALIDATION_DELETE, name),
+            DnsCommand::AcmeValidationDelete(name) => {
+                write!(f, "{} {}", ACME_VALIDATION_DELETE, name)
+            }
             DnsCommand::List(name) => write!(f, "{} {}", LIST, name),
             DnsCommand::AcmeValidationSet(name, challenge) => {
                 write!(f, "{} {} {}", ACME_VALIDATION_SET, name, challenge)
@@ -79,12 +80,16 @@ impl FromStr for DnsCommand {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-
         if let Some(domain_name) = s.one_param(ACME_VALIDATION_DELETE) {
-            return Ok(DnsCommand::AcmeValidationDelete(check_environment(domain_name)?));
+            return Ok(DnsCommand::AcmeValidationDelete(check_environment(
+                domain_name,
+            )?));
         }
         if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_SET) {
-            return Ok(DnsCommand::AcmeValidationSet(check_environment(domain_name)?, check_environment(challenge)?));
+            return Ok(DnsCommand::AcmeValidationSet(
+                check_environment(domain_name)?,
+                check_environment(challenge)?,
+            ));
         }
         if let Some(domain_name) = s.one_param(LIST) {
             return Ok(DnsCommand::List(check_environment(domain_name)?));
@@ -118,9 +123,10 @@ mod test {
     #[test]
     fn from_str() {
         assert_eq!(
-            "acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}".parse::<DnsCommand>().unwrap(),
+            "acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}"
+                .parse::<DnsCommand>()
+                .unwrap(),
             DnsCommand::AcmeValidationSet("paulmin.nl".to_owned(), "876543".to_owned())
-
         );
     }
 }

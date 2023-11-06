@@ -5,7 +5,7 @@ pub use domain::DomainCommand;
 use error::ErrorExt;
 pub use invoice::{InvoiceAction, InvoiceCommand};
 pub use product::ProductCommand;
-use std::{fmt::Display, str::FromStr, env::VarError};
+use std::{env::VarError, fmt::Display, str::FromStr};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
@@ -71,9 +71,12 @@ impl FromStr for TransipCommand {
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         macro_rules! parse {
-            ($s:expr, $command:expr, $subcommand:path, $map:path) => {
-                if s.starts_with($command) {
-                    return s[$command.len()..].parse::<$subcommand>().err_into().map($map);
+            ($s:expr, $command:expr, $sub_command_type:path, $map:path) => {
+                if let Some(sub_command) = s.strip_prefix($command) {
+                    return sub_command
+                        .parse::<$sub_command_type>()
+                        .err_into()
+                        .map($map);
                 }
             };
         }
@@ -107,11 +110,10 @@ impl Display for TransipCommand {
 }
 
 fn check_environment(name: &str) -> std::result::Result<String, VarError> {
-    if name.starts_with("${") && name.ends_with("}") {
+    if name.starts_with("${") && name.ends_with('}') {
         let s = name[2..name.len() - 1].trim();
         std::env::var(s)
-    }
-    else {
+    } else {
         Ok(name.to_owned())
     }
 }
@@ -158,14 +160,19 @@ mod test {
         assert_eq!(
             "# alsjff".parse::<TransipCommand>().unwrap(),
             TransipCommand::Comment("# alsjff".to_owned()),
-        ); 
+        );
         assert_eq!(
             "dns list paulmin.nl ".parse::<TransipCommand>().unwrap(),
             TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned()))
         );
         assert_eq!(
-            "vps reset paulusminus-vps2".parse::<TransipCommand>().unwrap(),
-            TransipCommand::Vps(crate::VpsCommand::Action("paulusminus-vps2".to_owned(), crate::VpsAction::Reset))
+            "vps reset paulusminus-vps2"
+                .parse::<TransipCommand>()
+                .unwrap(),
+            TransipCommand::Vps(crate::VpsCommand::Action(
+                "paulusminus-vps2".to_owned(),
+                crate::VpsAction::Reset
+            ))
         );
         assert_eq!(
             "sleep 3984".parse::<TransipCommand>().unwrap(),

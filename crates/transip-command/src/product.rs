@@ -1,5 +1,5 @@
-use std::{fmt::Display, str::FromStr};
 use crate::{error::Error, str_extension::StrExtension};
+use std::{fmt::Display, str::FromStr};
 
 pub type ProductName = String;
 
@@ -50,7 +50,7 @@ impl FromStr for ProductCommand {
         if let Some(product_name) = s.one_param(ELEMENTS) {
             return Ok(ProductCommand::Elements(product_name.to_owned()));
         }
-        
+
         Err(Error::ParseProductCommand(s.to_owned()))
     }
 }
@@ -85,17 +85,13 @@ mod test {
             ProductCommand::List,
         );
 
-        assert!(
-            "list kdf".parse::<ProductCommand>().is_err()
-        );
+        assert!("list kdf".parse::<ProductCommand>().is_err());
 
         assert_eq!(
             "elements lkjdf".parse::<ProductCommand>().unwrap(),
             ProductCommand::Elements("lkjdf".to_owned()),
         );
 
-        assert!(
-            "elements ldkfj dkfjf".parse::<ProductCommand>().is_err()
-        );
+        assert!("elements ldkfj dkfjf".parse::<ProductCommand>().is_err());
     }
 }

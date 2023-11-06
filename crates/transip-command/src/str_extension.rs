@@ -1,6 +1,6 @@
 pub(crate) trait StrExtension<'a> {
     fn one_param(self, command: &str) -> Option<&'a str>;
-    fn two_params(self, command: &str) -> Option<(&'a str, &'a str)>; 
+    fn two_params(self, command: &str) -> Option<(&'a str, &'a str)>;
 }
 
 impl<'a> StrExtension<'a> for &'a str {
@@ -10,12 +10,10 @@ impl<'a> StrExtension<'a> for &'a str {
             let rest = self[command.len()..].trim();
             if rest.find(' ').is_none() {
                 Some(rest)
-            }
-            else {
+            } else {
                 None
-            }    
-        }
-        else {
+            }
+        } else {
             None
         }
     }
@@ -26,18 +24,12 @@ impl<'a> StrExtension<'a> for &'a str {
             let rest = self[command.len()..].trim();
             if let Some(end_first) = rest.find(' ') {
                 let param1 = &rest[..end_first];
-                if let Some(param2) = rest.one_param(param1) {
-                    Some((param1.trim(), param2.trim()))
-                }
-                else {
-                    None
-                }
-            }
-            else {
+                rest.one_param(param1)
+                    .map(|param2| (param1.trim(), param2.trim()))
+            } else {
                 None
-            }    
-        }
-        else {
+            }
+        } else {
             None
         }
     }
@@ -46,7 +38,7 @@ impl<'a> StrExtension<'a> for &'a str {
 #[cfg(test)]
 mod test {
     use super::StrExtension;
-    
+
     #[test]
     fn has_two() {
         assert_eq!(
@@ -54,8 +46,6 @@ mod test {
             Some(("dslkf", "lkdjf")),
         );
 
-        assert!(
-            "elements dkf  dkf dkf".two_params("elements").is_none(),
-        );
-    }    
+        assert!("elements dkf  dkf dkf".two_params("elements").is_none(),);
+    }
 }

@@ -1,5 +1,5 @@
+use crate::{check_environment, error::Error, str_extension::StrExtension};
 use std::{fmt::Display, str::FromStr};
-use crate::{error::Error, str_extension::StrExtension, check_environment};
 
 pub type DomainName = String;
 
@@ -57,8 +57,7 @@ impl FromStr for DomainCommand {
         }
         if let Some(domain_name) = s.one_param(ITEM) {
             Ok(DomainCommand::Item(check_environment(domain_name)?))
-        }
-        else {
+        } else {
             Err(Error::ParseDomainCommand(s.to_owned()))
         }
     }

@@ -1,8 +1,5 @@
+use crate::{check_environment, error::Error, str_extension::StrExtension};
 use std::{fmt::Display, str::FromStr};
-use crate::{
-    error::Error,
-    str_extension::StrExtension, check_environment,
-};
 use strum::{Display, EnumString};
 
 pub type VpsName = String;
@@ -71,12 +68,19 @@ impl FromStr for VpsCommand {
             return Ok(VpsCommand::List);
         }
 
-        for action in [VpsAction::Item, VpsAction::Lock, VpsAction::Reset, VpsAction::Start, VpsAction::Stop, VpsAction::Unlock] {
+        for action in [
+            VpsAction::Item,
+            VpsAction::Lock,
+            VpsAction::Reset,
+            VpsAction::Start,
+            VpsAction::Stop,
+            VpsAction::Unlock,
+        ] {
             if let Some(vps_name) = s.one_param(action.to_string().as_str()) {
                 return Ok(VpsCommand::Action(check_environment(vps_name)?, action));
-            }    
+            }
         }
-        
+
         Err(Error::ParseVpsCommand(s.to_owned()))
     }
 }
