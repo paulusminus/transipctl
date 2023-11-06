@@ -10,7 +10,7 @@ version.workspace = true
 [dependencies]
 serde = "1.0.190"
 transip = "0.1.5"
-transip-command = { version = "0.3.0", path = "../transip-command" }
+transip-command = { version = "0.3.1", path = "../transip-command" }
 
 [dev-dependencies]
 serde_json = "1.0.108"

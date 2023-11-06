@@ -1,9 +1,5 @@
 use input::Input;
 use std::process::exit;
-use tracing_log::LogTracer;
-use tracing_subscriber::{
-    filter::LevelFilter, prelude::__tracing_subscriber_SubscriberExt, EnvFilter,
-};
 use transip_command::TransipCommand;
 use transip_execute::{configuration_from_environment, Client};
 
@@ -13,6 +9,7 @@ pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_V
 
 mod error;
 mod input;
+mod log;
 
 fn arg_version() {
     if std::env::args()
@@ -65,22 +62,10 @@ impl Out {
     }
 }
 
-fn setup_logging() {
-    LogTracer::init_with_filter(tracing_log::log::LevelFilter::Debug).unwrap();
-
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::DEBUG.into())
-        .from_env_lossy();
-
-    let layer = tracing_journald::layer().unwrap();
-
-    let subscriber = tracing_subscriber::registry().with(env_filter).with(layer);
-    tracing::subscriber::set_global_default(subscriber).unwrap();
-}
 
 fn main() -> Result<()> {
     arg_version();
-    setup_logging();
+    log::setup_logging();
     let input: Input = std::env::args().try_into()?;
 
     let run_from = input.run_from();
