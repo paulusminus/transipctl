@@ -510,7 +510,7 @@ dependencies = [
 
 [[package]]
 name = "transip-command"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "strum",
  "thiserror",
@@ -518,7 +518,7 @@ dependencies = [
 
 [[package]]
 name = "transip-execute"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -529,7 +529,7 @@ dependencies = [
 
 [[package]]
 name = "transipctl"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "serde",
  "serde_json",

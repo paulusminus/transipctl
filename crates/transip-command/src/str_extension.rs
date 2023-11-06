@@ -5,33 +5,28 @@ pub(crate) trait StrExtension<'a> {
 
 impl<'a> StrExtension<'a> for &'a str {
     fn one_param(self, command: &str) -> Option<&'a str> {
-        let command = command.to_owned() + " ";
-        if self.starts_with(command.as_str()) {
-            let rest = self[command.len()..].trim();
-            if rest.find(' ').is_none() {
-                Some(rest)
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+        self.strip_prefix((command.to_owned() + " ").as_str())
+            .map(|s| s.trim())
+            .and_then(|rest| {
+                if rest.find(' ').is_none() {
+                    Some(rest)
+                } else {
+                    None
+                }
+            })
     }
 
     fn two_params(self, command: &str) -> Option<(&'a str, &'a str)> {
-        let command = command.to_owned() + " ";
-        if self.starts_with(command.as_str()) {
-            let rest = self[command.len()..].trim();
-            if let Some(end_first) = rest.find(' ') {
-                let param1 = &rest[..end_first];
-                rest.one_param(param1)
-                    .map(|param2| (param1.trim(), param2.trim()))
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+        self.strip_prefix((command.to_owned() + " ").as_str())
+            .map(|s| s.trim())
+            .and_then(|rest| {
+                if let Some(end_first) = rest.find(' ') {
+                    let param1 = &rest[..end_first];
+                    rest.one_param(param1).map(|param2| (param1, param2.trim()))
+                } else {
+                    None
+                }
+            })
     }
 }
 
@@ -42,7 +37,7 @@ mod test {
     #[test]
     fn has_two() {
         assert_eq!(
-            "elements  dslkf  lkdjf".two_params("elements"),
+            "elements   dslkf    lkdjf  ".two_params("elements"),
             Some(("dslkf", "lkdjf")),
         );
 
