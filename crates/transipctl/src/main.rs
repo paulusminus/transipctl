@@ -20,26 +20,50 @@ fn arg_version() {
     }
 }
 
+enum Out {
+    #[allow(dead_code)]
+    Json,
+    Yaml,
+}
+
+macro_rules! execute_out {
+    ($ser:path, $client:ident, $command:ident, $print:ident) => {
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut ser = $ser(&mut buffer);
+
+        match $client.execute($command, &mut ser) {
+            Ok(_) => {
+                let s = String::from_utf8(buffer).unwrap();
+                if s.len() > 0 {
+                    $print!("{}", s);
+                }
+            }
+            Err(error) => eprintln!("Error: {error}"),
+        }
+    };
+}
+
+impl Out {
+    fn execute(&self, client: &mut Client, command: &TransipCommand) {
+        match self {
+            Out::Json => {
+                execute_out!(serde_json::Serializer::pretty, client, command, println);
+            }
+            Out::Yaml => {
+                execute_out!(serde_yaml::Serializer::new, client, command, print);
+            }
+        }
+    }
+}
+
 fn main() -> Result<()> {
     arg_version();
     let input: Input = std::env::args().try_into()?;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
     for (line_number, line) in input.lines().enumerate() {
-        let mut buffer: Vec<u8> = Vec::new();
-        let mut s = serde_yaml::Serializer::new(&mut buffer);
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
-                Ok(command) => match client.execute(&command, &mut s) {
-                    Ok(_) => {
-                        let s = String::from_utf8(buffer).unwrap();
-                        if !s.is_empty() {
-                            print!("{}", s);
-                        }
-                    }
-                    Err(error) => {
-                        eprintln!("Error executing command {:#?}: {}", command, error);
-                    }
-                },
+                Ok(command) => Out::Yaml.execute(&mut client, &command),
                 Err(error) => eprintln!("Error {} parsing line {}", error, line_number + 1),
             }
         }
