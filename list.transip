@@ -1,0 +1,5 @@
+#!/usr/bin/transipctl -v
+
+onerror exit
+
+dns list paulmin.nl

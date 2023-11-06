@@ -1,4 +1,5 @@
 #!/usr/bin/transipctl
 
 onerror exit
+
 dns acme-validation-delete ${CERTBOT_DOMAIN}
