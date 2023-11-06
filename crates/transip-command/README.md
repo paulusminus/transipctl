@@ -23,6 +23,7 @@ cargo install transip-command
 - invoice list
 - invoice item \<invoicenumber\>
 - invoice pdf \<invoicenumber\>
+- onerror print | exit
 - product list
 - product elements \<productname\>
 - sleep \<number-of-seconds\>
@@ -31,6 +32,7 @@ cargo install transip-command
 
 You can use a enviroment variable to specify domainname, acme-validation.
 
-### Example
+### Examples
 
-- domain item ${DOMAIN_NAME}
+- domain item \${DOMAIN_NAME}
+- dns acme-validation-set \${CERTBOT_DOMAIN} \${CERTBOT_VALIDATION}
