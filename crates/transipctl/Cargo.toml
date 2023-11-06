@@ -17,8 +17,8 @@ assets = [
 [package.metadata.generate-rpm]
 assets = [
     { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
-    { source = "scripts/certbot-challenge-delete.transip", dest = "/usr/bin/certbot-challenge-delete.transip", mode = "755" },
-    { source = "scripts/certbot-challenge-set.transip", dest = "/usr/bin/certbot-challenge-set.transip", mode = "755" },
+    { source = "scripts/certbot-validation-delete.transip", dest = "/usr/bin/certbot-validation-delete.transip", mode = "755" },
+    { source = "scripts/certbot-validation-set.transip", dest = "/usr/bin/certbot-validation-set.transip", mode = "755" },
     { source = "transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
 ]
 

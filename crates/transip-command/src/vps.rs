@@ -1,16 +1,13 @@
-use std::fmt::Display;
-
+use std::{fmt::Display, str::FromStr};
 use crate::{
-    error::{Error, ErrorExt},
-    parse::Rule,
-    Result,
+    error::Error,
+    str_extension::StrExtension, check_environment,
 };
-use pest::iterators::Pair;
 use strum::{Display, EnumString};
 
-use super::parameter;
-
 pub type VpsName = String;
+
+const LIST: &str = "list";
 
 #[derive(Debug, PartialEq, EnumString, Display)]
 #[strum(serialize_all = "lowercase")]
@@ -61,44 +58,26 @@ impl Display for VpsCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             VpsCommand::Action(name, action) => write!(f, "{} {}", action, name),
-            VpsCommand::List => write!(f, "list"),
+            VpsCommand::List => write!(f, "{}", LIST),
         }
     }
 }
 
-impl<'a> TryFrom<Pair<'a, Rule>> for VpsCommand {
-    type Error = Error;
+impl FromStr for VpsCommand {
+    type Err = Error;
 
-    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
-        let commandline = pair.as_str().to_owned();
-        let inner = pair.into_inner().next().unwrap();
-        match inner.as_rule() {
-            Rule::vps_list => Ok(VpsCommand::List),
-            Rule::vps_item_action => {
-                let mut inner = inner.into_inner();
-                let action = inner.next().unwrap().as_str().trim();
-                let name = parameter(inner.next().unwrap())?;
-                action
-                    .parse::<VpsAction>()
-                    .map_err(|_| Error::ParseVpsCommand(commandline))
-                    .map(|action| VpsCommand::Action(name, action))
-            }
-            _ => Err(Error::ParseVpsCommand(commandline)),
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        if s.trim() == LIST {
+            return Ok(VpsCommand::List);
         }
-    }
-}
 
-pub struct Parameter(String);
-
-impl<'a> TryFrom<Pair<'a, Rule>> for Parameter {
-    type Error = Error;
-
-    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
-        match pair.as_rule() {
-            Rule::value => Ok(Parameter(pair.as_str().to_owned())),
-            Rule::env => std::env::var(pair.as_str()).err_into().map(Parameter),
-            _ => Err(Error::ParseTransipCommand("Failure".to_owned())),
+        for action in [VpsAction::Item, VpsAction::Lock, VpsAction::Reset, VpsAction::Start, VpsAction::Stop, VpsAction::Unlock] {
+            if let Some(vps_name) = s.one_param(action.to_string().as_str()) {
+                return Ok(VpsCommand::Action(check_environment(vps_name)?, action));
+            }    
         }
+        
+        Err(Error::ParseVpsCommand(s.to_owned()))
     }
 }
 

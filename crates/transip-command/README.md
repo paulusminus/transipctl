@@ -16,8 +16,8 @@ cargo install transip-command
 ## Commands
 
 - dns list \<domainname\>
-- dns acme-challenge-delete \<domainname\>
-- dns acme-challenge-set \<domainname\> \<acme-challenge\>
+- dns acme-validation-delete \<domainname\>
+- dns acme-validation-set \<domainname\> \<acme-validation\>
 - domain list
 - domain item \<domainname\>
 - invoice list
@@ -29,7 +29,7 @@ cargo install transip-command
 
 ## Environment variable usage
 
-You can use a enviroment variable to specify domainname, acme-challenge, invoicenumer or productname.
+You can use a enviroment variable to specify domainname, acme-validation.
 
 ### Example
 

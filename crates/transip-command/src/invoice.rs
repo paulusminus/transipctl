@@ -1,13 +1,8 @@
-use std::fmt::Display;
-
-use super::parameter;
-use crate::{
-    error::{Error, ErrorExt},
-    parse::Rule,
-    Result,
-};
-use pest::iterators::Pair;
+use std::{fmt::Display, str::FromStr};
+use crate::{error::Error, str_extension::StrExtension};
 use strum::{Display, EnumString};
+
+const LIST: &str = "list";
 
 #[derive(Debug, PartialEq, EnumString, Display)]
 #[strum(serialize_all = "lowercase")]
@@ -58,30 +53,26 @@ impl Display for InvoiceCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InvoiceCommand::Action(number, action) => write!(f, "{} {}", action, number),
-            InvoiceCommand::List => write!(f, "list"),
+            InvoiceCommand::List => write!(f, "{}", LIST),
         }
     }
 }
 
-impl<'a> TryFrom<Pair<'a, Rule>> for InvoiceCommand {
-    type Error = Error;
+impl FromStr for InvoiceCommand {
+    type Err = Error;
 
-    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
-        let commandline = pair.as_str().to_owned();
-        let inner = pair.into_inner().next().unwrap();
-        match inner.as_rule() {
-            Rule::invoice_list => Ok(Self::List),
-            Rule::invoice_item_action => {
-                let mut inner = inner.into_inner();
-                let action = inner.next().unwrap().as_str().trim();
-                let name = parameter(inner.next().unwrap())?;
-                action
-                    .parse::<InvoiceAction>()
-                    .err_into()
-                    .map(|action| Self::Action(name, action))
-            }
-            _ => Err(Error::ParseInvoiceCommand(commandline)),
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        if s.trim() == LIST {
+            return Ok(InvoiceCommand::List);
         }
+
+        for action in [InvoiceAction::Item, InvoiceAction::Pdf] {
+            if let Some(invoice_number) = s.one_param(action.to_string().as_str()) {
+                return Ok(InvoiceCommand::Action(invoice_number.to_owned(), action));
+            }
+        }
+        
+        Err(Error::ParseInvoiceCommand(s.to_owned()))
     }
 }
 
@@ -102,5 +93,23 @@ mod test {
         );
 
         assert_eq!(InvoiceCommand::List.to_string(), "list".to_owned(),);
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(
+            "list".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::List,
+        );
+
+        assert_eq!(
+            "item 98874".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::Action("98874".to_owned(), InvoiceAction::Item),
+        );
+
+        assert_eq!(
+            "pdf 98874".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::Action("98874".to_owned(), InvoiceAction::Pdf),
+        );
     }
 }

@@ -5,8 +5,8 @@ use transip_command::TransipCommand;
 use transip_execute::Client;
 
 const COMMAND_DNS_LIST: &str = "dns list paulmin.nl";
-const COMMAND_ADD_CHALLENGE: &str = "dns acme-challenge-set paulmin.nl 89823875";
-const COMMAND_DELETE_CHALLENGE: &str = "dns acme-challenge-delete paulmin.nl";
+const COMMAND_ADD_CHALLENGE: &str = "dns acme-validation-set paulmin.nl 89823875";
+const COMMAND_DELETE_CHALLENGE: &str = "dns acme-validation-delete paulmin.nl";
 
 enum Out {
     Json,

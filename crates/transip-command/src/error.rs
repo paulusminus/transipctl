@@ -1,5 +1,5 @@
-use crate::{parse::Rule, Result};
-use std::env::VarError;
+use crate::Result;
+use std::{env::VarError, num::ParseIntError};
 use strum::ParseError;
 
 #[derive(thiserror::Error, Debug)]
@@ -28,11 +28,11 @@ pub enum Error {
     #[error("IO: {0}")]
     IO(#[from] std::io::Error),
 
-    #[error("Parsing: {0}")]
-    Pest(#[from] Box<pest::error::Error<Rule>>),
-
     #[error("Variable: {0}")]
     Var(#[from] VarError),
+
+    #[error("Parse: {0}")]
+    ParseInt(#[from] ParseIntError),
 }
 
 pub trait ErrorExt<T, E> {

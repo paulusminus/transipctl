@@ -1,10 +1,12 @@
-use std::fmt::Display;
-
-use super::parameter;
-use crate::{error::Error, parse::Rule, Result};
-use pest::iterators::Pair;
+use std::{fmt::Display, str::FromStr};
+use crate::{error::Error, str_extension::StrExtension, check_environment};
 
 pub type DomainName = String;
+
+const ACME_VALIDATION_DELETE: &str = "acme-validation-delete";
+const ACME_VALIDATION_SET: &str = "acme-validation-set";
+const LIST: &str = "list";
+
 
 #[derive(Debug, PartialEq)]
 pub enum DnsCommand {
@@ -28,74 +30,66 @@ pub enum DnsCommand {
     /// # Example
     ///
     /// ```
-    /// use transip_command::{DnsCommand, TransipCommand};
+    /// use transip_command::{DnsCommand, TransipCommand2};
     ///
-    /// let commandline = "dns acme-challenge-delete lkdfjf.nl";
+    /// let commandline = "dns acme-validation-delete lkdfjf.nl";
     /// assert_eq!(
-    ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Dns(
-    ///         DnsCommand::AcmeChallengeDelete(
+    ///     commandline.parse::<TransipCommand2>().unwrap(),
+    ///     TransipCommand2::Dns(
+    ///         DnsCommand::AcmeValidationDelete(
     ///             "lkdfjf.nl".to_owned()
     ///         )
     ///     ),
     /// );
     /// ```
-    AcmeChallengeDelete(DomainName),
+    AcmeValidationDelete(DomainName),
 
     /// # Example
     ///
     /// ```
-    /// use transip_command::{DnsCommand, TransipCommand};
+    /// use transip_command::{DnsCommand, TransipCommand2};
     ///
-    /// let commandline = "dns acme-challenge-set lkdfjf.nl oe8rtg";
+    /// let commandline = "dns acme-validation-set lkdfjf.nl oe8rtg";
     /// assert_eq!(
-    ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Dns(
-    ///         DnsCommand::AcmeChallengeSet(
+    ///     commandline.parse::<TransipCommand2>().unwrap(),
+    ///     TransipCommand2::Dns(
+    ///         DnsCommand::AcmeValidationSet(
     ///             "lkdfjf.nl".to_owned(),
     ///             "oe8rtg".to_owned(),
     ///         )
     ///     ),
     /// );
     /// ```
-    AcmeChallengeSet(DomainName, String),
+    AcmeValidationSet(DomainName, String),
 }
 
 impl Display for DnsCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DnsCommand::AcmeChallengeDelete(name) => write!(f, "acme-challenge-delete {}", name),
-            DnsCommand::List(name) => write!(f, "list {}", name),
-            DnsCommand::AcmeChallengeSet(name, challenge) => {
-                write!(f, "acme-challenge-set {} {}", name, challenge)
+            DnsCommand::AcmeValidationDelete(name) => write!(f, "{} {}", ACME_VALIDATION_DELETE, name),
+            DnsCommand::List(name) => write!(f, "{} {}", LIST, name),
+            DnsCommand::AcmeValidationSet(name, challenge) => {
+                write!(f, "{} {} {}", ACME_VALIDATION_SET, name, challenge)
             }
         }
     }
 }
 
-impl<'a> TryFrom<Pair<'a, Rule>> for DnsCommand {
-    type Error = Error;
+impl FromStr for DnsCommand {
+    type Err = Error;
 
-    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
-        let commandline = pair.as_str().to_owned();
-        let inner = pair.into_inner().next().unwrap();
-        match inner.as_rule() {
-            Rule::dns_list => {
-                let name = parameter(inner.into_inner().next().unwrap())?;
-                Ok(DnsCommand::List(name))
-            }
-            Rule::dns_acme_challenge_delete => {
-                let name = parameter(inner.into_inner().next().unwrap())?;
-                Ok(DnsCommand::AcmeChallengeDelete(name))
-            }
-            Rule::dns_acme_challenge_set => {
-                let mut inner = inner.into_inner();
-                let name = parameter(inner.next().unwrap())?;
-                let value = parameter(inner.next().unwrap())?;
-                Ok(DnsCommand::AcmeChallengeSet(name, value))
-            }
-            _ => Err(Error::ParseDnsCommand(commandline)),
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+
+        if let Some(domain_name) = s.one_param(ACME_VALIDATION_DELETE) {
+            return Ok(DnsCommand::AcmeValidationDelete(check_environment(domain_name)?));
         }
+        if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_SET) {
+            return Ok(DnsCommand::AcmeValidationSet(check_environment(domain_name)?, check_environment(challenge)?));
+        }
+        if let Some(domain_name) = s.one_param(LIST) {
+            return Ok(DnsCommand::List(check_environment(domain_name)?));
+        }
+        Err(Error::ParseDnsCommand(s.to_owned()))
     }
 }
 
@@ -111,13 +105,22 @@ mod test {
         );
 
         assert_eq!(
-            DnsCommand::AcmeChallengeDelete("paulmin.nl".to_owned()).to_string(),
-            "acme-challenge-delete paulmin.nl".to_owned(),
+            DnsCommand::AcmeValidationDelete("paulmin.nl".to_owned()).to_string(),
+            "acme-validation-delete paulmin.nl".to_owned(),
         );
 
         assert_eq!(
-            DnsCommand::AcmeChallengeSet("paulmin.nl".to_owned(), "hallo".to_owned()).to_string(),
-            "acme-challenge-set paulmin.nl hallo".to_owned(),
+            DnsCommand::AcmeValidationSet("paulmin.nl".to_owned(), "hallo".to_owned()).to_string(),
+            "acme-validation-set paulmin.nl hallo".to_owned(),
+        );
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(
+            "acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}".parse::<DnsCommand>().unwrap(),
+            DnsCommand::AcmeValidationSet("paulmin.nl".to_owned(), "876543".to_owned())
+
         );
     }
 }

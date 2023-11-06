@@ -1,10 +1,10 @@
-use std::fmt::Display;
-
-use super::parameter;
-use crate::{error::Error, parse::Rule, Result};
-use pest::iterators::Pair;
+use std::{fmt::Display, str::FromStr};
+use crate::{error::Error, str_extension::StrExtension, check_environment};
 
 pub type DomainName = String;
+
+const ITEM: &str = "item";
+const LIST: &str = "list";
 
 #[derive(Debug, PartialEq)]
 pub enum DomainCommand {
@@ -42,26 +42,24 @@ pub enum DomainCommand {
 impl Display for DomainCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DomainCommand::Item(item) => write!(f, "item {}", item),
-            DomainCommand::List => write!(f, "list"),
+            DomainCommand::Item(item) => write!(f, "{} {}", ITEM, item),
+            DomainCommand::List => write!(f, "{}", LIST),
         }
     }
 }
 
-impl<'a> TryFrom<Pair<'a, Rule>> for DomainCommand {
-    type Error = Error;
+impl FromStr for DomainCommand {
+    type Err = Error;
 
-    fn try_from(pair: Pair<'a, Rule>) -> Result<Self> {
-        let commandline = pair.as_str().to_owned();
-        let inner = pair.into_inner().next().unwrap();
-        match inner.as_rule() {
-            Rule::domain_list => Ok(DomainCommand::List),
-            Rule::domain_item => {
-                let mut inner = inner.into_inner();
-                let name = parameter(inner.next().unwrap())?;
-                Ok(DomainCommand::Item(name))
-            }
-            _ => Err(Error::ParseDomainCommand(commandline)),
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        if s.trim() == LIST {
+            return Ok(DomainCommand::List);
+        }
+        if let Some(domain_name) = s.one_param(ITEM) {
+            Ok(DomainCommand::Item(check_environment(domain_name)?))
+        }
+        else {
+            Err(Error::ParseDomainCommand(s.to_owned()))
         }
     }
 }
@@ -78,5 +76,18 @@ mod test {
         );
 
         assert_eq!(DomainCommand::List.to_string(), "list".to_owned(),);
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(
+            "list".parse::<DomainCommand>().unwrap(),
+            DomainCommand::List,
+        );
+
+        assert_eq!(
+            "item paulmin.nl".parse::<DomainCommand>().unwrap(),
+            DomainCommand::Item("paulmin.nl".to_owned()),
+        );
     }
 }

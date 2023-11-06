@@ -1,0 +1,4 @@
+#!/usr/bin/transipctl
+
+dns acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
+sleep 30

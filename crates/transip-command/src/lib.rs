@@ -4,10 +4,8 @@ pub use dns::DnsCommand;
 pub use domain::DomainCommand;
 use error::ErrorExt;
 pub use invoice::{InvoiceAction, InvoiceCommand};
-use parse::{Rule, TransipCommandParser};
-use pest::{iterators::Pair, Parser};
 pub use product::ProductCommand;
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, str::FromStr, env::VarError};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
@@ -17,9 +15,17 @@ mod dns;
 mod domain;
 mod error;
 mod invoice;
-mod parse;
 mod product;
+mod str_extension;
 mod vps;
+
+const COMMENT: &str = "#";
+const DNS_COMMAND: &str = "dns ";
+const DOMAIN_COMMAND: &str = "domain ";
+const INVOICE_COMMAND: &str = "invoice ";
+const PRODUCT_COMMAND: &str = "product ";
+const SLEEP_COMMAND: &str = "sleep ";
+const VPS_COMMAND: &str = "vps ";
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
@@ -63,30 +69,26 @@ pub enum TransipCommand {
 impl FromStr for TransipCommand {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
-        let mut pairs = TransipCommandParser::parse(Rule::transip, s).map_err(Box::new)?;
-        let pair = pairs
-            .nth(0)
-            .ok_or(Error::ParseTransipCommand(s.to_owned()))?;
-        let inner = pair.into_inner().next().unwrap();
-        match inner.as_rule() {
-            Rule::comment => Ok(TransipCommand::Comment(inner.as_str().to_owned())),
-            Rule::dns_command => DnsCommand::try_from(inner).map(TransipCommand::Dns),
-            Rule::domain_command => DomainCommand::try_from(inner).map(TransipCommand::Domain),
-            Rule::invoice_command => InvoiceCommand::try_from(inner).map(TransipCommand::Invoice),
-            Rule::product_command => ProductCommand::try_from(inner).map(TransipCommand::Product),
-            Rule::sleep_command => Ok(TransipCommand::Sleep(
-                inner
-                    .into_inner()
-                    .next()
-                    .unwrap()
-                    .as_str()
-                    .parse::<u64>()
-                    .unwrap(),
-            )),
-            Rule::vps_command => VpsCommand::try_from(inner).map(TransipCommand::Vps),
-            _ => Err(Error::ParseTransipCommand(s.to_owned())),
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        macro_rules! parse {
+            ($s:expr, $command:expr, $subcommand:path, $map:path) => {
+                if s.starts_with($command) {
+                    return s[$command.len()..].parse::<$subcommand>().err_into().map($map);
+                }
+            };
         }
+
+        if s.starts_with(COMMENT) {
+            return Ok(TransipCommand::Comment(s.to_owned()));
+        }
+        parse!(s, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
+        parse!(s, DOMAIN_COMMAND, DomainCommand, TransipCommand::Domain);
+        parse!(s, INVOICE_COMMAND, InvoiceCommand, TransipCommand::Invoice);
+        parse!(s, PRODUCT_COMMAND, ProductCommand, TransipCommand::Product);
+        parse!(s, SLEEP_COMMAND, u64, TransipCommand::Sleep);
+        parse!(s, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
+
+        Err(Error::ParseTransipCommand(s.to_owned()))
     }
 }
 
@@ -94,30 +96,23 @@ impl Display for TransipCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TransipCommand::Comment(comment) => write!(f, "{}", comment),
-            TransipCommand::Dns(command) => write!(f, "dns {}", command),
-            TransipCommand::Domain(command) => write!(f, "domain {}", command),
-            TransipCommand::Invoice(command) => write!(f, "invoice {}", command),
-            TransipCommand::Product(command) => write!(f, "product {}", command),
-            TransipCommand::Sleep(timeout) => write!(f, "sleep {}", timeout),
-            TransipCommand::Vps(command) => write!(f, "vps {}", command),
+            TransipCommand::Dns(command) => write!(f, "{}{}", DNS_COMMAND, command),
+            TransipCommand::Domain(command) => write!(f, "{}{}", DOMAIN_COMMAND, command),
+            TransipCommand::Invoice(command) => write!(f, "{}{}", INVOICE_COMMAND, command),
+            TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),
+            TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
+            TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
         }
     }
 }
 
-fn parameter(pair: Pair<'_, Rule>) -> Result<String> {
-    match pair.as_rule() {
-        Rule::env => {
-            let name = pair
-                .as_str()
-                .strip_prefix("${")
-                .unwrap()
-                .strip_suffix('}')
-                .unwrap();
-
-            std::env::var(name).err_into()
-        }
-        Rule::value => Ok(pair.as_str().to_owned()),
-        _ => Err(Error::ParseVpsCommand(pair.as_str().to_owned())),
+fn check_environment(name: &str) -> std::result::Result<String, VarError> {
+    if name.starts_with("${") && name.ends_with("}") {
+        let s = name[2..name.len() - 1].trim();
+        std::env::var(s)
+    }
+    else {
+        Ok(name.to_owned())
     }
 }
 
@@ -155,6 +150,26 @@ mod test {
         assert_eq!(
             TransipCommand::Vps(crate::VpsCommand::List).to_string(),
             "vps list".to_owned(),
+        );
+    }
+
+    #[test]
+    fn transip_command_from_str() {
+        assert_eq!(
+            "# alsjff".parse::<TransipCommand>().unwrap(),
+            TransipCommand::Comment("# alsjff".to_owned()),
+        ); 
+        assert_eq!(
+            "dns list paulmin.nl ".parse::<TransipCommand>().unwrap(),
+            TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned()))
+        );
+        assert_eq!(
+            "vps reset paulusminus-vps2".parse::<TransipCommand>().unwrap(),
+            TransipCommand::Vps(crate::VpsCommand::Action("paulusminus-vps2".to_owned(), crate::VpsAction::Reset))
+        );
+        assert_eq!(
+            "sleep 3984".parse::<TransipCommand>().unwrap(),
+            TransipCommand::Sleep(3984),
         );
     }
 }
