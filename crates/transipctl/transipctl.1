@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "transipctl" "1" "0.2.1" "transipctl" "User Manual"
+.TH "transipctl" "1" "0.3.0" "transipctl" "User Manual"
 .hy
 .SH NAME
 .PP
@@ -27,12 +27,12 @@ the Transip Api Endpoint.
 .SH DESCRIPTION
 .PP
 \f[B]transipctl\f[R] is a command line utitity.
-Lines are read from standard in or from the FILENAME if specified.
+Lines are read from stdin or from the FILENAME if specified.
 Each line is interpreted as a command that is to be executed on the
 Transip Api Endpoint.
 .PP
 If the Transip Api Endpoint returns data, the data will be serialized as
-YAML and displayed on standard out.
+YAML and displayed on stdout.
 .PP
 See https://crates.io/crates/transip-command for a list of supported
 commands.
