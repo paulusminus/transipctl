@@ -22,5 +22,5 @@ See https://crates.io/crates/transip-command for a list of supported commands.
 Execution of commands is logged. Set RUST_LOG environment variable to define the level filter.
 
 # OPTIONS
-**-v** **--version**
+**\-v** **\-\-version**
 : display the name and version

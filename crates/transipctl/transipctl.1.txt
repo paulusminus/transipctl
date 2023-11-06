@@ -27,5 +27,5 @@ define the level filter.
 
 OPTIONS
 
--v –version
+-v --version
     display the name and version
