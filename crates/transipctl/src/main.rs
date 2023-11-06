@@ -62,7 +62,6 @@ impl Out {
     }
 }
 
-
 fn main() -> Result<()> {
     arg_version();
     log::setup_logging();
