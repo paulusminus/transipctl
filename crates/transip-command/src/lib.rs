@@ -6,6 +6,7 @@ use error::ErrorExt;
 pub use invoice::{InvoiceAction, InvoiceCommand};
 pub use product::ProductCommand;
 use std::{env::VarError, fmt::Display, str::FromStr};
+use strum::{Display, EnumString};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
@@ -26,6 +27,14 @@ const INVOICE_COMMAND: &str = "invoice ";
 const PRODUCT_COMMAND: &str = "product ";
 const SLEEP_COMMAND: &str = "sleep ";
 const VPS_COMMAND: &str = "vps ";
+const ONERROR_COMMAND: &str = "onerror ";
+
+#[derive(Clone, Debug, PartialEq, Display, EnumString)]
+#[strum(serialize_all = "lowercase")]
+pub enum OnError {
+    Print,
+    Exit,
+}
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
@@ -47,6 +56,8 @@ pub enum TransipCommand {
     Dns(dns::DnsCommand),
 
     Invoice(invoice::InvoiceCommand),
+
+    OnError(OnError),
 
     Product(product::ProductCommand),
 
@@ -87,6 +98,7 @@ impl FromStr for TransipCommand {
         parse!(s, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
         parse!(s, DOMAIN_COMMAND, DomainCommand, TransipCommand::Domain);
         parse!(s, INVOICE_COMMAND, InvoiceCommand, TransipCommand::Invoice);
+        parse!(s, ONERROR_COMMAND, OnError, TransipCommand::OnError);
         parse!(s, PRODUCT_COMMAND, ProductCommand, TransipCommand::Product);
         parse!(s, SLEEP_COMMAND, u64, TransipCommand::Sleep);
         parse!(s, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
@@ -102,6 +114,7 @@ impl Display for TransipCommand {
             TransipCommand::Dns(command) => write!(f, "{}{}", DNS_COMMAND, command),
             TransipCommand::Domain(command) => write!(f, "{}{}", DOMAIN_COMMAND, command),
             TransipCommand::Invoice(command) => write!(f, "{}{}", INVOICE_COMMAND, command),
+            TransipCommand::OnError(onerror) => write!(f, "{}{}", ONERROR_COMMAND, onerror),
             TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),
             TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
             TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
@@ -150,8 +163,13 @@ mod test {
         );
 
         assert_eq!(
-            TransipCommand::Vps(crate::VpsCommand::List).to_string(),
-            "vps list".to_owned(),
+            TransipCommand::OnError(crate::OnError::Exit).to_string(),
+            "onerror exit".to_owned(),
+        );
+
+        assert_eq!(
+            TransipCommand::OnError(crate::OnError::Print).to_string(),
+            "onerror print".to_owned(),
         );
     }
 
@@ -161,10 +179,12 @@ mod test {
             "# alsjff".parse::<TransipCommand>().unwrap(),
             TransipCommand::Comment("# alsjff".to_owned()),
         );
+
         assert_eq!(
             "dns list paulmin.nl ".parse::<TransipCommand>().unwrap(),
             TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned()))
         );
+
         assert_eq!(
             "vps reset paulusminus-vps2"
                 .parse::<TransipCommand>()
@@ -174,9 +194,20 @@ mod test {
                 crate::VpsAction::Reset
             ))
         );
+
         assert_eq!(
             "sleep 3984".parse::<TransipCommand>().unwrap(),
             TransipCommand::Sleep(3984),
+        );
+
+        assert_eq!(
+            "onerror print".parse::<TransipCommand>().unwrap(),
+            TransipCommand::OnError(crate::OnError::Print),
+        );
+
+        assert_eq!(
+            "onerror exit".parse::<TransipCommand>().unwrap(),
+            TransipCommand::OnError(crate::OnError::Exit),
         );
     }
 }

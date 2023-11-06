@@ -38,7 +38,12 @@ macro_rules! execute_out {
                     $print!("{}", s);
                 }
             }
-            Err(error) => eprintln!("Error: {error}"),
+            Err(error) => {
+                eprintln!("Error: {error}");
+                if $client.exit_on_error() {
+                    exit(1);
+                }
+            }
         }
     };
 }
@@ -59,12 +64,19 @@ impl Out {
 fn main() -> Result<()> {
     arg_version();
     let input: Input = std::env::args().try_into()?;
+    let output_format = Out::Yaml;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
+
     for (line_number, line) in input.lines().enumerate() {
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
-                Ok(command) => Out::Yaml.execute(&mut client, &command),
-                Err(error) => eprintln!("Error {} parsing line {}", error, line_number + 1),
+                Ok(command) => output_format.execute(&mut client, &command),
+                Err(error) => {
+                    eprintln!("Error {} parsing line {}", error, line_number + 1);
+                    if client.exit_on_error() {
+                        exit(1);
+                    }
+                }
             }
         }
     }

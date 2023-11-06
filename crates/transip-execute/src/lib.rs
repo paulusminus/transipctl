@@ -5,12 +5,19 @@ pub use transip::configuration_from_environment;
 use transip::Configuration;
 pub use transip::Error;
 use transip_command::{
-    DnsCommand, DomainCommand, InvoiceAction, InvoiceCommand, ProductCommand, TransipCommand,
-    VpsAction, VpsCommand,
+    DnsCommand, DomainCommand, InvoiceAction, InvoiceCommand, OnError, ProductCommand,
+    TransipCommand, VpsAction, VpsCommand,
 };
 
 pub struct Client {
     inner: transip::Client,
+    onerror: transip_command::OnError,
+}
+
+impl Client {
+    pub fn exit_on_error(&self) -> bool {
+        self.onerror == OnError::Exit
+    }
 }
 
 trait Report {
@@ -37,7 +44,10 @@ impl TryFrom<Box<dyn Configuration>> for Client {
     type Error = transip::Error;
 
     fn try_from(configuration: Box<dyn Configuration>) -> Result<Self, Self::Error> {
-        transip::Client::try_from(configuration).map(|client| Client { inner: client })
+        transip::Client::try_from(configuration).map(|client| Client {
+            inner: client,
+            onerror: OnError::Print,
+        })
     }
 }
 
@@ -133,6 +143,10 @@ impl Client {
             TransipCommand::Dns(command) => self.execute_dns(command, s),
             TransipCommand::Domain(command) => self.execute_domain(command, s),
             TransipCommand::Invoice(command) => self.execute_invoice(command, s),
+            TransipCommand::OnError(onerror) => {
+                self.onerror = onerror.clone();
+                Ok(())
+            }
             TransipCommand::Product(command) => self.execute_product(command, s),
             TransipCommand::Sleep(timeout) => {
                 std::thread::sleep(Duration::from_secs(*timeout));
