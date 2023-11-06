@@ -13,6 +13,7 @@ assets = [
     ["scripts/*", "/usr/bin/", "755"],
     ["transipctl.1", "/usr/share/man/man1/", "644"],
 ]
+extended-description-file = transipctl.1.txt
 
 [package.metadata.generate-rpm]
 assets = [
