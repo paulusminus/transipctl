@@ -11,7 +11,7 @@ version.workspace = true
 assets = [
     ["target/release/transipctl", "/usr/bin/", "755"],
     ["scripts/*", "/usr/bin/", "755"],
-    ["transipctl.1", "/usr/share/man/man1/", "644"],
+    ["docs/transipctl.1", "/usr/share/man/man1/", "644"],
 ]
 extended-description-file = "crates/transipctl/transipctl.1.txt"
 
@@ -20,7 +20,7 @@ assets = [
     { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
     { source = "scripts/certbot-validation-delete.transip", dest = "/usr/bin/certbot-validation-delete.transip", mode = "755" },
     { source = "scripts/certbot-validation-set.transip", dest = "/usr/bin/certbot-validation-set.transip", mode = "755" },
-    { source = "transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
+    { source = "docs/transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
 ]
 
 [dependencies]

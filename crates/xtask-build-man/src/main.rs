@@ -6,7 +6,7 @@
 //!         build-man
 //!
 //! DESCRIPTION
-//!         Build the man pages for packages `mdman` and `cargo`.
+//!         Build the man pages for package `transipctl`.
 //!         For more, read their doc comments.
 //! ```
 
@@ -16,11 +16,6 @@ use std::process;
 use std::process::Command;
 
 fn main() -> io::Result<()> {
-    // build_mdman()?;
-    build_transipctl()
-}
-
-fn build_transipctl() -> io::Result<()> {
     cwd_to_workspace_root()?;
 
     let src_paths = &["crates/transipctl/transipctl.man".into()];
@@ -40,11 +35,7 @@ fn cwd_to_workspace_root() -> io::Result<()> {
 }
 
 /// Builds the man pages.
-fn build_man(
-    pkg_name: &str,
-    src_paths: &[PathBuf],
-    outs: &[(&str, &str)],
-) -> io::Result<()> {
+fn build_man(pkg_name: &str, src_paths: &[PathBuf], outs: &[(&str, &str)]) -> io::Result<()> {
     for (format, dst_path) in outs {
         eprintln!("Start converting `{format}` for package `{pkg_name}`...");
         let mut cmd = Command::new(std::env!("CARGO"));

@@ -14,6 +14,9 @@ OPTIONS
        -v, --version
            Print version info and exit.
 
+       <filename>
+           Process the lines from <filename> and exit.
+
 EXAMPLES
        1. Display the version and exit:
 

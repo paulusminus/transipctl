@@ -21,6 +21,10 @@ Compile local packages and all of their dependencies.
 <dd class="option-desc">Print version info and exit.</dd>
 
 
+<dt class="option-term" id="option-transipctl-filename"><a class="option-anchor" href="#option-transipctl-filename"></a><code>&lt;filename&gt;</code></dt>
+<dd class="option-desc">Process the lines from &lt;filename&gt; and exit.</dd>
+
+
 </dl>
 
 ## EXAMPLES

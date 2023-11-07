@@ -10,12 +10,10 @@ const ORGANISATION: &str = "paulmin";
 const APPLICATION: &str = "transip";
 
 fn log_dir() -> PathBuf {
-    let local_data_dir = directories::ProjectDirs::from(
-        QUALIFIER, ORGANISATION, APPLICATION
-    )
-    .unwrap()
-    .data_local_dir()
-    .to_path_buf();
+    let local_data_dir = directories::ProjectDirs::from(QUALIFIER, ORGANISATION, APPLICATION)
+        .unwrap()
+        .data_local_dir()
+        .to_path_buf();
 
     std::env::var("TRANSIP_API_LOG_DIR")
         .map(PathBuf::from)

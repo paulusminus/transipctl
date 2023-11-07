@@ -56,18 +56,18 @@ impl super::Formatter for MdFormatter {
                 bail!("unexpected empty option with no tags `{}`", param);
             }
             let id = format!("option-{}-{}", man_name, no_tags);
-            write!(
+            writeln!(
                 result,
                 "<dt class=\"option-term\" id=\"{ID}\">\
-                <a class=\"option-anchor\" href=\"#{ID}\"></a>{OPTION}</dt>\n",
+                <a class=\"option-anchor\" href=\"#{ID}\"></a>{OPTION}</dt>",
                 ID = id,
                 OPTION = no_p
             )?;
         }
         let rendered_block = self.render_html(block)?;
-        write!(
+        writeln!(
             result,
-            "<dd class=\"option-desc\">{}</dd>\n",
+            "<dd class=\"option-desc\">{}</dd>",
             unwrap_p(&rendered_block)
         )?;
         Ok(result)

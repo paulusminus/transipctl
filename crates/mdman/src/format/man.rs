@@ -129,13 +129,13 @@ impl<'e> ManRenderer<'e> {
                                 // Section header
                                 let text = header_text(&mut self.parser)?;
                                 self.flush();
-                                write!(self.output, ".SH \"{}\"\n", text)?;
+                                writeln!(self.output, ".SH \"{}\"", text)?;
                                 suppress_paragraph = true;
                             } else {
                                 // Subsection header
                                 let text = header_text(&mut self.parser)?;
                                 self.flush();
-                                write!(self.output, ".SS \"{}\"\n", text)?;
+                                writeln!(self.output, ".SS \"{}\"", text)?;
                                 suppress_paragraph = true;
                             }
                         }
@@ -306,7 +306,7 @@ impl<'e> ManRenderer<'e> {
                                     panic!("unexpected tag {:?}", tag);
                                 }
                             }
-                            write!(self.output, "<{}>", escape(&dest_url)?)?;
+                            write!(self.output, "<{}>", escape(dest_url)?)?;
                         }
                         Tag::Image(_link_type, _dest_url, _title) => {}
                     }
@@ -414,8 +414,7 @@ fn escape(s: &str) -> Result<String, Error> {
         .replace('“', "\\[lq]") // \u{201C} left double quote
         .replace('”', "\\[rq]") // \u{201D} right double quote
         .replace('…', "\\[u2026]") // \u{2026} ellipsis
-        .replace('│', "|") // \u{2502} box drawing light vertical (could use \[br])
-        .replace('├', "|") // \u{251C} box drawings light vertical and right
+        .replace(['│', '├'], "|") // \u{2502} box drawing light vertical (could use \[br])
         .replace('└', "`") // \u{2514} box drawings light up and right
         .replace('─', "\\-") // \u{2500} box drawing light horizontal
     ;

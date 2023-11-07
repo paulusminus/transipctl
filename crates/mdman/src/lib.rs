@@ -112,7 +112,7 @@ pub fn extract_section(file: &Path) -> Result<Section, Error> {
     if !line.starts_with("# ") {
         bail!("expected input file to start with # header");
     }
-    let (_name, section) = util::parse_name_and_section(&line[2..].trim()).with_context(|| {
+    let (_name, section) = util::parse_name_and_section(line[2..].trim()).with_context(|| {
         format!(
             "expected input file to have header with the format `# command-name(1)`, found: `{}`",
             line

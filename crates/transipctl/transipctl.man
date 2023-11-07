@@ -20,6 +20,10 @@ Compile local packages and all of their dependencies.
 Print version info and exit.
 {{/option}}
 
+{{#option "`<filename>`" }}
+Process the lines from \<filename\> and exit.
+{{/option}}
+
 {{/options}}
 
 ## EXAMPLES

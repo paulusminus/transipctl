@@ -441,7 +441,7 @@ impl Table {
 
     /// Processes table events and generates a text table.
     fn process(&mut self, parser: &mut EventIter<'_>, indent: usize) -> Result<String, Error> {
-        while let Some((event, _range)) = parser.next() {
+        for (event, _range) in parser.by_ref() {
             match event {
                 Event::Start(tag) => match tag {
                     Tag::TableHead
@@ -457,11 +457,11 @@ impl Table {
                 Event::End(tag) => match tag {
                     Tag::Table(_) => return self.render(indent),
                     Tag::TableCell => {
-                        let cell = mem::replace(&mut self.cell, String::new());
+                        let cell = mem::take(&mut self.cell);
                         self.row.push(cell);
                     }
                     Tag::TableHead | Tag::TableRow => {
-                        let row = mem::replace(&mut self.row, Vec::new());
+                        let row = mem::take(&mut self.row);
                         self.rows.push(row);
                     }
                     Tag::Strikethrough => self.cell.push_str("~~"),
@@ -593,7 +593,7 @@ fn fill_cell(text: &str, width: usize, alignment: Alignment) -> Vec<String> {
                 line.push_str(word);
             } else {
                 line.push(' ');
-                line.push_str(&word);
+                line.push_str(word);
             }
         }
         if !line.is_empty() {

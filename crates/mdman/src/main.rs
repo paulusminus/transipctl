@@ -49,7 +49,7 @@ fn run() -> Result<(), Error> {
             bail!("cannot output to the same file as the source");
         }
         eprintln!("Converting {} -> {}", source.display(), out_path.display());
-        let result = mdman::convert(&source, opts.format, opts.url.clone(), opts.man_map.clone())
+        let result = mdman::convert(source, opts.format, opts.url.clone(), opts.man_map.clone())
             .with_context(|| format!("failed to translate {}", source.display()))?;
 
         std::fs::write(out_path, result)?;

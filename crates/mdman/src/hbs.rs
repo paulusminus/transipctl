@@ -54,7 +54,7 @@ impl HelperDef for OptionsHelper<'_> {
         // Prevent nested {{#options}}.
         set_in_context(rc, "__MDMAN_IN_OPTIONS", serde_json::Value::Bool(true));
         let s = self.formatter.render_options_start();
-        out.write(&s)?;
+        out.write(s)?;
         let t = match h.template() {
             Some(t) => t,
             None => return Err(RenderError::new("options block must not be empty")),
@@ -63,7 +63,7 @@ impl HelperDef for OptionsHelper<'_> {
         out.write(&block)?;
 
         let s = self.formatter.render_options_end();
-        out.write(&s)?;
+        out.write(s)?;
         remove_from_context(rc, "__MDMAN_IN_OPTIONS");
         Ok(())
     }
