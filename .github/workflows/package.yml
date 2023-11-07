@@ -20,6 +20,8 @@ jobs:
       run: cargo install cargo-generate-rpm
     - name: Install cargo deb
       run: cargo install cargo-deb
+    - name: Build man page
+      run: cargo build-man
     - name: Build for x86_64
       run: cargo build --release
     - name: Generate rpm
