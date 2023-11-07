@@ -22,6 +22,8 @@ If you want to install transipctl for all users you can find a debian or rpm pac
 ```bash
 #!/usr/bin/transipctl
 
+onerror exit
+
 dns acme-challenge-delete paulmin.nl
 ```
 
@@ -29,6 +31,8 @@ dns acme-challenge-delete paulmin.nl
 
 ```bash
 #!/usr/bin/transipctl
+
+onerror exit
 
 dns acme-challenge-set paulmin.nl dlkjfkeig
 ```
@@ -40,6 +44,8 @@ dns acme-challenge-set paulmin.nl dlkjfkeig
 ```bash
 #!/usr/bin/transipctl
 
+onerror exit
+
 dns acme-challenge-delete ${CERTBOT_DOMAIN}
 ```
 
@@ -47,6 +53,8 @@ dns acme-challenge-delete ${CERTBOT_DOMAIN}
 
 ```bash
 #!/usr/bin/transipctl
+
+onerror exit
 
 dns acme-challenge-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 ```
