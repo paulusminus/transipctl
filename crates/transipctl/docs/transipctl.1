@@ -1,0 +1,39 @@
+'\" t
+.TH "TRANSIPCTL" "1"
+.nh
+.ad l
+.ss \n[.ss] 0
+.SH "NAME"
+transipctl \[em] Parse lines into commands to be executed on Transip Api Endpoint
+.SH "SYNOPSIS"
+\fBtransipctl\fR [\fIoptions\fR]
+.SH "DESCRIPTION"
+Compile local packages and all of their dependencies.
+.SH "OPTIONS"
+.sp
+\fB\-v\fR, 
+\fB\-\-version\fR
+.RS 4
+Print version info and exit.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+\h'-04' 1.\h'+01'Display the version and exit:
+.sp
+.RS 4
+.nf
+transipctl \-v
+.fi
+.RE
+.RE
+.sp
+.RS 4
+\h'-04' 2.\h'+01'Execute one command and exit:
+.sp
+.RS 4
+.nf
+echo "domain list" | transipctl
+.fi
+.RE
+.RE

@@ -1,0 +1,33 @@
+# transipctl(1)
+
+## NAME
+
+transipctl --- Parse lines into commands to be executed on Transip Api Endpoint
+
+## SYNOPSIS
+
+`transipctl` [_options_]
+
+## DESCRIPTION
+
+Compile local packages and all of their dependencies.
+
+## OPTIONS
+
+{{#options}}
+
+{{#option "`-v`" "`--version`" }}
+Print version info and exit.
+{{/option}}
+
+{{/options}}
+
+## EXAMPLES
+
+1. Display the version and exit:
+
+       transipctl -v
+
+2. Execute one command and exit:
+
+       echo "domain list" | transipctl

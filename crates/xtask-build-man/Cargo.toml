@@ -1,0 +1,11 @@
+[package]
+name = "xtask-build-man"
+authors.workspace = true
+description = "Build task for mdman"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
