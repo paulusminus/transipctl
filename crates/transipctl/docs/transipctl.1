@@ -8,18 +8,20 @@ transipctl \[em] Parse lines into commands to be executed on Transip Api Endpoin
 .SH "SYNOPSIS"
 \fBtransipctl\fR [\fIoptions\fR]
 .SH "DESCRIPTION"
-Compile local packages and all of their dependencies.
+This command takes lines from stdin or the filename provided. Each line is interpreted as a command to 
+be executed on the Transip Api Endpoint. See \fI\f(BIcommand\fI\fR <https://crates.io/crates/transip\-command> for all
+list of available commands.
 .SH "OPTIONS"
 .sp
 \fB\-v\fR, 
 \fB\-\-version\fR
 .RS 4
-Print version info and exit.
+Print version info and exit. This option cannot be combined with other options.
 .RE
 .sp
 \fB<filename>\fR
 .RS 4
-Process the lines from <filename> and exit.
+Process the lines from <filename> and exit. This option cannot be combined with other options.
 .RE
 .SH "EXAMPLES"
 .sp

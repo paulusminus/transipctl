@@ -26,17 +26,12 @@ trait Report {
 
 impl<T: Serialize> Report for Result<T, transip::Error> {
     fn report(self, s: impl Serializer) -> Result<(), transip::Error> {
-        match self {
-            Ok(result) => {
-                if size_of::<T>() == 0 {
-                    Ok(())
-                } else {
-                    result.serialize(s).unwrap();
-                    Ok(())
-                }
-            }
-            Err(error) => Err(error),
-        }
+        self.and_then(|result| {
+            if size_of::<T>() > 0 {
+                result.serialize(s).unwrap();
+            } 
+            Ok(())
+        })
     }
 }
 

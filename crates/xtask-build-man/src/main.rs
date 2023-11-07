@@ -15,14 +15,17 @@ use std::path::PathBuf;
 use std::process;
 use std::process::Command;
 
+const SOURCE_FILE: &str = "crates/transipctl/transipctl.man";
+const DEST_PATH: &str = "crates/transipctl/docs";
+const PKG_NAME: &str = "transipctl";
+
 fn main() -> io::Result<()> {
     cwd_to_workspace_root()?;
 
-    let src_paths = &["crates/transipctl/transipctl.man".into()];
-    let dst_path = "crates/transipctl/docs";
-    let outs = [("md", dst_path), ("txt", dst_path), ("man", dst_path)];
+    let src_paths = &[SOURCE_FILE.into()];
+    let outs = [("md", DEST_PATH), ("txt", DEST_PATH), ("man", DEST_PATH)];
 
-    build_man("mdman", src_paths, &outs)
+    build_man(PKG_NAME, src_paths, &outs)
 }
 
 /// Change to workspace root.

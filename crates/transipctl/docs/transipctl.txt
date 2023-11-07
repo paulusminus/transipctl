@@ -8,14 +8,19 @@ SYNOPSIS
        transipctl [options]
 
 DESCRIPTION
-       Compile local packages and all of their dependencies.
+       This command takes lines from stdin or the filename provided. Each line
+       is interpreted as a command to be executed on the Transip Api Endpoint.
+       See command <https://crates.io/crates/transip-command> for all list of
+       available commands.
 
 OPTIONS
        -v, --version
-           Print version info and exit.
+           Print version info and exit. This option cannot be combined with
+           other options.
 
        <filename>
-           Process the lines from <filename> and exit.
+           Process the lines from <filename> and exit. This option cannot be
+           combined with other options.
 
 EXAMPLES
        1. Display the version and exit:
