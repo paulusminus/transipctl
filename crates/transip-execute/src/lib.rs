@@ -66,6 +66,11 @@ impl Client {
                         .dns_entry_insert(name, DnsEntry::new_acme_challenge(60, challenge))
                 })
                 .report(s),
+                DnsCommand::AcmeValidationCheck(name, challenge ) => {
+                    acme_validation_propagation::wait(name, challenge).map_err(
+                        |_| Error::AcmeChallege
+                    )
+                }
         }
     }
 

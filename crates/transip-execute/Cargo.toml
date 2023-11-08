@@ -8,6 +8,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
+acme-validation-propagation = "0.1.5"
 serde = "1.0.190"
 transip = "0.1.5"
 transip-command = { version = "0.3.1", path = "../transip-command" }

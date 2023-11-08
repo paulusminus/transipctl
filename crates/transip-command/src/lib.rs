@@ -24,10 +24,10 @@ const COMMENT: &str = "#";
 const DNS_COMMAND: &str = "dns ";
 const DOMAIN_COMMAND: &str = "domain ";
 const INVOICE_COMMAND: &str = "invoice ";
+const ONERROR_COMMAND: &str = "onerror ";
 const PRODUCT_COMMAND: &str = "product ";
 const SLEEP_COMMAND: &str = "sleep ";
 const VPS_COMMAND: &str = "vps ";
-const ONERROR_COMMAND: &str = "onerror ";
 
 #[derive(Clone, Debug, PartialEq, Display, EnumString)]
 #[strum(serialize_all = "lowercase")]

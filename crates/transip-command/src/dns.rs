@@ -5,6 +5,7 @@ pub type DomainName = String;
 
 const ACME_VALIDATION_DELETE: &str = "acme-validation-delete";
 const ACME_VALIDATION_SET: &str = "acme-validation-set";
+const ACME_VALIDATION_CHECK: &str = "acme-validation-check";
 const LIST: &str = "list";
 
 #[derive(Debug, PartialEq)]
@@ -60,6 +61,8 @@ pub enum DnsCommand {
     /// );
     /// ```
     AcmeValidationSet(DomainName, String),
+
+    AcmeValidationCheck(DomainName, String),
 }
 
 impl Display for DnsCommand {
@@ -71,6 +74,9 @@ impl Display for DnsCommand {
             DnsCommand::List(name) => write!(f, "{} {}", LIST, name),
             DnsCommand::AcmeValidationSet(name, challenge) => {
                 write!(f, "{} {} {}", ACME_VALIDATION_SET, name, challenge)
+            }
+            DnsCommand::AcmeValidationCheck(name, challenge) => {
+                write!(f, "{} {} {}", ACME_VALIDATION_CHECK, name, challenge)
             }
         }
     }

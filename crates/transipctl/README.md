@@ -1,5 +1,6 @@
 ![`build-badge`]
 [![`mit-badge`]](https://opensource.org/licenses/MIT)
+[![Crates.io](https://img.shields.io/crates/v/transipctl)](https://crates.io/crates/transipctl)
 
 # transipctl
 
