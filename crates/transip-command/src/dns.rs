@@ -97,6 +97,12 @@ impl FromStr for DnsCommand {
                 check_environment(challenge)?,
             ));
         }
+        if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_CHECK) {
+            return Ok(DnsCommand::AcmeValidationCheck(
+                check_environment(domain_name)?,
+                check_environment(challenge)?,
+            ));
+        }
         if let Some(domain_name) = s.one_param(LIST) {
             return Ok(DnsCommand::List(check_environment(domain_name)?));
         }

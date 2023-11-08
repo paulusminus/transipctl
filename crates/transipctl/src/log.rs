@@ -5,19 +5,22 @@ use tracing_subscriber::{
     EnvFilter,
 };
 
+use crate::error::{Error, ErrorExt};
+
 const QUALIFIER: &str = "nl";
 const ORGANISATION: &str = "paulmin";
 const APPLICATION: &str = "transip";
 
 fn log_dir() -> PathBuf {
     let local_data_dir = directories::ProjectDirs::from(QUALIFIER, ORGANISATION, APPLICATION)
-        .unwrap()
-        .data_local_dir()
-        .to_path_buf();
+        .map(|project_dirs| {
+            project_dirs.data_local_dir().to_path_buf()
+        })
+        .ok_or(Error::Xdg("XDG not found"));
 
     std::env::var("TRANSIP_API_LOG_DIR")
-        .map(PathBuf::from)
-        .unwrap_or(local_data_dir)
+        .err_into()
+        .map_or_else(|_| local_data_dir.unwrap(), PathBuf::from)
 }
 
 pub fn setup_logging() {

@@ -38,6 +38,9 @@ pub enum Error {
 
     #[error("Command: {0}")]
     Command(#[from] transip_command::Error),
+
+    #[error("XDG: {0}")]
+    Xdg(&'static str),
 }
 
 pub trait ErrorExt<T, E> {
