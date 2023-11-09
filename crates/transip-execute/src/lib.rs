@@ -139,6 +139,7 @@ impl Client {
         command: &TransipCommand,
         s: impl Serializer,
     ) -> Result<(), transip::Error> {
+        use transip::api::general::GeneralApi;
         match command {
             TransipCommand::Comment(_) => Ok(()),
             TransipCommand::Dns(command) => self.execute_dns(command, s),
@@ -148,6 +149,7 @@ impl Client {
                 self.onerror = onerror.clone();
                 Ok(())
             }
+            TransipCommand::Ping => self.inner.api_test().report(s),
             TransipCommand::Product(command) => self.execute_product(command, s),
             TransipCommand::Sleep(timeout) => {
                 std::thread::sleep(Duration::from_secs(*timeout));

@@ -21,6 +21,7 @@ mod str_extension;
 mod vps;
 
 const COMMENT: &str = "#";
+const PING: &str = "ping";
 const DNS_COMMAND: &str = "dns ";
 const DOMAIN_COMMAND: &str = "domain ";
 const INVOICE_COMMAND: &str = "invoice ";
@@ -63,6 +64,8 @@ pub enum TransipCommand {
 
     Vps(vps::VpsCommand),
 
+    Ping,
+
     /// # Example
     ///
     /// ```
@@ -97,6 +100,9 @@ impl FromStr for TransipCommand {
             return Ok(TransipCommand::Comment(s.to_owned()));
         }
         let trimmed = s.trim();
+        if trimmed == PING {
+            return Ok(TransipCommand::Ping);
+        }
         parse!(trimmed, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
         parse!(
             trimmed,
@@ -135,6 +141,7 @@ impl Display for TransipCommand {
             TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),
             TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
             TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
+            TransipCommand::Ping => write!(f, "{}", PING),
         }
     }
 }
@@ -188,6 +195,8 @@ mod test {
             TransipCommand::OnError(crate::OnError::Print).to_string(),
             "onerror print".to_owned(),
         );
+
+        assert_eq!(TransipCommand::Ping.to_string(), "ping".to_owned(),);
     }
 
     #[test]
@@ -208,7 +217,7 @@ mod test {
                 .unwrap(),
             TransipCommand::Vps(crate::VpsCommand::Action(
                 "paulusminus-vps2".to_owned(),
-                crate::VpsAction::Reset
+                crate::VpsAction::Reset,
             ))
         );
 
@@ -225,6 +234,11 @@ mod test {
         assert_eq!(
             "onerror   exit".parse::<TransipCommand>().unwrap(),
             TransipCommand::OnError(crate::OnError::Exit),
+        );
+
+        assert_eq!(
+            " ping ".parse::<TransipCommand>().unwrap(),
+            TransipCommand::Ping,
         );
     }
 }
