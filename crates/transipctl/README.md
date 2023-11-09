@@ -6,7 +6,7 @@
 
 transipctl is an executable that processes lines with transip api commands. It can take input from a file or stdin.
 
-It uses the [`transip-command`] and the [`transip-execute`](https://crates.io/crates/transip-execute) library crates.
+It uses the [`transip-execute`] library crates.
 
 If you want to install transipctl for all users you can find a debian or rpm package on [`github-releases`].
 

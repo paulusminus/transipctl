@@ -33,5 +33,4 @@ tracing = "0.1.40"
 tracing-appender = "0.2.2"
 tracing-log = "0.2.0"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "local-time"] }
-transip-command = { version = "0.3.1", path = "../transip-command", features = ["propagation"] }
-transip-execute = { version = "0.3.1", path = "../transip-execute", features = ["propagation"] }
+transip-execute = { version = "0.3", path = "../transip-execute", features = ["propagation"] }

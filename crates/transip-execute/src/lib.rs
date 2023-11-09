@@ -5,9 +5,12 @@ pub use transip::configuration_from_environment;
 use transip::Configuration;
 pub use transip::Error;
 use transip_command::{
-    DnsCommand, DomainCommand, InvoiceAction, InvoiceCommand, OnError, ProductCommand,
-    TransipCommand, VpsAction, VpsCommand,
+    DnsCommand, DomainCommand, InvoiceAction, InvoiceCommand, OnError, ProductCommand, VpsAction,
+    VpsCommand,
 };
+
+// reexport TransipCommand
+pub use transip_command::TransipCommand;
 
 pub struct Client {
     inner: transip::Client,

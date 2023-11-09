@@ -1,7 +1,6 @@
 use input::Input;
 use std::process::exit;
-use transip_command::TransipCommand;
-use transip_execute::{configuration_from_environment, Client};
+use transip_execute::{configuration_from_environment, Client, TransipCommand};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
