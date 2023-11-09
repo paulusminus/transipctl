@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Add musl packages
-        run: apt install -y musl-tools
+        run: sudo apt install -y musl-tools
       - name: Add musl toolchain
         run: rustup target add x86_64-unknown-linux-musl
       - name: Checkout repository
