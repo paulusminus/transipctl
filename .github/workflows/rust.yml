@@ -22,5 +22,8 @@ jobs:
       run: cargo build-man
     - name: Run tests
       run: cargo test --verbose
+      env:
+        CERTBOT_DOMAIN: paulmin.nl
+        CERTBOT_VALIDATION: 876543
     - name: Build for x86_64
       run: cargo build --verbose
