@@ -36,16 +36,10 @@ mod test {
 
     #[test]
     fn has_one() {
-        assert_eq!(
-            "elements  dlkf".one_param("elements"),
-            Some("dlkf"),
-        );
+        assert_eq!("elements  dlkf".one_param("elements"), Some("dlkf"),);
 
         assert!("elements dlkjf kgjf".one_param("elements").is_none());
-        assert_eq!(
-            "elements   ".one_param("elements"),
-            None
-        );
+        assert_eq!("elements   ".one_param("elements"), None);
     }
 
     #[test]
@@ -65,19 +59,21 @@ mod test {
         let s = "dit is een  mooi dag   om werkelijk waar te zijn";
         let mut splitted = s.split_ascii_whitespace();
 
-        assert_eq!(
-            splitted.next(),
-            Some("dit"),
-        );
+        assert_eq!(splitted.next(), Some("dit"),);
 
-        assert_eq!(
-            splitted.next(),
-            Some("is"),
-        );
+        assert_eq!(splitted.next(), Some("is"),);
         assert_eq!(
             splitted.collect::<Vec<_>>(),
-            vec!["een", "mooi", "dag", "om", "werkelijk", "waar", "te", "zijn"],
+            vec![
+                "een",
+                "mooi",
+                "dag",
+                "om",
+                "werkelijk",
+                "waar",
+                "te",
+                "zijn"
+            ],
         );
-
     }
 }

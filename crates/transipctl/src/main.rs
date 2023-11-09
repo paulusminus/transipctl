@@ -40,8 +40,7 @@ fn handle_ok(buffer: Vec<u8>, extra_newline: bool) {
     if !s.is_empty() {
         if extra_newline {
             println!("{}", s);
-        }
-        else {
+        } else {
             print!("{}", s);
         }
     }
@@ -94,7 +93,10 @@ fn main() -> Result<()> {
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => output_format.execute(&mut client, &command),
-                Err(error) => handle_error(format!("Error {} parsing line {}", error, line_number + 1), client.exit_on_error()),
+                Err(error) => handle_error(
+                    format!("Error {} parsing line {}", error, line_number + 1),
+                    client.exit_on_error(),
+                ),
             }
         }
     }

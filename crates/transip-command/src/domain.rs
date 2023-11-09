@@ -1,5 +1,12 @@
-use crate::{check_environment, error::{Error, ErrorExt}, str_extension::StrExtension};
-use std::{fmt::Display, str::{FromStr, SplitAsciiWhitespace}};
+use crate::{
+    check_environment,
+    error::{Error, ErrorExt},
+    str_extension::StrExtension,
+};
+use std::{
+    fmt::Display,
+    str::{FromStr, SplitAsciiWhitespace},
+};
 
 pub type DomainName = String;
 
@@ -71,21 +78,29 @@ impl<'a> TryFrom<SplitAsciiWhitespace<'a>> for DomainCommand {
         if first == Some(LIST) {
             if value.next().is_none() {
                 return Ok(DomainCommand::List);
-            }
-            else {
-                return Err(Error::ParseDomainCommand("domain item takes no parameters".to_owned()));
+            } else {
+                return Err(Error::ParseDomainCommand(
+                    "domain item takes no parameters".to_owned(),
+                ));
             }
         }
         if first == Some(ITEM) {
-            let second = value.next().ok_or(Error::ParseDnsCommand("no domain name".to_owned()))?;
+            let second = value
+                .next()
+                .ok_or(Error::ParseDnsCommand("no domain name".to_owned()))?;
             if value.next().is_none() {
-                return check_environment(second).err_into().map(DomainCommand::Item);
-            }
-            else {
-                return Err(Error::ParseDomainCommand("domain item takes 1 parameter only".to_owned()));
+                return check_environment(second)
+                    .err_into()
+                    .map(DomainCommand::Item);
+            } else {
+                return Err(Error::ParseDomainCommand(
+                    "domain item takes 1 parameter only".to_owned(),
+                ));
             }
         }
-        return Err(Error::ParseDomainCommand("unknown subcommand for domain. Please use list or item".to_owned()));
+        Err(Error::ParseDomainCommand(
+            "unknown subcommand for domain. Please use list or item".to_owned(),
+        ))
     }
 }
 

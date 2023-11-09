@@ -98,10 +98,25 @@ impl FromStr for TransipCommand {
         }
         let trimmed = s.trim();
         parse!(trimmed, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
-        parse!(trimmed, DOMAIN_COMMAND, DomainCommand, TransipCommand::Domain);
-        parse!(trimmed, INVOICE_COMMAND, InvoiceCommand, TransipCommand::Invoice);
+        parse!(
+            trimmed,
+            DOMAIN_COMMAND,
+            DomainCommand,
+            TransipCommand::Domain
+        );
+        parse!(
+            trimmed,
+            INVOICE_COMMAND,
+            InvoiceCommand,
+            TransipCommand::Invoice
+        );
         parse!(trimmed, ONERROR_COMMAND, OnError, TransipCommand::OnError);
-        parse!(trimmed, PRODUCT_COMMAND, ProductCommand, TransipCommand::Product);
+        parse!(
+            trimmed,
+            PRODUCT_COMMAND,
+            ProductCommand,
+            TransipCommand::Product
+        );
         parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
         parse!(trimmed, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
 

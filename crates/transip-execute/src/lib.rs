@@ -29,7 +29,7 @@ impl<T: Serialize> Report for Result<T, transip::Error> {
         self.map(|result| {
             if size_of::<T>() > 0 {
                 result.serialize(s).unwrap();
-            } 
+            }
         })
     }
 }
@@ -66,12 +66,10 @@ impl Client {
                         .dns_entry_insert(name, DnsEntry::new_acme_challenge(60, challenge))
                 })
                 .report(s),
-                #[cfg(feature = "propagation")]
-                DnsCommand::AcmeValidationCheck(name, challenge ) => {
-                    acme_validation_propagation::wait(name, challenge).map_err(
-                        |_| Error::AcmeChallege
-                    )
-                }
+            #[cfg(feature = "propagation")]
+            DnsCommand::AcmeValidationCheck(name, challenge) => {
+                acme_validation_propagation::wait(name, challenge).map_err(|_| Error::AcmeChallege)
+            }
         }
     }
 

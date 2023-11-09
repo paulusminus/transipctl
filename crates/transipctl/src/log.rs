@@ -13,9 +13,7 @@ const APPLICATION: &str = "transip";
 
 fn log_dir() -> PathBuf {
     let local_data_dir = directories::ProjectDirs::from(QUALIFIER, ORGANISATION, APPLICATION)
-        .map(|project_dirs| {
-            project_dirs.data_local_dir().to_path_buf()
-        })
+        .map(|project_dirs| project_dirs.data_local_dir().to_path_buf())
         .ok_or(Error::Xdg("XDG not found"));
 
     std::env::var("TRANSIP_API_LOG_DIR")
