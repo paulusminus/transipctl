@@ -18,6 +18,7 @@ transip-command is a library that can parse a string and turn it in a command. I
 - invoice item \<invoicenumber\>
 - invoice pdf \<invoicenumber\>
 - onerror print | exit
+- ping
 - product list
 - product elements \<productname\>
 - sleep \<number-of-seconds\>
