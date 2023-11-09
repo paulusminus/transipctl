@@ -19,7 +19,7 @@ If you want to install transipctl for all users you can find a debian or rpm pac
 
 onerror exit
 
-dns acme-challenge-delete paulmin.nl
+dns acme-validation-delete paulmin.nl
 ```
 
 ### Example script set acme challenge
@@ -29,7 +29,7 @@ dns acme-challenge-delete paulmin.nl
 
 onerror exit
 
-dns acme-challenge-set paulmin.nl dlkjfkeig
+dns acme-validation-set paulmin.nl dlkjfkeig
 ```
 
 ## Examples of environment variables in script files
