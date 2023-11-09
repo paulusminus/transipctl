@@ -6,16 +6,13 @@
 # transip-execute
 
 transip-execute is a library that executes commands on the Transip Api Endpoint.
-It uses the [`transip-command`] and the [`transip`] crates.
+It uses the [`transip-command`] and the [`transip`] crates. It has one optional feature propagation.
+If enabled you can execute a "dns acme-validation-check \<domain-name\> \<acme-validation\> command.
 
 
 ## Usage
 
 Set environment variables needed to configure the Client. See [`transip`] documentation.
-
-```bash
-cargo add transip-execute
-```
 
 [`transip-command`]: https://crates.io/crates/transip-command
 [`transip`]: https://crates.io/crates/transip

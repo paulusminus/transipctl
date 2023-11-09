@@ -6,7 +6,7 @@
 
 transipctl is an executable that processes lines with transip api commands. It can take input from a file or stdin.
 
-It uses the [transip](https://crates.io/crates/transip) and [transip-command](https://crates.io/crates/transip-command) library crates.
+It uses the [`transip-command`] and the [`transip-execute`](https://crates.io/crates/transip-execute) library crates.
 
 If you want to install transipctl for all users you can find a debian or rpm package on [`github-releases`].
 
@@ -57,3 +57,5 @@ dns acme-challenge-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 [`build-badge`]: https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg
 [`mit-badge`]: https://img.shields.io/badge/License-MIT-yellow.svg
 [`github-releases`]: https://github.com/paulusminus/transipctl/releases/latest/
+[`transip-command`]: https://crates.io/crates/transip-command
+[`transip-execute`]: https://crates.io/crates/transip-execute

@@ -5,14 +5,7 @@
 
 # transip-command
 
-transip-command is a library that can parse a string and turn it in a command.
-
-
-## Installation
-
-```bash
-cargo install transip-command
-```
+transip-command is a library that can parse a string and turn it in a command. It has one optional feature propagation. If you enable this feature a extra command "dns acme-validation-check \<domainname\> \<acme-validation\>" is added.
 
 ## Commands
 
