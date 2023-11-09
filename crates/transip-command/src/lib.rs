@@ -82,9 +82,10 @@ impl FromStr for TransipCommand {
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         macro_rules! parse {
-            ($s:expr, $command:expr, $sub_command_type:path, $map:path) => {
-                if let Some(sub_command) = s.strip_prefix($command) {
+            ($trimmed:expr, $command:expr, $sub_command_type:path, $map:path) => {
+                if let Some(sub_command) = $trimmed.strip_prefix($command) {
                     return sub_command
+                        .trim()
                         .parse::<$sub_command_type>()
                         .err_into()
                         .map($map);
@@ -95,13 +96,14 @@ impl FromStr for TransipCommand {
         if s.starts_with(COMMENT) {
             return Ok(TransipCommand::Comment(s.to_owned()));
         }
-        parse!(s, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
-        parse!(s, DOMAIN_COMMAND, DomainCommand, TransipCommand::Domain);
-        parse!(s, INVOICE_COMMAND, InvoiceCommand, TransipCommand::Invoice);
-        parse!(s, ONERROR_COMMAND, OnError, TransipCommand::OnError);
-        parse!(s, PRODUCT_COMMAND, ProductCommand, TransipCommand::Product);
-        parse!(s, SLEEP_COMMAND, u64, TransipCommand::Sleep);
-        parse!(s, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
+        let trimmed = s.trim();
+        parse!(trimmed, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
+        parse!(trimmed, DOMAIN_COMMAND, DomainCommand, TransipCommand::Domain);
+        parse!(trimmed, INVOICE_COMMAND, InvoiceCommand, TransipCommand::Invoice);
+        parse!(trimmed, ONERROR_COMMAND, OnError, TransipCommand::OnError);
+        parse!(trimmed, PRODUCT_COMMAND, ProductCommand, TransipCommand::Product);
+        parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
+        parse!(trimmed, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
 
         Err(Error::ParseTransipCommand(s.to_owned()))
     }
@@ -186,7 +188,7 @@ mod test {
         );
 
         assert_eq!(
-            "vps reset paulusminus-vps2"
+            "vps \treset paulusminus-vps2"
                 .parse::<TransipCommand>()
                 .unwrap(),
             TransipCommand::Vps(crate::VpsCommand::Action(
@@ -201,12 +203,12 @@ mod test {
         );
 
         assert_eq!(
-            "onerror print".parse::<TransipCommand>().unwrap(),
+            "onerror print  ".parse::<TransipCommand>().unwrap(),
             TransipCommand::OnError(crate::OnError::Print),
         );
 
         assert_eq!(
-            "onerror exit".parse::<TransipCommand>().unwrap(),
+            "onerror   exit".parse::<TransipCommand>().unwrap(),
             TransipCommand::OnError(crate::OnError::Exit),
         );
     }

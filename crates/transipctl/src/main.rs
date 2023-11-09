@@ -6,6 +6,7 @@ use transip_execute::{configuration_from_environment, Client};
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
+const EXIT_COMMANDS: [&str; 2] = ["exit", "quit"];
 
 mod error;
 mod input;
@@ -80,13 +81,16 @@ fn main() -> Result<()> {
     log::setup_logging();
     let input: Input = std::env::args().try_into()?;
 
-    let run_from = input.run_from();
+    let (interactive, run_from) = input.run_from();
     tracing::info!("Running {} {}", VERSION, run_from);
 
     let output_format = Out::Yaml;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
 
     for (line_number, line) in input.lines().enumerate() {
+        if EXIT_COMMANDS.contains(&line.trim().to_ascii_lowercase().as_str()) && interactive {
+            break;
+        }
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => output_format.execute(&mut client, &command),

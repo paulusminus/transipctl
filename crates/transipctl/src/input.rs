@@ -11,11 +11,10 @@ pub struct Input {
 }
 
 impl Input {
-    pub fn run_from(&self) -> String {
-        match &self.script {
-            Some(script) => format!("from script {}", script),
-            None => "interactively".into(),
-        }
+    pub fn run_from(&self) -> (bool, String) {
+        self.script.as_ref()
+            .map(|script| (false, format!("script {}", &script)))
+            .unwrap_or((true, "interactive".into()))
     }
 
     pub fn lines(self) -> impl Iterator<Item = String> {

@@ -8,12 +8,6 @@ transipctl is an executable that processes lines with transip api commands. It c
 
 It uses the [transip](https://crates.io/crates/transip) and [transip-command](https://crates.io/crates/transip-command) library crates.
 
-## Installation
-
-```bash
-cargo install transipctl
-```
-
 If you want to install transipctl for all users you can find a debian or rpm package on [`github-releases`].
 
 ## Examples of using transipctl in script files
