@@ -4,7 +4,6 @@ resolver = "2"
 
 [profile.release]
 strip = true
-lto = true
 
 [workspace.package]
 authors = ["Paul Min"]
