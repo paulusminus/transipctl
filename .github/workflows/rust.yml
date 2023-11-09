@@ -18,6 +18,8 @@ jobs:
       run: cargo fmt --check
     - name: Clippy
       run: cargo clippy -- -D warnings
+    - name: Build man page for transipctl
+      run: cargo build-man
     - name: Run tests
       run: cargo test --verbose
     - name: Build for x86_64

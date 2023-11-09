@@ -5,6 +5,7 @@ pub type DomainName = String;
 
 const ACME_VALIDATION_DELETE: &str = "acme-validation-delete";
 const ACME_VALIDATION_SET: &str = "acme-validation-set";
+#[cfg(feature = "propagation")]
 const ACME_VALIDATION_CHECK: &str = "acme-validation-check";
 const LIST: &str = "list";
 
@@ -62,6 +63,7 @@ pub enum DnsCommand {
     /// ```
     AcmeValidationSet(DomainName, String),
 
+    #[cfg(feature = "propagation")]
     AcmeValidationCheck(DomainName, String),
 }
 
@@ -75,6 +77,7 @@ impl Display for DnsCommand {
             DnsCommand::AcmeValidationSet(name, challenge) => {
                 write!(f, "{} {} {}", ACME_VALIDATION_SET, name, challenge)
             }
+            #[cfg(feature = "propagation")]
             DnsCommand::AcmeValidationCheck(name, challenge) => {
                 write!(f, "{} {} {}", ACME_VALIDATION_CHECK, name, challenge)
             }
@@ -97,6 +100,7 @@ impl FromStr for DnsCommand {
                 check_environment(challenge)?,
             ));
         }
+        #[cfg(feature = "propagation")]
         if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_CHECK) {
             return Ok(DnsCommand::AcmeValidationCheck(
                 check_environment(domain_name)?,

@@ -7,8 +7,11 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[features]
+propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
+
 [dependencies]
-acme-validation-propagation = "0.1.5"
+acme-validation-propagation = { version = "0.1.5", optional = true }
 serde = "1.0.190"
 transip = "0.1.5"
 transip-command = { version = "0.3.1", path = "../transip-command" }
