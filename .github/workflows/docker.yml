@@ -6,12 +6,12 @@ name: Docker
 # documentation.
 
 on:
+  workflow_dispatch:
   push:
     tags: [ 'v*.*.*' ]
 env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
+  REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
 
 
@@ -50,7 +50,7 @@ jobs:
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: Log into Docker Hub
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
