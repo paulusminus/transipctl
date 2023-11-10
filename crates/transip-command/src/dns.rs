@@ -1,5 +1,8 @@
 use crate::{check_environment, error::Error, str_extension::StrExtension};
-use std::{fmt::Display, str::FromStr};
+use std::{
+    fmt::Display,
+    str::{FromStr, SplitAsciiWhitespace},
+};
 
 pub type DomainName = String;
 
@@ -8,6 +11,9 @@ const ACME_VALIDATION_SET: &str = "acme-validation-set";
 #[cfg(feature = "propagation")]
 const ACME_VALIDATION_CHECK: &str = "acme-validation-check";
 const LIST: &str = "list";
+const INSERT: &str = "insert";
+const DELETE: &str = "delete";
+const RECORD_TYPES: [&str; 6] = ["A", "AAAA", "CNAME", "MX", "TXT", "SRV"];
 
 #[derive(Debug, PartialEq)]
 pub enum DnsCommand {
@@ -27,6 +33,10 @@ pub enum DnsCommand {
     /// );
     /// ```
     List(DomainName),
+
+    Delete(DomainName, String),
+
+    Insert(DomainName, String),
 
     /// # Example
     ///
@@ -73,7 +83,13 @@ impl Display for DnsCommand {
             DnsCommand::AcmeValidationDelete(name) => {
                 write!(f, "{} {}", ACME_VALIDATION_DELETE, name)
             }
+            DnsCommand::Delete(name, dns_entry_string) => {
+                write!(f, "{} {}", name, dns_entry_string)
+            }
             DnsCommand::List(name) => write!(f, "{} {}", LIST, name),
+            DnsCommand::Insert(name, dns_entry_string) => {
+                write!(f, "{} {}", name, dns_entry_string)
+            }
             DnsCommand::AcmeValidationSet(name, challenge) => {
                 write!(f, "{} {} {}", ACME_VALIDATION_SET, name, challenge)
             }
@@ -110,8 +126,66 @@ impl FromStr for DnsCommand {
         if let Some(domain_name) = s.one_param(LIST) {
             return Ok(DnsCommand::List(check_environment(domain_name)?));
         }
+
+        let mut splitted = s.split_ascii_whitespace();
+        let command = splitted.next();
+        if command == Some(DELETE) {
+            let domain_name = splitted.next().ok_or(Error::ParseDnsCommand(
+                "domain name not provided".to_owned(),
+            ))?;
+            let dns_entry = dns_entry_string(splitted)?;
+            return Ok(DnsCommand::Delete(
+                check_environment(domain_name)?,
+                dns_entry,
+            ));
+        }
+
+        if command == Some(INSERT) {
+            let domain_name = splitted.next().ok_or(Error::ParseDnsCommand(
+                "domain name not provided".to_owned(),
+            ))?;
+            let dns_entry = dns_entry_string(splitted)?;
+            return Ok(DnsCommand::Insert(
+                check_environment(domain_name)?,
+                dns_entry,
+            ));
+        }
+
         Err(Error::ParseDnsCommand(s.to_owned()))
     }
+}
+
+fn dns_entry_string(mut splitted: SplitAsciiWhitespace) -> Result<String, Error> {
+    let dns_name = splitted
+        .next()
+        .ok_or(Error::ParseDnsCommand("dns name not provided".to_owned()))?;
+    let ttl = splitted
+        .next()
+        .ok_or(Error::ParseDnsCommand("ttl not provided".to_owned()))
+        .and_then(|s| {
+            s.parse::<u64>()
+                .map_err(|_| Error::ParseDnsCommand("ttl sould be a postive number".to_owned()))
+        })?;
+    let record_type = splitted.next().ok_or(Error::ParseDnsCommand(
+        "record type name not provided".to_owned(),
+    ))?;
+    if !RECORD_TYPES.contains(&record_type) {
+        return Err(Error::ParseDnsCommand(format!(
+            "record type must be one of {}",
+            RECORD_TYPES.join(" ")
+        )));
+    }
+    let content = splitted.collect::<Vec<_>>().join(" ");
+    if content.is_empty() {
+        return Err(Error::ParseDnsCommand("content not provided".to_owned()));
+    }
+    Ok(format!(
+        "{} {} {} {}",
+        dns_name,
+        ttl,
+        record_type,
+        check_environment(&content)?
+    ))
 }
 
 #[cfg(test)]

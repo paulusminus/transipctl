@@ -61,6 +61,14 @@ impl Client {
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
                 .report(s),
             DnsCommand::List(name) => self.inner.dns_entry_list(name).report(s),
+            DnsCommand::Delete(name, dns_entry) => dns_entry
+                .parse::<DnsEntry>()
+                .and_then(|entry| self.inner.dns_entry_delete(name, entry))
+                .report(s),
+            DnsCommand::Insert(name, dns_entry) => dns_entry
+                .parse::<DnsEntry>()
+                .and_then(|entry| self.inner.dns_entry_insert(name, entry))
+                .report(s),
             DnsCommand::AcmeValidationSet(name, challenge) => self
                 .inner
                 .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)

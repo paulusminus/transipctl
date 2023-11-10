@@ -5,7 +5,7 @@ description = "Parse a string and return a transip command"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-version.workspace = true
+version = "0.3.5"
 
 [dependencies]
 strum = { version = "0.25.0", features = ["derive"] }

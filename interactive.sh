@@ -8,4 +8,5 @@ podman run \
     --secret transip-key \
     --name transipctl \
     -i \
-    --rm paulmin.nl/certbot
+    --rm \
+    docker.io/paulusminus/transipctl

@@ -7,5 +7,6 @@ podman run \
     --env TRANSIP_API_USERNAME \
     --secret transip-key \
     --name certbot-validation-delete \
-    --rm paulmin.nl/tipctl \
+    --rm \
+    docker.io/paulusminus/transipctl \
     set

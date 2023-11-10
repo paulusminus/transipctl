@@ -5,7 +5,7 @@ description = "execute commands on the Transip Api Endpoint"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-version.workspace = true
+version = "0.3.5"
 
 [features]
 propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
@@ -13,7 +13,7 @@ propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
 [dependencies]
 acme-validation-propagation = { version = "0.1.5", optional = true }
 serde = "1.0.190"
-transip = "0.1.5"
+transip = "0.2"
 transip-command = { version = "0.3", path = "../transip-command" }
 
 [dev-dependencies]

@@ -5,13 +5,15 @@
 
 # transip-command
 
-transip-command is a library that can parse a string and turn it in a command. It has one optional feature propagation. If you enable this feature a extra command "dns acme-validation-check \<domainname\> \<acme-validation\>" is added.
+transip-command is a library that can parse a string and turn it in a command. It has one optional feature propagation.
 
 ## Commands
 
-- dns list \<domainname\>
 - dns acme-validation-delete \<domainname\>
 - dns acme-validation-set \<domainname\> \<acme-validation\>
+- dns delete \<domainname\> \<recordname\> \<ttl\> \<recordtype\> \<content\>
+- dns insert \<domainname\> \<recordname\> \<ttl\> \<recordtype\> \<content\>
+- dns list \<domainname\>
 - domain list
 - domain item \<domainname\>
 - invoice list
@@ -23,9 +25,12 @@ transip-command is a library that can parse a string and turn it in a command. I
 - product elements \<productname\>
 - sleep \<number-of-seconds\>
 
+### Available on feature propagation
+- dns acme-validation-check \<domainname\> \<acme-validation\>
+
 ## Environment variable usage
 
-You can use a enviroment variable to specify domainname, acme-validation.
+You can use a enviroment variable to specify domainname, acme-validation or content.
 
 ### Examples
 
