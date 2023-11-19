@@ -56,6 +56,8 @@ dns acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 ```
 
 [`build-badge`]: https://github.com/paulusminus/transipctl/actions/workflows/rust.yml/badge.svg
+[`docker-hub`]: https://hub.docker.com/r/paulusminus/transipctl
+
 [`mit-badge`]: https://img.shields.io/badge/License-MIT-yellow.svg
 [`github-releases`]: https://github.com/paulusminus/transipctl/releases/latest/
 [`docker-hub`]: https://hub.docker.com/r/paulusminus/transipctl
