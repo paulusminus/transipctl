@@ -3,7 +3,25 @@ use std::{env::VarError, num::ParseIntError};
 use strum::ParseError;
 
 #[derive(thiserror::Error, Debug)]
+pub enum DnsCommandError {
+    #[error("Domain name missing")]
+    DomainNameMissing,
+
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(&'static str),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+}
+
+#[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("Dns: {0}")]
+    Dns(#[from] DnsCommandError),
+
     #[error("Strum: {0}")]
     Strum(#[from] ParseError),
 

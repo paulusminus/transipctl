@@ -1,4 +1,8 @@
-use crate::{check_environment, error::Error, str_extension::StrExtension};
+use crate::{
+    check_environment,
+    error::{DnsCommandError, Error},
+    str_extension::{StrExtension, Words},
+};
 use std::{
     fmt::Display,
     str::{FromStr, SplitAsciiWhitespace},
@@ -98,6 +102,26 @@ impl Display for DnsCommand {
                 write!(f, "{} {} {}", ACME_VALIDATION_CHECK, name, challenge)
             }
         }
+    }
+}
+
+impl<'a> TryFrom<Words<'a>> for DnsCommand {
+    type Error = Error;
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(DnsCommandError::MissingSubCommand)?;
+        let domain_name = words.next().ok_or(DnsCommandError::DomainNameMissing)?;
+
+        if sub_command == ACME_VALIDATION_DELETE {
+            let rest = words.rest();
+            if rest.trim().is_empty() {
+                return Ok(DnsCommand::AcmeValidationDelete(check_environment(
+                    domain_name,
+                )?));
+            } else {
+                return Err(DnsCommandError::TooManyParameters(rest.trim().to_owned()).into());
+            }
+        }
+        Err(DnsCommandError::MissingSubCommand.into())
     }
 }
 
