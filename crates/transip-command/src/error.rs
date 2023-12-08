@@ -7,6 +7,42 @@ pub enum DnsCommandError {
     #[error("Domain name missing")]
     DomainNameMissing,
 
+    #[error("Validation missing")]
+    ValidationMissing,
+
+    #[error("Record type missing")]
+    RecordTypeMissing,
+
+    #[error("Content missing")]
+    ContentMissing,
+
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(String),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+
+    #[error("Dns recordname not provided")]
+    NoDnsRecordName,
+
+    #[error("Dns ttl not provided")]
+    NoTTL,
+
+    #[error("Invalid ttl: {0}")]
+    InvalidTTL(#[from] ParseIntError),
+
+    #[error("Invalid record type: {0}")]
+    InvalidRecordType(String),
+
+    #[error("Environment: {0}")]
+    Environment(#[from] VarError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum VpsCommandError {
     #[error("Too many parameter for {0}")]
     TooManyParameters(String),
 
@@ -15,12 +51,81 @@ pub enum DnsCommandError {
 
     #[error("Missing subcommand")]
     MissingSubCommand,
+
+    #[error("Parsing action")]
+    ParsingAction(#[from] strum::ParseError),
+
+    #[error("Environment: {0}")]
+    Environment(#[from] VarError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum ProductCommandError {
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(String),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+
+    #[error("Missing product name")]
+    MissingProductName,
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum InvoiceCommandError {
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(&'static str),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+
+    #[error("Missing invoice number")]
+    MissingInvoiceNumber,
+
+    #[error("Parsing action")]
+    ParsingAction(#[from] strum::ParseError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum DomainCommandError {
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(String),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+
+    #[error("Missing domain name")]
+    MissingDomainName,
+
+    #[error("Environment: {0}")]
+    Environment(#[from] VarError),
 }
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Dns: {0}")]
     Dns(#[from] DnsCommandError),
+
+    #[error("Dns: {0}")]
+    Vps(#[from] VpsCommandError),
+
+    #[error("Product: {0}")]
+    Product(#[from] ProductCommandError),
+
+    #[error("Invoice: {0}")]
+    Invoice(#[from] InvoiceCommandError),
+
+    #[error("Invoice: {0}")]
+    Domain(#[from] DomainCommandError),
 
     #[error("Strum: {0}")]
     Strum(#[from] ParseError),

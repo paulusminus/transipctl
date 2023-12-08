@@ -103,6 +103,10 @@ impl FromStr for TransipCommand {
         if trimmed == PING {
             return Ok(TransipCommand::Ping);
         }
+
+        parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
+        parse!(trimmed, ONERROR_COMMAND, OnError, TransipCommand::OnError);
+
         parse!(trimmed, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
         parse!(
             trimmed,
@@ -116,14 +120,12 @@ impl FromStr for TransipCommand {
             InvoiceCommand,
             TransipCommand::Invoice
         );
-        parse!(trimmed, ONERROR_COMMAND, OnError, TransipCommand::OnError);
         parse!(
             trimmed,
             PRODUCT_COMMAND,
             ProductCommand,
             TransipCommand::Product
         );
-        parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
         parse!(trimmed, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
 
         Err(Error::ParseTransipCommand(s.to_owned()))
@@ -195,6 +197,8 @@ mod test {
             TransipCommand::OnError(crate::OnError::Print).to_string(),
             "onerror print".to_owned(),
         );
+
+        assert_eq!(TransipCommand::Sleep(45).to_string(), "sleep 45".to_owned(),);
 
         assert_eq!(TransipCommand::Ping.to_string(), "ping".to_owned(),);
     }

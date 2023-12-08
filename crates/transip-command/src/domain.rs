@@ -1,12 +1,5 @@
-use crate::{
-    check_environment,
-    error::{Error, ErrorExt},
-    str_extension::StrExtension,
-};
-use std::{
-    fmt::Display,
-    str::{FromStr, SplitAsciiWhitespace},
-};
+use crate::{check_environment, error::DomainCommandError, str_extension::Words};
+use std::{fmt::Display, str::FromStr};
 
 pub type DomainName = String;
 
@@ -56,56 +49,42 @@ impl Display for DomainCommand {
 }
 
 impl FromStr for DomainCommand {
-    type Err = Error;
+    type Err = DomainCommandError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if s.trim() == LIST {
-            return Ok(DomainCommand::List);
-        }
-        if let Some(domain_name) = s.one_param(ITEM) {
-            Ok(DomainCommand::Item(check_environment(domain_name)?))
-        } else {
-            Err(Error::ParseDomainCommand(s.to_owned()))
-        }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        DomainCommand::try_from(Words::from(s))
     }
 }
 
-impl<'a> TryFrom<SplitAsciiWhitespace<'a>> for DomainCommand {
-    type Error = Error;
+impl<'a> TryFrom<Words<'a>> for DomainCommand {
+    type Error = DomainCommandError;
 
-    fn try_from(mut value: SplitAsciiWhitespace<'a>) -> Result<Self, Self::Error> {
-        let first = value.next();
-        if first == Some(LIST) {
-            if value.next().is_none() {
-                return Ok(DomainCommand::List);
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(DomainCommandError::MissingSubCommand)?;
+
+        if sub_command == LIST {
+            if let Some(rest) = words.rest() {
+                Err(DomainCommandError::TooManyParameters(rest.to_owned()))
             } else {
-                return Err(Error::ParseDomainCommand(
-                    "domain item takes no parameters".to_owned(),
-                ));
+                Ok(DomainCommand::List)
             }
-        }
-        if first == Some(ITEM) {
-            let second = value
-                .next()
-                .ok_or(Error::ParseDnsCommand("no domain name".to_owned()))?;
-            if value.next().is_none() {
-                return check_environment(second)
-                    .err_into()
-                    .map(DomainCommand::Item);
+        } else if sub_command == ITEM {
+            let domain_name = words.next().ok_or(DomainCommandError::MissingDomainName)?;
+            if let Some(rest) = words.rest() {
+                Err(DomainCommandError::TooManyParameters(rest.to_owned()))
             } else {
-                return Err(Error::ParseDomainCommand(
-                    "domain item takes 1 parameter only".to_owned(),
-                ));
+                Ok(DomainCommand::Item(check_environment(domain_name)?))
             }
+        } else {
+            Err(DomainCommandError::WrongSubCommand(sub_command.to_owned()))
         }
-        Err(Error::ParseDomainCommand(
-            "unknown subcommand for domain. Please use list or item".to_owned(),
-        ))
     }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::str_extension::Words;
+
     use super::DomainCommand;
 
     #[test]
@@ -121,7 +100,7 @@ mod test {
     #[test]
     fn try_from() {
         assert_eq!(
-            DomainCommand::try_from("  item   paulmin.nl   ".split_ascii_whitespace()).unwrap(),
+            DomainCommand::try_from(Words::from("  item   paulmin.nl   ")).unwrap(),
             DomainCommand::Item("paulmin.nl".to_owned())
         );
     }
@@ -129,12 +108,12 @@ mod test {
     #[test]
     fn from_str() {
         assert_eq!(
-            "list".parse::<DomainCommand>().unwrap(),
+            DomainCommand::try_from(Words::from("list")).unwrap(),
             DomainCommand::List,
         );
 
         assert_eq!(
-            "item paulmin.nl".parse::<DomainCommand>().unwrap(),
+            DomainCommand::try_from(Words::from("item paulmin.nl")).unwrap(),
             DomainCommand::Item("paulmin.nl".to_owned()),
         );
     }

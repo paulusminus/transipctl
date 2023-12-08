@@ -1,4 +1,4 @@
-use crate::{check_environment, error::Error, str_extension::StrExtension};
+use crate::{check_environment, error::VpsCommandError, str_extension::Words};
 use std::{fmt::Display, str::FromStr};
 use strum::{Display, EnumString};
 
@@ -61,29 +61,57 @@ impl Display for VpsCommand {
 }
 
 impl FromStr for VpsCommand {
-    type Err = Error;
+    type Err = VpsCommandError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if s.trim() == LIST {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        VpsCommand::try_from(Words::from(s))
+    }
+}
+
+impl<'a> TryFrom<Words<'a>> for VpsCommand {
+    type Error = VpsCommandError;
+
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(VpsCommandError::MissingSubCommand)?;
+
+        if sub_command == LIST {
             return Ok(VpsCommand::List);
         }
 
-        for action in [
-            VpsAction::Item,
-            VpsAction::Lock,
-            VpsAction::Reset,
-            VpsAction::Start,
-            VpsAction::Stop,
-            VpsAction::Unlock,
-        ] {
-            if let Some(vps_name) = s.one_param(action.to_string().as_str()) {
-                return Ok(VpsCommand::Action(check_environment(vps_name)?, action));
-            }
+        let action = sub_command.parse::<VpsAction>()?;
+        let vps = words.next().ok_or(VpsCommandError::MissingSubCommand)?;
+        if let Some(s) = words.rest() {
+            Err(VpsCommandError::TooManyParameters(s.to_owned()))
+        } else {
+            Ok(VpsCommand::Action(check_environment(vps)?, action))
         }
-
-        Err(Error::ParseVpsCommand(s.to_owned()))
     }
 }
+
+// impl FromStr for VpsCommand {
+//     type Err = Error;
+
+//     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+//         if s.trim() == LIST {
+//             return Ok(VpsCommand::List);
+//         }
+
+//         for action in [
+//             VpsAction::Item,
+//             VpsAction::Lock,
+//             VpsAction::Reset,
+//             VpsAction::Start,
+//             VpsAction::Stop,
+//             VpsAction::Unlock,
+//         ] {
+//             if let Some(vps_name) = s.one_param(action.to_string().as_str()) {
+//                 return Ok(VpsCommand::Action(check_environment(vps_name)?, action));
+//             }
+//         }
+
+//         Err(Error::ParseVpsCommand(s.to_owned()))
+//     }
+// }
 
 #[cfg(test)]
 mod test {

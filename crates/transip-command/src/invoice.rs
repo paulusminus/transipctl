@@ -1,4 +1,4 @@
-use crate::{error::Error, str_extension::StrExtension};
+use crate::{error::InvoiceCommandError, str_extension::Words};
 use std::{fmt::Display, str::FromStr};
 use strum::{Display, EnumString};
 
@@ -59,25 +59,62 @@ impl Display for InvoiceCommand {
 }
 
 impl FromStr for InvoiceCommand {
-    type Err = Error;
+    type Err = InvoiceCommandError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if s.trim() == LIST {
-            return Ok(InvoiceCommand::List);
-        }
-
-        for action in [InvoiceAction::Item, InvoiceAction::Pdf] {
-            if let Some(invoice_number) = s.one_param(action.to_string().as_str()) {
-                return Ok(InvoiceCommand::Action(invoice_number.to_owned(), action));
-            }
-        }
-
-        Err(Error::ParseInvoiceCommand(s.to_owned()))
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        InvoiceCommand::try_from(Words::from(s))
     }
 }
 
+impl<'a> TryFrom<Words<'a>> for InvoiceCommand {
+    type Error = InvoiceCommandError;
+
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(InvoiceCommandError::MissingSubCommand)?;
+
+        if sub_command == LIST {
+            if let Some(rest) = words.rest() {
+                return Err(InvoiceCommandError::TooManyParameters(rest.to_owned()));
+            } else {
+                return Ok(InvoiceCommand::List);
+            }
+        }
+
+        let action = sub_command.parse::<InvoiceAction>()?;
+        let invoice_number = words
+            .next()
+            .ok_or(InvoiceCommandError::MissingInvoiceNumber)?;
+
+        if let Some(rest) = words.rest() {
+            Err(InvoiceCommandError::TooManyParameters(rest.to_owned()))
+        } else {
+            Ok(InvoiceCommand::Action(invoice_number.to_owned(), action))
+        }
+    }
+}
+
+// impl FromStr for InvoiceCommand {
+//     type Err = Error;
+
+//     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+//         if s.trim() == LIST {
+//             return Ok(InvoiceCommand::List);
+//         }
+
+//         for action in [InvoiceAction::Item, InvoiceAction::Pdf] {
+//             if let Some(invoice_number) = s.one_param(action.to_string().as_str()) {
+//                 return Ok(InvoiceCommand::Action(invoice_number.to_owned(), action));
+//             }
+//         }
+
+//         Err(Error::ParseInvoiceCommand(s.to_owned()))
+//     }
+// }
+
 #[cfg(test)]
 mod test {
+    use crate::str_extension::Words;
+
     use super::{InvoiceAction, InvoiceCommand};
 
     #[test]
@@ -98,17 +135,17 @@ mod test {
     #[test]
     fn from_str() {
         assert_eq!(
-            "list".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::try_from(Words::from("list")).unwrap(),
             InvoiceCommand::List,
         );
 
         assert_eq!(
-            "item 98874".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::try_from(Words::from("item 98874")).unwrap(),
             InvoiceCommand::Action("98874".to_owned(), InvoiceAction::Item),
         );
 
         assert_eq!(
-            "pdf 98874".parse::<InvoiceCommand>().unwrap(),
+            InvoiceCommand::try_from(Words::from("pdf 98874")).unwrap(),
             InvoiceCommand::Action("98874".to_owned(), InvoiceAction::Pdf),
         );
     }

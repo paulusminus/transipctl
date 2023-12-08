@@ -1,4 +1,4 @@
-use crate::{error::Error, str_extension::StrExtension};
+use crate::{error::ProductCommandError, str_extension::Words};
 use std::{fmt::Display, str::FromStr};
 
 pub type ProductName = String;
@@ -40,20 +40,55 @@ pub enum ProductCommand {
 }
 
 impl FromStr for ProductCommand {
-    type Err = Error;
+    type Err = ProductCommandError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if s.trim() == LIST {
-            return Ok(ProductCommand::List);
-        }
-
-        if let Some(product_name) = s.one_param(ELEMENTS) {
-            return Ok(ProductCommand::Elements(product_name.to_owned()));
-        }
-
-        Err(Error::ParseProductCommand(s.to_owned()))
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        ProductCommand::try_from(Words::from(s))
     }
 }
+
+impl<'a> TryFrom<Words<'a>> for ProductCommand {
+    type Error = ProductCommandError;
+
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(ProductCommandError::MissingSubCommand)?;
+
+        if sub_command == LIST {
+            if let Some(rest) = words.rest() {
+                Err(ProductCommandError::TooManyParameters(rest.to_owned()))
+            } else {
+                Ok(ProductCommand::List)
+            }
+        } else if sub_command == ELEMENTS {
+            let product_name = words
+                .next()
+                .ok_or(ProductCommandError::MissingProductName)?;
+            if let Some(rest) = words.rest() {
+                Err(ProductCommandError::TooManyParameters(rest.to_owned()))
+            } else {
+                Ok(ProductCommand::Elements(product_name.to_owned()))
+            }
+        } else {
+            Err(ProductCommandError::WrongSubCommand(sub_command.to_owned()))
+        }
+    }
+}
+
+// impl FromStr for ProductCommand {
+//     type Err = Error;
+
+//     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+//         if s.trim() == LIST {
+//             return Ok(ProductCommand::List);
+//         }
+
+//         if let Some(product_name) = s.one_param(ELEMENTS) {
+//             return Ok(ProductCommand::Elements(product_name.to_owned()));
+//         }
+
+//         Err(Error::ParseProductCommand(s.to_owned()))
+//     }
+// }
 
 impl Display for ProductCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -66,6 +101,8 @@ impl Display for ProductCommand {
 
 #[cfg(test)]
 mod test {
+    use crate::str_extension::Words;
+
     use super::ProductCommand;
 
     #[test]
@@ -79,19 +116,19 @@ mod test {
     }
 
     #[test]
-    fn from_str() {
+    fn from_words() {
         assert_eq!(
-            "list".parse::<ProductCommand>().unwrap(),
+            ProductCommand::try_from(Words::from("list")).unwrap(),
             ProductCommand::List,
         );
 
-        assert!("list kdf".parse::<ProductCommand>().is_err());
+        assert!(ProductCommand::try_from(Words::from("list kdf")).is_err());
 
         assert_eq!(
-            "elements lkjdf".parse::<ProductCommand>().unwrap(),
+            ProductCommand::try_from(Words::from("elements lkjdf")).unwrap(),
             ProductCommand::Elements("lkjdf".to_owned()),
         );
 
-        assert!("elements ldkfj dkfjf".parse::<ProductCommand>().is_err());
+        assert!(ProductCommand::try_from(Words::from("elements ldkfj dkfjf")).is_err());
     }
 }

@@ -1,12 +1,5 @@
-use crate::{
-    check_environment,
-    error::{DnsCommandError, Error},
-    str_extension::{StrExtension, Words},
-};
-use std::{
-    fmt::Display,
-    str::{FromStr, SplitAsciiWhitespace},
-};
+use crate::{check_environment, error::DnsCommandError, str_extension::Words};
+use std::{fmt::Display, str::FromStr};
 
 pub type DomainName = String;
 
@@ -17,6 +10,23 @@ const ACME_VALIDATION_CHECK: &str = "acme-validation-check";
 const LIST: &str = "list";
 const INSERT: &str = "insert";
 const DELETE: &str = "delete";
+#[cfg(feature = "propagation")]
+const ALL_SUBCOMMANDS: [&str; 6] = [
+    ACME_VALIDATION_DELETE,
+    ACME_VALIDATION_SET,
+    ACME_VALIDATION_CHECK,
+    LIST,
+    INSERT,
+    DELETE,
+];
+#[cfg(not(feature = "propagation"))]
+const ALL_SUBCOMMANDS: [&str; 5] = [
+    ACME_VALIDATION_DELETE,
+    ACME_VALIDATION_SET,
+    LIST,
+    INSERT,
+    DELETE,
+];
 const RECORD_TYPES: [&str; 6] = ["A", "AAAA", "CNAME", "MX", "TXT", "SRV"];
 
 #[derive(Debug, PartialEq)]
@@ -105,115 +115,115 @@ impl Display for DnsCommand {
     }
 }
 
-impl<'a> TryFrom<Words<'a>> for DnsCommand {
-    type Error = Error;
-    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
-        let sub_command = words.next().ok_or(DnsCommandError::MissingSubCommand)?;
-        let domain_name = words.next().ok_or(DnsCommandError::DomainNameMissing)?;
+impl FromStr for DnsCommand {
+    type Err = DnsCommandError;
 
-        if sub_command == ACME_VALIDATION_DELETE {
-            let rest = words.rest();
-            if rest.trim().is_empty() {
-                return Ok(DnsCommand::AcmeValidationDelete(check_environment(
-                    domain_name,
-                )?));
-            } else {
-                return Err(DnsCommandError::TooManyParameters(rest.trim().to_owned()).into());
-            }
-        }
-        Err(DnsCommandError::MissingSubCommand.into())
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        DnsCommand::try_from(Words::from(s))
     }
 }
 
-impl FromStr for DnsCommand {
-    type Err = Error;
+impl<'a> TryFrom<Words<'a>> for DnsCommand {
+    type Error = DnsCommandError;
+    fn try_from(mut words: Words<'a>) -> Result<Self, Self::Error> {
+        let sub_command = words.next().ok_or(DnsCommandError::MissingSubCommand)?;
+        if !ALL_SUBCOMMANDS.contains(&sub_command) {
+            return Err(DnsCommandError::WrongSubCommand(sub_command.to_owned()));
+        }
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if let Some(domain_name) = s.one_param(ACME_VALIDATION_DELETE) {
-            return Ok(DnsCommand::AcmeValidationDelete(check_environment(
-                domain_name,
-            )?));
+        let domain_name = words.next().ok_or(DnsCommandError::DomainNameMissing)?;
+
+        if sub_command == LIST {
+            if let Some(rest) = words.rest() {
+                return Err(DnsCommandError::TooManyParameters(rest.to_owned()));
+            } else {
+                return Ok(DnsCommand::List(check_environment(domain_name)?));
+            }
         }
-        if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_SET) {
-            return Ok(DnsCommand::AcmeValidationSet(
-                check_environment(domain_name)?,
-                check_environment(challenge)?,
-            ));
+
+        if sub_command == ACME_VALIDATION_DELETE {
+            if let Some(rest) = words.rest() {
+                return Err(DnsCommandError::TooManyParameters(rest.to_owned()));
+            } else {
+                return Ok(DnsCommand::AcmeValidationDelete(check_environment(
+                    domain_name,
+                )?));
+            }
         }
+
         #[cfg(feature = "propagation")]
-        if let Some((domain_name, challenge)) = s.two_params(ACME_VALIDATION_CHECK) {
-            return Ok(DnsCommand::AcmeValidationCheck(
-                check_environment(domain_name)?,
-                check_environment(challenge)?,
-            ));
-        }
-        if let Some(domain_name) = s.one_param(LIST) {
-            return Ok(DnsCommand::List(check_environment(domain_name)?));
+        if sub_command == ACME_VALIDATION_CHECK {
+            {
+                let validation = words.next().ok_or(DnsCommandError::ValidationMissing)?;
+                if let Some(rest) = words.rest() {
+                    return Err(DnsCommandError::TooManyParameters(rest.to_owned()).into());
+                } else {
+                    return Ok(DnsCommand::AcmeValidationCheck(
+                        check_environment(domain_name)?,
+                        check_environment(validation)?,
+                    ));
+                }
+            }
         }
 
-        let mut splitted = s.split_ascii_whitespace();
-        let command = splitted.next();
-        if command == Some(DELETE) {
-            let domain_name = splitted.next().ok_or(Error::ParseDnsCommand(
-                "domain name not provided".to_owned(),
-            ))?;
-            let dns_entry = dns_entry_string(splitted)?;
+        if sub_command == ACME_VALIDATION_SET {
+            let validation = words.next().ok_or(DnsCommandError::ValidationMissing)?;
+            if let Some(rest) = words.rest() {
+                return Err(DnsCommandError::TooManyParameters(rest.to_owned()));
+            } else {
+                return Ok(DnsCommand::AcmeValidationSet(
+                    check_environment(domain_name)?,
+                    check_environment(validation)?,
+                ));
+            }
+        }
+
+        if sub_command == DELETE {
+            let dns_entry = dns_entry_string(words)?;
             return Ok(DnsCommand::Delete(
                 check_environment(domain_name)?,
                 dns_entry,
             ));
         }
 
-        if command == Some(INSERT) {
-            let domain_name = splitted.next().ok_or(Error::ParseDnsCommand(
-                "domain name not provided".to_owned(),
-            ))?;
-            let dns_entry = dns_entry_string(splitted)?;
+        if sub_command == INSERT {
+            let dns_entry = dns_entry_string(words)?;
             return Ok(DnsCommand::Insert(
                 check_environment(domain_name)?,
                 dns_entry,
             ));
         }
-
-        Err(Error::ParseDnsCommand(s.to_owned()))
+        Err(DnsCommandError::MissingSubCommand)
     }
 }
 
-fn dns_entry_string(mut splitted: SplitAsciiWhitespace) -> Result<String, Error> {
-    let dns_name = splitted
+fn dns_entry_string(mut words: Words<'_>) -> Result<String, DnsCommandError> {
+    let dns_name = words.next().ok_or(DnsCommandError::NoDnsRecordName)?;
+    let ttl = words
         .next()
-        .ok_or(Error::ParseDnsCommand("dns name not provided".to_owned()))?;
-    let ttl = splitted
-        .next()
-        .ok_or(Error::ParseDnsCommand("ttl not provided".to_owned()))
-        .and_then(|s| {
-            s.parse::<u64>()
-                .map_err(|_| Error::ParseDnsCommand("ttl sould be a postive number".to_owned()))
-        })?;
-    let record_type = splitted.next().ok_or(Error::ParseDnsCommand(
-        "record type name not provided".to_owned(),
-    ))?;
+        .ok_or(DnsCommandError::NoTTL)
+        .and_then(|s| s.parse::<u64>().map_err(DnsCommandError::InvalidTTL))?;
+    let record_type = words.next().ok_or(DnsCommandError::RecordTypeMissing)?;
     if !RECORD_TYPES.contains(&record_type) {
-        return Err(Error::ParseDnsCommand(format!(
-            "record type must be one of {}",
-            RECORD_TYPES.join(" ")
-        )));
+        return Err(DnsCommandError::InvalidRecordType(record_type.to_owned()));
     }
-    let content = splitted.collect::<Vec<_>>().join(" ");
-    if content.is_empty() {
-        return Err(Error::ParseDnsCommand("content not provided".to_owned()));
+    if let Some(content) = words.rest() {
+        Ok(format!(
+            "{} {} {} {}",
+            dns_name,
+            ttl,
+            record_type,
+            check_environment(content)?
+        ))
+    } else {
+        Err(DnsCommandError::ContentMissing)
     }
-    Ok(format!(
-        "{} {} {} {}",
-        dns_name,
-        ttl,
-        record_type,
-        check_environment(&content)?
-    ))
 }
 
 #[cfg(test)]
 mod test {
+    use crate::str_extension::Words;
+
     use super::DnsCommand;
 
     #[test]
@@ -237,9 +247,10 @@ mod test {
     #[test]
     fn from_str() {
         assert_eq!(
-            "acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}"
-                .parse::<DnsCommand>()
-                .unwrap(),
+            DnsCommand::try_from(Words::from(
+                "acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}"
+            ))
+            .unwrap(),
             DnsCommand::AcmeValidationSet("paulmin.nl".to_owned(), "876543".to_owned())
         );
     }
