@@ -12,6 +12,6 @@ WORKDIR /
 
 COPY target/x86_64-unknown-linux-musl/release/transipctl /
 COPY crates/transipctl/scripts/acme-validation-delete.transip /
-COPY crates/transipctl/scripts/acme-validation-set /
+COPY crates/transipctl/scripts/acme-validation-set.transip /
 
 ENTRYPOINT [ "/transipctl" ]
