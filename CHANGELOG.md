@@ -9,4 +9,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cargo update
 - Use cache in Github Action Workflow
+- Use alpine as base for docker image
 
