@@ -30,11 +30,11 @@ impl super::Formatter for MdFormatter {
     }
 
     fn render_options_start(&self) -> &'static str {
-        "<dl>"
+        "<dl>\n"
     }
 
     fn render_options_end(&self) -> &'static str {
-        "</dl>"
+        "</dl>\n"
     }
 
     fn render_option(&self, params: &[&str], block: &str, man_name: &str) -> Result<String, Error> {
@@ -56,18 +56,18 @@ impl super::Formatter for MdFormatter {
                 bail!("unexpected empty option with no tags `{}`", param);
             }
             let id = format!("option-{}-{}", man_name, no_tags);
-            writeln!(
+            write!(
                 result,
                 "<dt class=\"option-term\" id=\"{ID}\">\
-                <a class=\"option-anchor\" href=\"#{ID}\"></a>{OPTION}</dt>",
+                <a class=\"option-anchor\" href=\"#{ID}\"></a>{OPTION}</dt>\n",
                 ID = id,
                 OPTION = no_p
             )?;
         }
         let rendered_block = self.render_html(block)?;
-        writeln!(
+        write!(
             result,
-            "<dd class=\"option-desc\">{}</dd>",
+            "<dd class=\"option-desc\">{}</dd>\n\n",
             unwrap_p(&rendered_block)
         )?;
         Ok(result)

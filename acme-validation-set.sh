@@ -3,9 +3,10 @@
 podman run \
     -v transip-logs:/var/log/transip \
     --env CERTBOT_DOMAIN \
+    --env CERTBOT_VALIDATION \
     --env TRANSIP_API_USERNAME \
     --secret transip-key \
-    --name certbot-validation-delete \
+    --name acme-validation-set \
     --rm \
     docker.io/paulusminus/transipctl \
-    delete
+    acme-validation-set.transip

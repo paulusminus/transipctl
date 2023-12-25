@@ -5,7 +5,7 @@ description = "execute commands on the Transip Api Endpoint"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-version = "0.3.7"
+version.workspace = true
 
 [features]
 propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]

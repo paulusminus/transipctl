@@ -1,4 +1,0 @@
-onerror exit
-
-dns acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
-dns acme-validation-check ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}

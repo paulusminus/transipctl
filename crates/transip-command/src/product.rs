@@ -1,4 +1,7 @@
-use crate::{error::ProductCommandError, str_extension::Words};
+use crate::{
+    error::{ProductCommandError, TooMany},
+    str_extension::Words,
+};
 use std::{fmt::Display, str::FromStr};
 
 pub type ProductName = String;
@@ -54,41 +57,25 @@ impl<'a> TryFrom<Words<'a>> for ProductCommand {
         let sub_command = words.next().ok_or(ProductCommandError::MissingSubCommand)?;
 
         if sub_command == LIST {
-            if let Some(rest) = words.rest() {
-                Err(ProductCommandError::TooManyParameters(rest.to_owned()))
-            } else {
-                Ok(ProductCommand::List)
-            }
+            words
+                .next()
+                .too_many()
+                .map_err(ProductCommandError::TooManyParameters)
+                .map(|_| ProductCommand::List)
         } else if sub_command == ELEMENTS {
             let product_name = words
                 .next()
                 .ok_or(ProductCommandError::MissingProductName)?;
-            if let Some(rest) = words.rest() {
-                Err(ProductCommandError::TooManyParameters(rest.to_owned()))
-            } else {
-                Ok(ProductCommand::Elements(product_name.to_owned()))
-            }
+            words
+                .next()
+                .too_many()
+                .map_err(ProductCommandError::TooManyParameters)
+                .map(|_| ProductCommand::Elements(product_name.to_owned()))
         } else {
             Err(ProductCommandError::WrongSubCommand(sub_command.to_owned()))
         }
     }
 }
-
-// impl FromStr for ProductCommand {
-//     type Err = Error;
-
-//     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-//         if s.trim() == LIST {
-//             return Ok(ProductCommand::List);
-//         }
-
-//         if let Some(product_name) = s.one_param(ELEMENTS) {
-//             return Ok(ProductCommand::Elements(product_name.to_owned()));
-//         }
-
-//         Err(Error::ParseProductCommand(s.to_owned()))
-//     }
-// }
 
 impl Display for ProductCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -11,7 +11,7 @@ ENV RUST_LOG info
 WORKDIR /
 
 COPY target/x86_64-unknown-linux-musl/release/transipctl /
-COPY crates/transipctl/scripts/delete /
-COPY crates/transipctl/scripts/set /
+COPY crates/transipctl/scripts/acme-validation-delete.transip /
+COPY crates/transipctl/scripts/acme-validation-set /
 
 ENTRYPOINT [ "/transipctl" ]

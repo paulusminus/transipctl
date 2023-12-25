@@ -61,7 +61,7 @@ pub fn convert(
 }
 
 /// Pulldown-cmark iterator yielding an `(event, range)` tuple.
-pub(crate) type EventIter<'a> = Box<dyn Iterator<Item = (Event<'a>, Range<usize>)> + 'a>;
+type EventIter<'a> = Box<dyn Iterator<Item = (Event<'a>, Range<usize>)> + 'a>;
 
 /// Creates a new markdown parser with the given input.
 pub(crate) fn md_parser(input: &str, url: Option<Url>) -> EventIter<'_> {
@@ -112,7 +112,7 @@ pub fn extract_section(file: &Path) -> Result<Section, Error> {
     if !line.starts_with("# ") {
         bail!("expected input file to start with # header");
     }
-    let (_name, section) = util::parse_name_and_section(line[2..].trim()).with_context(|| {
+    let (_name, section) = util::parse_name_and_section(&line[2..].trim()).with_context(|| {
         format!(
             "expected input file to have header with the format `# command-name(1)`, found: `{}`",
             line

@@ -1,4 +1,8 @@
-use crate::{check_environment, error::DomainCommandError, str_extension::Words};
+use crate::{
+    check_environment,
+    error::{DomainCommandError, TooMany},
+    str_extension::Words,
+};
 use std::{fmt::Display, str::FromStr};
 
 pub type DomainName = String;
@@ -63,18 +67,21 @@ impl<'a> TryFrom<Words<'a>> for DomainCommand {
         let sub_command = words.next().ok_or(DomainCommandError::MissingSubCommand)?;
 
         if sub_command == LIST {
-            if let Some(rest) = words.rest() {
-                Err(DomainCommandError::TooManyParameters(rest.to_owned()))
-            } else {
-                Ok(DomainCommand::List)
-            }
+            words
+                .next()
+                .too_many()
+                .map_err(DomainCommandError::TooManyParameters)
+                .map(|_| DomainCommand::List)
         } else if sub_command == ITEM {
             let domain_name = words.next().ok_or(DomainCommandError::MissingDomainName)?;
-            if let Some(rest) = words.rest() {
-                Err(DomainCommandError::TooManyParameters(rest.to_owned()))
-            } else {
-                Ok(DomainCommand::Item(check_environment(domain_name)?))
-            }
+            words
+                .next()
+                .too_many()
+                .map_err(DomainCommandError::TooManyParameters)
+                .and_then(|_| {
+                    check_environment(domain_name).map_err(DomainCommandError::Environment)
+                })
+                .map(DomainCommand::Item)
         } else {
             Err(DomainCommandError::WrongSubCommand(sub_command.to_owned()))
         }

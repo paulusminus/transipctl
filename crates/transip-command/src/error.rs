@@ -13,6 +13,9 @@ pub enum DnsCommandError {
     #[error("Record type missing")]
     RecordTypeMissing,
 
+    #[error("Invalid record type")]
+    InvalidRecord(strum::ParseError),
+
     #[error("Content missing")]
     ContentMissing,
 
@@ -35,7 +38,7 @@ pub enum DnsCommandError {
     InvalidTTL(#[from] ParseIntError),
 
     #[error("Invalid record type: {0}")]
-    InvalidRecordType(String),
+    InvalidRecordType(ParseError),
 
     #[error("Environment: {0}")]
     Environment(#[from] VarError),
@@ -158,6 +161,12 @@ pub enum Error {
     ParseInt(#[from] ParseIntError),
 }
 
+// #[derive(Debug, Error)]
+// pub enum TooManyError {
+//     #[error("Too many parameters: {0}")]
+//     TooMany(String),
+// }
+
 pub trait ErrorExt<T, E> {
     fn err_into(self) -> Result<T>;
 }
@@ -168,5 +177,19 @@ where
 {
     fn err_into(self) -> Result<T> {
         self.map_err(Into::into)
+    }
+}
+
+pub trait TooMany {
+    fn too_many(self) -> std::result::Result<(), String>;
+}
+
+impl TooMany for Option<&str> {
+    fn too_many(self) -> std::result::Result<(), String> {
+        if let Some(value) = self {
+            Err(value.to_owned())
+        } else {
+            Ok(())
+        }
     }
 }

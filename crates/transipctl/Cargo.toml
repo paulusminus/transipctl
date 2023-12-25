@@ -5,7 +5,7 @@ edition.workspace = true
 license.workspace = true
 name = "transipctl"
 repository.workspace = true
-version = "0.3.7"
+version.workspace = true
 
 [package.metadata.deb]
 assets = [
@@ -18,8 +18,8 @@ extended-description-file = "crates/transipctl/docs/transipctl.txt"
 [package.metadata.generate-rpm]
 assets = [
     { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
-    { source = "scripts/certbot-validation-delete.transip", dest = "/usr/bin/certbot-validation-delete.transip", mode = "755" },
-    { source = "scripts/certbot-validation-set.transip", dest = "/usr/bin/certbot-validation-set.transip", mode = "755" },
+    { source = "scripts/acme-validation-delete.transip", dest = "/usr/bin/acme-validation-delete.transip", mode = "755" },
+    { source = "scripts/acme-validation-set.transip", dest = "/usr/bin/acme-validation-set.transip", mode = "755" },
     { source = "docs/transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
 ]
 

@@ -33,6 +33,8 @@ jobs:
         run: rustup target add x86_64-unknown-linux-musl
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Use cache
+        uses: Swatinem/rust-cache@v2
       - name: Build transipctl
         run: cargo build --release --target x86_64-unknown-linux-musl
       # Install the cosign tool except on PR

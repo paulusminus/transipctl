@@ -10,8 +10,8 @@ SYNOPSIS
 DESCRIPTION
        This command takes lines from stdin or the filename provided. Each line
        is interpreted as a command to be executed on the Transip Api Endpoint.
-       See command <https://crates.io/crates/transip-command> for all list of
-       available commands.
+       See transip-command <https://crates.io/crates/transip-command> for all
+       list of available commands.
 
 OPTIONS
        -v, --version

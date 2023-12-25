@@ -26,11 +26,11 @@ impl super::Formatter for TextFormatter {
     fn render_options_start(&self) -> &'static str {
         // Tell pulldown_cmark to ignore this.
         // This will be stripped out later.
-        "<![CDATA["
+        "<![CDATA[\n"
     }
 
     fn render_options_end(&self) -> &'static str {
-        "]]>"
+        "]]>\n"
     }
 
     fn render_option(
@@ -46,7 +46,7 @@ impl super::Formatter for TextFormatter {
         let trimmed: Vec<_> = rendered_options.iter().map(|o| o.trim()).collect();
         // Wrap in HTML tags, they will be stripped out during rendering.
         Ok(format!(
-            "<dt>{}</dt>\n<dd>{}</dd>\n<br>\n",
+            "<dt>{}</dt>\n<dd>\n{}</dd>\n<br>\n",
             trimmed.join(", "),
             block
         ))
@@ -441,7 +441,7 @@ impl Table {
 
     /// Processes table events and generates a text table.
     fn process(&mut self, parser: &mut EventIter<'_>, indent: usize) -> Result<String, Error> {
-        for (event, _range) in parser.by_ref() {
+        while let Some((event, _range)) = parser.next() {
             match event {
                 Event::Start(tag) => match tag {
                     Tag::TableHead
@@ -457,11 +457,11 @@ impl Table {
                 Event::End(tag) => match tag {
                     Tag::Table(_) => return self.render(indent),
                     Tag::TableCell => {
-                        let cell = mem::take(&mut self.cell);
+                        let cell = mem::replace(&mut self.cell, String::new());
                         self.row.push(cell);
                     }
                     Tag::TableHead | Tag::TableRow => {
-                        let row = mem::take(&mut self.row);
+                        let row = mem::replace(&mut self.row, Vec::new());
                         self.rows.push(row);
                     }
                     Tag::Strikethrough => self.cell.push_str("~~"),
@@ -593,7 +593,7 @@ fn fill_cell(text: &str, width: usize, alignment: Alignment) -> Vec<String> {
                 line.push_str(word);
             } else {
                 line.push(' ');
-                line.push_str(word);
+                line.push_str(&word);
             }
         }
         if !line.is_empty() {
