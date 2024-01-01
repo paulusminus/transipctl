@@ -8,7 +8,7 @@ publish = false
 rust-version = "1.73"
 
 [dependencies]
-anyhow = "1.0.76"
+anyhow = "1.0.78"
 handlebars = { version = "4.5.0", features = ["dir_source"] }
 pulldown-cmark = "0.9.3"
 same-file = "1.0.6"
