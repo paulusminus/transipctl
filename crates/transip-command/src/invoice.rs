@@ -93,24 +93,6 @@ impl<'a> TryFrom<Words<'a>> for InvoiceCommand {
     }
 }
 
-// impl FromStr for InvoiceCommand {
-//     type Err = Error;
-
-//     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-//         if s.trim() == LIST {
-//             return Ok(InvoiceCommand::List);
-//         }
-
-//         for action in [InvoiceAction::Item, InvoiceAction::Pdf] {
-//             if let Some(invoice_number) = s.one_param(action.to_string().as_str()) {
-//                 return Ok(InvoiceCommand::Action(invoice_number.to_owned(), action));
-//             }
-//         }
-
-//         Err(Error::ParseInvoiceCommand(s.to_owned()))
-//     }
-// }
-
 #[cfg(test)]
 mod test {
     use crate::str_extension::Words;
@@ -148,5 +130,14 @@ mod test {
             InvoiceCommand::try_from(Words::from("pdf 98874")).unwrap(),
             InvoiceCommand::Action("98874".to_owned(), InvoiceAction::Pdf),
         );
+    }
+
+    #[test]
+    fn from_words() {
+        let mut words: Words = "list".into();
+        let _sub_command = words
+            .next()
+            .ok_or(crate::error::InvoiceCommandError::MissingSubCommand)
+            .unwrap();
     }
 }
