@@ -1453,7 +1453,7 @@ dependencies = [
 
 [[package]]
 name = "transip-command"
-version = "0.3.8"
+version = "0.3.9"
 dependencies = [
  "strum",
  "thiserror",
@@ -1461,7 +1461,7 @@ dependencies = [
 
 [[package]]
 name = "transip-execute"
-version = "0.3.8"
+version = "0.3.9"
 dependencies = [
  "acme-validation-propagation",
  "serde",
@@ -1473,7 +1473,7 @@ dependencies = [
 
 [[package]]
 name = "transipctl"
-version = "0.3.8"
+version = "0.3.9"
 dependencies = [
  "directories",
  "serde",
