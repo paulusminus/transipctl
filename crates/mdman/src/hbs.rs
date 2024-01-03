@@ -118,15 +118,18 @@ impl HelperDef for OptionHelper<'_> {
         let params = params
             .iter()
             .map(|param| {
-                param
-                    .value()
-                    .as_str()
-                    .ok_or_else(|| RenderErrorReason::Other("option params must be strings".to_owned()).into())
+                param.value().as_str().ok_or_else(|| {
+                    RenderErrorReason::Other("option params must be strings".to_owned()).into()
+                })
             })
             .collect::<Result<Vec<&str>, RenderError>>()?;
         let t = match h.template() {
             Some(t) => t,
-            None => return Err(RenderErrorReason::Other("option block must not be empty".to_owned()).into()),
+            None => {
+                return Err(
+                    RenderErrorReason::Other("option block must not be empty".to_owned()).into(),
+                )
+            }
         };
         // Render the block.
         let block = t.renders(r, ctx, rc)?;
@@ -165,18 +168,19 @@ impl HelperDef for ManLinkHelper<'_> {
     ) -> HelperResult {
         let params = h.params();
         if params.len() != 2 {
-            return Err(RenderErrorReason::Other("{{man}} must have two arguments".to_owned()).into());
+            return Err(
+                RenderErrorReason::Other("{{man}} must have two arguments".to_owned()).into(),
+            );
         }
         let name = params[0]
             .value()
             .as_str()
             .ok_or_else(|| RenderErrorReason::Other("man link name must be a string".to_owned()))?;
-        let section = params[1]
-            .value()
-            .as_u64()
-            .ok_or_else(|| RenderErrorReason::Other("man link section must be an integer".to_owned()))?;
-        let section =
-            u8::try_from(section).map_err(|_e| RenderErrorReason::Other("section number too large".to_owned()))?;
+        let section = params[1].value().as_u64().ok_or_else(|| {
+            RenderErrorReason::Other("man link section must be an integer".to_owned())
+        })?;
+        let section = u8::try_from(section)
+            .map_err(|_e| RenderErrorReason::Other("section number too large".to_owned()))?;
         let link = self
             .formatter
             .linkify_man_to_md(name, section)
