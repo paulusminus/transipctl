@@ -12,7 +12,7 @@ anyhow = "1.0.76"
 handlebars = { version = "5.0.0", features = ["dir_source"] }
 pulldown-cmark = "0.9.3"
 same-file = "1.0.6"
-serde_json = "1.0.108"
+serde_json = "1.0.111"
 url = "2.5.0"
 
 [dev-dependencies]
