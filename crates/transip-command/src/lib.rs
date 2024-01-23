@@ -4,9 +4,9 @@ pub use dns::DnsCommand;
 pub use domain::DomainCommand;
 use error::ErrorExt;
 pub use invoice::{InvoiceAction, InvoiceCommand};
+pub use onerror::OnError;
 pub use product::ProductCommand;
 use std::{env::VarError, fmt::Display, str::FromStr};
-use strum::{Display, EnumString};
 pub use vps::{VpsAction, VpsCommand};
 
 pub use error::Error;
@@ -16,6 +16,7 @@ mod dns;
 mod domain;
 mod error;
 mod invoice;
+mod onerror;
 mod product;
 mod str_extension;
 mod vps;
@@ -29,13 +30,6 @@ const ONERROR_COMMAND: &str = "onerror ";
 const PRODUCT_COMMAND: &str = "product ";
 const SLEEP_COMMAND: &str = "sleep ";
 const VPS_COMMAND: &str = "vps ";
-
-#[derive(Clone, Debug, PartialEq, Display, EnumString)]
-#[strum(serialize_all = "lowercase")]
-pub enum OnError {
-    Print,
-    Exit,
-}
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
