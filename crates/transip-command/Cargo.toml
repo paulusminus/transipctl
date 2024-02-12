@@ -9,7 +9,7 @@ version.workspace = true
 
 [dependencies]
 strum = { version = "0.26.0", features = ["derive"] }
-thiserror = "1.0.50"
+thiserror = "1.0.57"
 
 [features]
 propagation = []
