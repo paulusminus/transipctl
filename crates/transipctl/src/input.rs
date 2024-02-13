@@ -19,7 +19,9 @@ impl Input {
     }
 
     pub fn lines(self) -> impl Iterator<Item = String> {
-        BufReader::new(self.reader).lines().flatten()
+        BufReader::new(self.reader)
+            .lines()
+            .map_while(std::io::Result::ok)
     }
 }
 
