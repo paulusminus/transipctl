@@ -6,7 +6,7 @@ license.workspace = true
 name = "transipctl"
 repository.workspace = true
 rust-version = "1.67.1"
-version.workspace = true
+version = "0.3.11"
 
 [package.metadata.deb]
 assets = [
