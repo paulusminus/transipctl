@@ -5,30 +5,17 @@ edition.workspace = true
 license.workspace = true
 description = "Creates a man page page from markdown."
 publish = false
-rust-version = "1.73.0"
 
 [dependencies]
-anyhow = "1.0.76"
-handlebars = { version = "5.0.0", features = ["dir_source"] }
-pulldown-cmark = "0.9.0"
-same-file = "1.0.6"
-serde_json = "1.0.108"
-url = "2.5.0"
+anyhow.workspace = true
+handlebars.workspace = true
+pulldown-cmark.workspace = true
+same-file.workspace = true
+serde_json.workspace = true
+url.workspace = true
 
 [dev-dependencies]
-snapbox = { version = "0.5.7", features = ["path"] }
+snapbox.workspace = true
 
-[lints.rust]
-rust_2018_idioms = "warn" 
-
-[lints.rustdoc]
-private_intra_doc_links = "allow"
-
-[lints.clippy]
-all = { level = "allow", priority = -1 }
-dbg_macro = "warn"
-disallowed_methods = "warn"
-print_stderr = "warn"
-print_stdout = "warn"
-self_named_module_files = "warn"
-
+[lints]
+workspace = true

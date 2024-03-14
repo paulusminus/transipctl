@@ -1,13 +1,15 @@
 //! Handlebars template processing.
 
-use crate::format::Formatter;
-use anyhow::Error;
-use handlebars::{
-    handlebars_helper, Context, Decorator, Handlebars, Helper, HelperDef, HelperResult, Output,
-    RenderContext, RenderError, RenderErrorReason, Renderable,
-};
 use std::collections::HashMap;
 use std::path::Path;
+
+use anyhow::Error;
+use handlebars::{
+    handlebars_helper, Context, Decorator, DirectorySourceOptions, Handlebars, Helper, HelperDef,
+    HelperResult, Output, RenderContext, RenderError, RenderErrorReason, Renderable,
+};
+
+use crate::format::Formatter;
 
 type FormatterRef<'a> = &'a (dyn Formatter + Send + Sync);
 
@@ -22,14 +24,12 @@ pub fn expand(file: &Path, formatter: FormatterRef<'_>) -> Result<String, Error>
     handlebars.register_decorator("set", Box::new(set_decorator));
     handlebars.register_template_file("template", file)?;
     let includes = file.parent().unwrap().join("includes");
-    handlebars.register_templates_directory(
-        includes,
-        handlebars::DirectorySourceOptions {
-            tpl_extension: ".md".to_owned(),
-            hidden: false,
-            temporary: false,
-        },
-    )?;
+    let options = DirectorySourceOptions {
+        tpl_extension: ".md".to_string(),
+        hidden: false,
+        temporary: false,
+    };
+    handlebars.register_templates_directory(includes, options)?;
     let man_name = file
         .file_stem()
         .expect("expected filename")
@@ -57,7 +57,7 @@ impl HelperDef for OptionsHelper<'_> {
     ) -> HelperResult {
         if in_options(rc) {
             return Err(
-                RenderErrorReason::Other("options blocks cannot be nested".to_owned()).into(),
+                RenderErrorReason::Other("options blocks cannot be nested".to_string()).into(),
             );
         }
         // Prevent nested {{#options}}.
@@ -67,9 +67,10 @@ impl HelperDef for OptionsHelper<'_> {
         let t = match h.template() {
             Some(t) => t,
             None => {
-                return Err(
-                    RenderErrorReason::Other("options block must not be empty".to_owned()).into(),
+                return Err(RenderErrorReason::Other(
+                    "options block must not be empty".to_string(),
                 )
+                .into());
             }
         };
         let block = t.renders(r, ctx, rc)?;
@@ -98,19 +99,19 @@ impl HelperDef for OptionHelper<'_> {
         &self,
         h: &Helper<'rc>,
         r: &'reg Handlebars<'reg>,
-        ctx: &'rc Context,
+        gctx: &'rc Context,
         rc: &mut RenderContext<'reg, 'rc>,
         out: &mut dyn Output,
     ) -> HelperResult {
         if !in_options(rc) {
             return Err(
-                RenderErrorReason::Other("option must be in options block".to_owned()).into(),
+                RenderErrorReason::Other("option must be in options block".to_string()).into(),
             );
         }
         let params = h.params();
         if params.is_empty() {
             return Err(RenderErrorReason::Other(
-                "option block must have at least one param".to_owned(),
+                "option block must have at least one param".to_string(),
             )
             .into());
         }
@@ -118,24 +119,28 @@ impl HelperDef for OptionHelper<'_> {
         let params = params
             .iter()
             .map(|param| {
-                param.value().as_str().ok_or_else(|| {
-                    RenderErrorReason::Other("option params must be strings".to_owned()).into()
-                })
+                param
+                    .value()
+                    .as_str()
+                    .ok_or_else(|| {
+                        RenderErrorReason::Other("option params must be strings".to_string())
+                    })
+                    .into()
             })
-            .collect::<Result<Vec<&str>, RenderError>>()?;
+            .collect::<Result<Vec<&str>, RenderErrorReason>>()?;
         let t = match h.template() {
             Some(t) => t,
             None => {
                 return Err(
-                    RenderErrorReason::Other("option block must not be empty".to_owned()).into(),
-                )
+                    RenderErrorReason::Other("option block must not be empty".to_string()).into(),
+                );
             }
         };
         // Render the block.
-        let block = t.renders(r, ctx, rc)?;
+        let block = t.renders(r, gctx, rc)?;
 
         // Get the name of this page.
-        let man_name = ctx
+        let man_name = gctx
             .data()
             .get("man_name")
             .expect("expected man_name in context")
@@ -169,18 +174,17 @@ impl HelperDef for ManLinkHelper<'_> {
         let params = h.params();
         if params.len() != 2 {
             return Err(
-                RenderErrorReason::Other("{{man}} must have two arguments".to_owned()).into(),
+                RenderErrorReason::Other("{{man}} must have two arguments".to_string()).into(),
             );
         }
-        let name = params[0]
-            .value()
-            .as_str()
-            .ok_or_else(|| RenderErrorReason::Other("man link name must be a string".to_owned()))?;
+        let name = params[0].value().as_str().ok_or_else(|| {
+            RenderErrorReason::Other("man link name must be a string".to_string())
+        })?;
         let section = params[1].value().as_u64().ok_or_else(|| {
-            RenderErrorReason::Other("man link section must be an integer".to_owned())
+            RenderErrorReason::Other("man link section must be an integer".to_string())
         })?;
         let section = u8::try_from(section)
-            .map_err(|_e| RenderErrorReason::Other("section number too large".to_owned()))?;
+            .map_err(|_e| RenderErrorReason::Other("section number too large".to_string()))?;
         let link = self
             .formatter
             .linkify_man_to_md(name, section)
@@ -208,13 +212,13 @@ fn set_decorator(
 
 /// Sets a variable to a value within the context.
 fn set_in_context(rc: &mut RenderContext<'_, '_>, key: &str, value: serde_json::Value) {
-    let mut ctx = match rc.context() {
+    let mut gctx = match rc.context() {
         Some(c) => (*c).clone(),
         None => Context::wraps(serde_json::Value::Object(serde_json::Map::new())).unwrap(),
     };
-    if let serde_json::Value::Object(m) = ctx.data_mut() {
+    if let serde_json::Value::Object(m) = gctx.data_mut() {
         m.insert(key.to_string(), value);
-        rc.set_context(ctx);
+        rc.set_context(gctx);
     } else {
         panic!("expected object in context");
     }
@@ -222,11 +226,11 @@ fn set_in_context(rc: &mut RenderContext<'_, '_>, key: &str, value: serde_json::
 
 /// Removes a variable from the context.
 fn remove_from_context(rc: &mut RenderContext<'_, '_>, key: &str) {
-    let ctx = rc.context().expect("cannot remove from null context");
-    let mut ctx = (*ctx).clone();
-    if let serde_json::Value::Object(m) = ctx.data_mut() {
+    let gctx = rc.context().expect("cannot remove from null context");
+    let mut gctx = (*gctx).clone();
+    if let serde_json::Value::Object(m) = gctx.data_mut() {
         m.remove(key);
-        rc.set_context(ctx);
+        rc.set_context(gctx);
     } else {
         panic!("expected object in context");
     }
