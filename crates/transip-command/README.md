@@ -24,6 +24,11 @@ transip-command is a library that can parse a string and turn it in a command. I
 - product list
 - product elements \<productname\>
 - sleep \<number-of-seconds\>
+- vps list
+- vps item \<vpsname\>
+- vps start \<vpsname\>
+- vps stop \<vpsname\>
+- vps reset \<vpsname\>
 
 ### Available on feature propagation
 - dns acme-validation-check \<domainname\> \<acme-validation\>
