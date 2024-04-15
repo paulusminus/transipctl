@@ -1,0 +1,11 @@
+[package]
+name = "lines"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rustyline = "14.0.0"
+thiserror = "1.0.58"
+
+[dev-dependencies]
+itertools = "0.12.0"

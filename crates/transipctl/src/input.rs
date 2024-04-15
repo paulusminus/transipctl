@@ -1,8 +1,8 @@
 use crate::{error::Error, Result};
 use std::{
     env::Args,
-    fs::OpenOptions,
-    io::{BufRead, BufReader, Read},
+    fs::File,
+    io::{stdin, BufRead, BufReader, Read},
 };
 
 pub struct Input {
@@ -28,17 +28,15 @@ impl Input {
 impl TryFrom<Args> for Input {
     type Error = Error;
     fn try_from(mut args: Args) -> Result<Self> {
-        if let Some(file_name) = args.nth(1) {
-            let file = OpenOptions::new().read(true).open(&file_name)?;
-            Ok(Self {
+        match args.nth(1) {
+            Some(file_name) => File::open(&file_name).map_err(Into::into).map(|file| Self {
                 reader: Box::new(file),
                 script: Some(file_name),
-            })
-        } else {
-            Ok(Self {
-                reader: Box::new(std::io::stdin()),
+            }),
+            None => Ok(Self {
+                reader: Box::new(stdin()),
                 script: None,
-            })
+            }),
         }
     }
 }
