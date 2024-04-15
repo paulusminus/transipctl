@@ -164,6 +164,7 @@ impl Client {
                 Ok(())
             }
             TransipCommand::Vps(command) => self.execute_vps(command, s),
+            TransipCommand::AvailibilityZones => self.inner.availability_zones().report(s),
         }
     }
 }

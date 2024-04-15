@@ -12,7 +12,7 @@ description = "Tool for manipulating and querying records on Transip Api Endpoin
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/paulusminus/transipctl"
-version = "0.3.13"
+version = "0.3.14"
 
 [workspace.dependencies]
 anyhow = "1.0.80"

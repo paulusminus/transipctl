@@ -21,6 +21,7 @@ mod product;
 mod str_extension;
 mod vps;
 
+const AVAILABILITY_ZONES: &str = "availibility-zones";
 const COMMENT: &str = "#";
 const PING: &str = "ping";
 const DNS_COMMAND: &str = "dns ";
@@ -72,6 +73,8 @@ pub enum TransipCommand {
     /// );
     /// ```
     Sleep(u64),
+
+    AvailibilityZones,
 }
 
 impl FromStr for TransipCommand {
@@ -96,6 +99,10 @@ impl FromStr for TransipCommand {
         let trimmed = s.trim();
         if trimmed == PING {
             return Ok(TransipCommand::Ping);
+        }
+
+        if trimmed == AVAILABILITY_ZONES {
+            return Ok(TransipCommand::AvailibilityZones);
         }
 
         parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
@@ -138,6 +145,7 @@ impl Display for TransipCommand {
             TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
             TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
             TransipCommand::Ping => write!(f, "{}", PING),
+            TransipCommand::AvailibilityZones => write!(f, "{}", AVAILABILITY_ZONES),
         }
     }
 }
@@ -195,6 +203,11 @@ mod test {
         assert_eq!(TransipCommand::Sleep(45).to_string(), "sleep 45".to_owned(),);
 
         assert_eq!(TransipCommand::Ping.to_string(), "ping".to_owned(),);
+
+        assert_eq!(
+            TransipCommand::AvailibilityZones.to_string(),
+            "availibility-zones".to_owned()
+        );
     }
 
     #[test]
@@ -237,6 +250,11 @@ mod test {
         assert_eq!(
             " ping ".parse::<TransipCommand>().unwrap(),
             TransipCommand::Ping,
+        );
+
+        assert_eq!(
+            "availibility-zones ".parse::<TransipCommand>().unwrap(),
+            TransipCommand::AvailibilityZones,
         );
     }
 }
