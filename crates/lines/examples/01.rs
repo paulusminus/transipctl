@@ -1,11 +1,11 @@
 use std::env::args;
 
 use itertools::Itertools;
-use lines::{lines, Error, Result};
+use lines::{lines, Result};
 
-fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn((bool, I)) -> Result<(), Error>
+fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn((bool, I)) -> Result<()>
 where
-    I: Iterator<Item = Result<String, Error>>,
+    I: Iterator<Item = Result<String>>,
 {
     move |(_interactive, lines)| {
         lines
@@ -21,5 +21,5 @@ fn print(s: String) {
 }
 
 fn main() -> Result<()> {
-    lines("tip", vec!["exit", "quit"], args().nth(1).as_ref()).and_then(process(print))
+    lines("tip", vec!["exit", "quit"], args().nth(1).as_ref(), None).and_then(process(print))
 }

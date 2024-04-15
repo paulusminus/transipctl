@@ -80,7 +80,13 @@ fn main() -> Result<()> {
     log::setup_logging();
 
     let filename = args().nth(1);
-    let (_interactive, lines) = lines::lines("tipctl", vec![EXIT, QUIT], filename.as_ref())?;
+    let history_filename = Some(log::log_dir().join("history.txt"));
+    let (_interactive, lines) = lines::lines(
+        "tipctl",
+        vec![EXIT, QUIT],
+        filename.as_ref(),
+        history_filename.as_ref(),
+    )?;
 
     tracing::info!(
         "Running {} {}",

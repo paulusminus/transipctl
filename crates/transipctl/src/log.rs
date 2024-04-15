@@ -11,7 +11,7 @@ const QUALIFIER: &str = "nl";
 const ORGANISATION: &str = "paulmin";
 const APPLICATION: &str = "transip";
 
-fn log_dir() -> PathBuf {
+pub fn log_dir() -> PathBuf {
     let local_data_dir = directories::ProjectDirs::from(QUALIFIER, ORGANISATION, APPLICATION)
         .map(|project_dirs| project_dirs.data_local_dir().to_path_buf())
         .ok_or(Error::Xdg("XDG not found"));

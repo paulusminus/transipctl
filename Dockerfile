@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3.19
 
 ENV TRANSIP_API_PRIVATE_KEY=/run/secrets/transip-key
 ENV TRANSIP_API_LOG_DIR=/var/log/transip
