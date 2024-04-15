@@ -1,14 +1,25 @@
 use std::path::PathBuf;
 
-use rustyline::{history::FileHistory, CompletionType, Config, EditMode, Editor};
+use rustyline::{
+    highlight::Highlighter, hint::HistoryHinter, history::FileHistory, Completer, CompletionType,
+    Config, EditMode, Editor, Helper, Hinter, Validator,
+};
 
 use crate::{ReadlineError, Result};
 use prompt::prompt;
 
 mod prompt;
 
+#[derive(Default, Completer, Helper, Hinter, Validator)]
+pub struct MyHelper {
+    #[rustyline(Hinter)]
+    hinter: HistoryHinter,
+}
+
+impl Highlighter for MyHelper {}
+
 pub struct LineEditor {
-    editor: Editor<(), FileHistory>,
+    editor: Editor<MyHelper, FileHistory>,
     prompt: String,
     exit_terms: Vec<&'static str>,
     history_filename: Option<PathBuf>,
@@ -44,7 +55,8 @@ impl LineEditor {
             .completion_type(CompletionType::List)
             .edit_mode(EditMode::Emacs)
             .build();
-        rustyline::Editor::<(), FileHistory>::with_config(config).and_then(|mut editor| {
+        rustyline::Editor::<MyHelper, FileHistory>::with_config(config).and_then(|mut editor| {
+            editor.set_helper(Some(MyHelper::default()));
             if let Some(filename) = history_filename {
                 if filename.exists() {
                     editor.load_history(filename)?;
