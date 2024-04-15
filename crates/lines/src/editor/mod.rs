@@ -1,8 +1,6 @@
 use std::path::PathBuf;
 
-use rustyline::{
-    highlight::Highlighter, hint::HistoryHinter, history::FileHistory, Cmd, Completer, CompletionType, Config, EditMode, Editor, Helper, Hinter, KeyEvent, Validator
-};
+use rustyline::{history::FileHistory, CompletionType, Config, EditMode, Editor};
 
 use crate::{ReadlineError, Result};
 use prompt::prompt;
@@ -10,7 +8,7 @@ use prompt::prompt;
 mod prompt;
 
 pub struct LineEditor {
-    editor: Editor<MyHelper, FileHistory>,
+    editor: Editor<(), FileHistory>,
     prompt: String,
     exit_terms: Vec<&'static str>,
     history_filename: Option<PathBuf>,
@@ -35,22 +33,6 @@ impl Iterator for LineEditor {
     }
 }
 
-#[derive(Completer, Helper, Hinter, Validator)]
-struct MyHelper {
-    #[rustyline(Hinter)]
-    hinter: HistoryHinter,
-}
-
-impl Highlighter for MyHelper {}
-
-impl Default for MyHelper {
-    fn default() -> Self {
-        Self {
-            hinter: HistoryHinter::new(),
-        }
-    }
-}
-
 impl LineEditor {
     pub fn try_new(
         name: &str,
@@ -62,10 +44,7 @@ impl LineEditor {
             .completion_type(CompletionType::List)
             .edit_mode(EditMode::Emacs)
             .build();
-        rustyline::Editor::<MyHelper, FileHistory>::with_config(config).and_then(|mut editor| {
-            editor.set_helper(Some(MyHelper::default()));
-            editor.bind_sequence(KeyEvent::alt('n'), Cmd::HistorySearchForward);
-            editor.bind_sequence(KeyEvent::alt('p'), Cmd::HistorySearchBackward);
+        rustyline::Editor::<(), FileHistory>::with_config(config).and_then(|mut editor| {
             if let Some(filename) = history_filename {
                 if filename.exists() {
                     editor.load_history(filename)?;
