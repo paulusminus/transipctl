@@ -1,14 +1,15 @@
-use input::Input;
-use std::process::exit;
+// use input::Input;
+use std::{env::args, process::exit};
 use transip_execute::{configuration_from_environment, Client, TransipCommand};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
-const EXIT_COMMANDS: [&str; 2] = ["exit", "quit"];
+const EXIT: &str = "exit";
+const QUIT: &str = "quit";
 
 mod error;
-mod input;
+// mod input;
 mod log;
 
 fn arg_version() {
@@ -77,18 +78,21 @@ impl Out {
 fn main() -> Result<()> {
     arg_version();
     log::setup_logging();
-    let input: Input = std::env::args().try_into()?;
 
-    let (interactive, run_from) = input.run_from();
-    tracing::info!("Running {} {}", VERSION, run_from);
+    let filename = args().nth(1);
+    let (_interactive, lines) = lines::lines("tipctl", vec![EXIT, QUIT], filename.as_ref())?;
+
+    tracing::info!(
+        "Running {} {}",
+        VERSION,
+        filename.as_ref().unwrap_or(&"tty".to_owned())
+    );
 
     let output_format = Out::Yaml;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
 
-    for (line_number, line) in input.lines().enumerate() {
-        if EXIT_COMMANDS.contains(&line.trim().to_ascii_lowercase().as_str()) && interactive {
-            break;
-        }
+    for (line_number, line_result) in lines.enumerate() {
+        let line = line_result?;
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => output_format.execute(&mut client, &command),
@@ -100,6 +104,10 @@ fn main() -> Result<()> {
         }
     }
 
-    tracing::info!("Ending {} {}", VERSION, run_from);
+    tracing::info!(
+        "Ending {} {}",
+        VERSION,
+        filename.as_ref().unwrap_or(&"tty".to_owned())
+    );
     Ok(())
 }

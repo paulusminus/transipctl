@@ -8,5 +8,6 @@ podman run \
     --secret transip-key \
     --name transipctl \
     -i \
+    --tty \
     --rm \
     docker.io/paulusminus/transipctl

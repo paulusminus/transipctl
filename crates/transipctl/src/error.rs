@@ -38,6 +38,9 @@ pub enum Error {
 
     #[error("XDG: {0}")]
     Xdg(&'static str),
+
+    #[error("Line: {0}")]
+    Line(#[from] lines::Error),
 }
 
 pub trait ErrorExt<T, E> {

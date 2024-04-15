@@ -23,10 +23,17 @@ impl Iterator for Input {
     }
 }
 
-pub fn lines(prompt_name: &str, exit_terms: Vec<&'static str>, filename: Option<String>) -> Result<(bool, impl Iterator<Item = Result<String>>), Error> {
+pub fn lines(
+    prompt_name: &str,
+    exit_terms: Vec<&'static str>,
+    filename: Option<&String>,
+) -> Result<(bool, impl Iterator<Item = Result<String>>), Error> {
     match filename {
-        Some(file_name) => FileReader::try_new(file_name).map(Input::File).map(|r| (false, r)),
-        None => LineEditor::try_new(prompt_name, exit_terms).map(Input::Tty).map(|r| (true, r)),
+        Some(file_name) => FileReader::try_new(file_name)
+            .map(Input::File)
+            .map(|r| (false, r)),
+        None => LineEditor::try_new(prompt_name, exit_terms)
+            .map(Input::Tty)
+            .map(|r| (true, r)),
     }
 }
-

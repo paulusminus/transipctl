@@ -1,7 +1,7 @@
 use std::env::args;
 
-use lines::{lines, Error, Result};
 use itertools::Itertools;
+use lines::{lines, Error, Result};
 
 fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn((bool, I)) -> Result<(), Error>
 where
@@ -21,5 +21,5 @@ fn print(s: String) {
 }
 
 fn main() -> Result<()> {
-    lines("tip", vec!["exit", "quit"], args().nth(1)).and_then(process(print))
+    lines("tip", vec!["exit", "quit"], args().nth(1).as_ref()).and_then(process(print))
 }
