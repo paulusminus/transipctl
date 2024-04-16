@@ -14,6 +14,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 mod dns;
 mod domain;
+mod email;
 mod error;
 mod invoice;
 mod onerror;
@@ -26,6 +27,9 @@ const COMMENT: &str = "#";
 const PING: &str = "ping";
 const DNS_COMMAND: &str = "dns ";
 const DOMAIN_COMMAND: &str = "domain ";
+const EMAIL_FORWARD: &str = "email-forward";
+const EMAIL_LIST: &str = "email-list";
+const EMAIL_BOX: &str = "email-box";
 const INVOICE_COMMAND: &str = "invoice ";
 const ONERROR_COMMAND: &str = "onerror ";
 const PRODUCT_COMMAND: &str = "product ";
@@ -34,6 +38,8 @@ const VPS_COMMAND: &str = "vps ";
 
 #[derive(Debug, PartialEq)]
 pub enum TransipCommand {
+    AvailibilityZones,
+
     /// # Example
     ///
     /// ```
@@ -50,6 +56,12 @@ pub enum TransipCommand {
     Domain(domain::DomainCommand),
 
     Dns(dns::DnsCommand),
+
+    EmailBox,
+
+    EmailForward,
+
+    EmailList,
 
     Invoice(invoice::InvoiceCommand),
 
@@ -73,8 +85,6 @@ pub enum TransipCommand {
     /// );
     /// ```
     Sleep(u64),
-
-    AvailibilityZones,
 }
 
 impl FromStr for TransipCommand {
@@ -136,16 +146,19 @@ impl FromStr for TransipCommand {
 impl Display for TransipCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            TransipCommand::AvailibilityZones => write!(f, "{}", AVAILABILITY_ZONES),
             TransipCommand::Comment(comment) => write!(f, "{}", comment),
             TransipCommand::Dns(command) => write!(f, "{}{}", DNS_COMMAND, command),
             TransipCommand::Domain(command) => write!(f, "{}{}", DOMAIN_COMMAND, command),
+            TransipCommand::EmailBox => write!(f, "{}", EMAIL_BOX),
+            TransipCommand::EmailForward => write!(f, "{}", EMAIL_FORWARD),
+            TransipCommand::EmailList => write!(f, "{}", EMAIL_LIST),
             TransipCommand::Invoice(command) => write!(f, "{}{}", INVOICE_COMMAND, command),
             TransipCommand::OnError(onerror) => write!(f, "{}{}", ONERROR_COMMAND, onerror),
             TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),
             TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
             TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
             TransipCommand::Ping => write!(f, "{}", PING),
-            TransipCommand::AvailibilityZones => write!(f, "{}", AVAILABILITY_ZONES),
         }
     }
 }

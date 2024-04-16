@@ -149,6 +149,7 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::general::GeneralApi;
         match command {
+            TransipCommand::AvailibilityZones => self.inner.availability_zones().report(s),
             TransipCommand::Comment(_) => Ok(()),
             TransipCommand::Dns(command) => self.execute_dns(command, s),
             TransipCommand::Domain(command) => self.execute_domain(command, s),
@@ -164,7 +165,7 @@ impl Client {
                 Ok(())
             }
             TransipCommand::Vps(command) => self.execute_vps(command, s),
-            TransipCommand::AvailibilityZones => self.inner.availability_zones().report(s),
+            _ => Ok(())
         }
     }
 }
