@@ -1,6 +1,6 @@
 // use input::Input;
 use std::{env::args, process::exit};
-use transip_execute::{configuration_from_environment, Client, TransipCommand};
+use transip_execute::{configuration_from_environment, Client, TransipCommand, SubCommand};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
@@ -63,7 +63,7 @@ macro_rules! execute_out {
 }
 
 impl Out {
-    fn execute(&self, client: &mut Client, command: &TransipCommand) {
+    fn execute(&self, client: &mut Client, command: &SubCommand) {
         match self {
             Out::Json => {
                 execute_out!(serde_json::Serializer::pretty, client, command, true);
@@ -101,7 +101,7 @@ fn main() -> Result<()> {
         let line = line_result?;
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
-                Ok(command) => output_format.execute(&mut client, &command),
+                Ok(command) => output_format.execute(&mut client, &command.command),
                 Err(error) => handle_error(
                     format!("Error {} parsing line {}", error, line_number + 1),
                     client.exit_on_error(),

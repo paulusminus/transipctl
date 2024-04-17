@@ -3,9 +3,10 @@ availibility-zones
 comment "dit is allemaal onzin"
 dns acme-validation-delete paulmin.nl
 dns acme-validation-set paulmin.nl kjdf
+dns acme-validation-check paulmin.nl ljdf
 dns delete paulmin.nl www 86400 A 283.54.567.32
 dns insert paulmin.nl www 86400 TXT "Ha daar gaan   wij weer"
-dns list
+dns list paulmin.nl
 domain list
 domain item paulmin.nl
 email-box list paulmin.nl

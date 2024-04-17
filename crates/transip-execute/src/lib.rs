@@ -5,12 +5,11 @@ pub use transip::configuration_from_environment;
 use transip::Configuration;
 pub use transip::Error;
 use transip_command::{
-    DnsCommand, DomainCommand, InvoiceAction, InvoiceCommand, OnError, ProductCommand, VpsAction,
-    VpsCommand,
+    DnsCommand, DomainCommand, InvoiceCommand, OnError, ProductCommand, VpsCommand
 };
 
 // reexport TransipCommand
-pub use transip_command::TransipCommand;
+pub use transip_command::{SubCommand, TransipCommand};
 
 pub struct Client {
     inner: transip::Client,
@@ -56,30 +55,45 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::dns::{DnsApi, DnsEntry};
         match command {
-            DnsCommand::AcmeValidationDelete(name) => self
+            DnsCommand::AcmeValidationDelete { domain } => self
                 .inner
-                .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
+                .dns_entry_delete_all(domain, DnsEntry::is_acme_challenge)
                 .report(s),
-            DnsCommand::List(name) => self.inner.dns_entry_list(name).report(s),
-            DnsCommand::Delete(name, dns_entry) => dns_entry
-                .parse::<DnsEntry>()
-                .and_then(|entry| self.inner.dns_entry_delete(name, entry))
-                .report(s),
-            DnsCommand::Insert(name, dns_entry) => dns_entry
-                .parse::<DnsEntry>()
-                .and_then(|entry| self.inner.dns_entry_insert(name, entry))
-                .report(s),
-            DnsCommand::AcmeValidationSet(name, challenge) => self
+            DnsCommand::List { domain } => self.inner.dns_entry_list(domain).report(s),
+            DnsCommand::Delete(dns_entry) => {
+                let entry = DnsEntry {
+                    name: dns_entry.name.clone(),
+                    expire: dns_entry.ttl,
+                    entry_type: format!("{:?}", dns_entry.r#type),
+                    content: dns_entry.content.clone(),
+                };
+                self.inner
+                    .dns_entry_delete(&dns_entry.domain, entry)
+                    .report(s)
+            }
+            DnsCommand::Insert(dns_entry) => {
+                let entry = DnsEntry {
+                    name: dns_entry.name.clone(),
+                    expire: dns_entry.ttl,
+                    entry_type: format!("{:?}", dns_entry.r#type),
+                    content: dns_entry.content.clone(),
+                };
+                self.inner
+                    .dns_entry_insert(&dns_entry.domain, entry)
+                    .report(s)
+            }
+            DnsCommand::AcmeValidationSet { domain, challenge } => self
                 .inner
-                .dns_entry_delete_all(name, DnsEntry::is_acme_challenge)
+                .dns_entry_delete_all(domain, DnsEntry::is_acme_challenge)
                 .and_then(|_| {
                     self.inner
-                        .dns_entry_insert(name, DnsEntry::new_acme_challenge(60, challenge))
+                        .dns_entry_insert(domain, DnsEntry::new_acme_challenge(60, challenge))
                 })
                 .report(s),
             #[cfg(feature = "propagation")]
-            DnsCommand::AcmeValidationCheck(name, challenge) => {
-                acme_validation_propagation::wait(name, challenge).map_err(|_| Error::AcmeChallege)
+            DnsCommand::AcmeValidationCheck { domain, challenge } => {
+                acme_validation_propagation::wait(domain, challenge)
+                    .map_err(|_| Error::AcmeChallege)
             }
         }
     }
@@ -91,7 +105,7 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::domain::DomainApi;
         match command {
-            DomainCommand::Item(name) => self.inner.domain_item(name).report(s),
+            DomainCommand::Item { domain } => self.inner.domain_item(domain).report(s),
             DomainCommand::List => self.inner.domain_list().report(s),
         }
     }
@@ -103,10 +117,8 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::account::AccountApi;
         match command {
-            InvoiceCommand::Action(number, action) => match action {
-                InvoiceAction::Item => self.inner.invoice(number).report(s),
-                InvoiceAction::Pdf => self.inner.invoice_pdf(number).report(s),
-            },
+            InvoiceCommand::Item { number } => self.inner.invoice(number).report(s),
+            InvoiceCommand::Pdf { number } => self.inner.invoice_pdf(number).report(s),
             InvoiceCommand::List => self.inner.invoice_list().report(s),
         }
     }
@@ -118,7 +130,7 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::general::GeneralApi;
         match command {
-            ProductCommand::Elements(elements) => self.inner.product_elements(elements).report(s),
+            ProductCommand::Elements { name } => self.inner.product_elements(name).report(s),
             ProductCommand::List => self.inner.products().report(s),
         }
     }
@@ -130,41 +142,39 @@ impl Client {
     ) -> Result<(), transip::Error> {
         use transip::api::vps::VpsApi;
         match command {
-            VpsCommand::Action(name, action) => match action {
-                VpsAction::Item => self.inner.vps(name).report(s),
-                VpsAction::Lock => self.inner.vps_set_is_locked(name, true).report(s),
-                VpsAction::Reset => self.inner.vps_reset(name).report(s),
-                VpsAction::Start => self.inner.vps_start(name).report(s),
-                VpsAction::Stop => self.inner.vps_stop(name).report(s),
-                VpsAction::Unlock => self.inner.vps_set_is_locked(name, false).report(s),
-            },
+            VpsCommand::Item { name } => self.inner.vps(name).report(s),
+            VpsCommand::Lock { name } => self.inner.vps_set_is_locked(name, true).report(s),
+            VpsCommand::Reset { name } => self.inner.vps_reset(name).report(s),
+            VpsCommand::Start { name } => self.inner.vps_start(name).report(s),
+            VpsCommand::Stop { name } => self.inner.vps_stop(name).report(s),
+            VpsCommand::Unlock { name } => self.inner.vps_set_is_locked(name, false).report(s),
             VpsCommand::List => self.inner.vps_list().report(s),
         }
     }
 
     pub fn execute(
         &mut self,
-        command: &TransipCommand,
+        command: &SubCommand,
         s: impl Serializer,
     ) -> Result<(), transip::Error> {
         use transip::api::general::GeneralApi;
         match command {
-            TransipCommand::AvailibilityZones => self.inner.availability_zones().report(s),
-            TransipCommand::Comment(_) => Ok(()),
-            TransipCommand::Dns(command) => self.execute_dns(command, s),
-            TransipCommand::Domain(command) => self.execute_domain(command, s),
-            TransipCommand::Invoice(command) => self.execute_invoice(command, s),
-            TransipCommand::OnError(onerror) => {
-                self.onerror = onerror.clone();
+            SubCommand::AvailibilityZones => self.inner.availability_zones().report(s),
+            SubCommand::Comment { text: _ } => Ok(()),
+            SubCommand::Dns(command) => self.execute_dns(command, s),
+            SubCommand::Domain(command) => self.execute_domain(command, s),
+            SubCommand::Invoice(command) => self.execute_invoice(command, s),
+            SubCommand::Onerror { on_error } => {
+                self.onerror = on_error.clone();
                 Ok(())
             }
-            TransipCommand::Ping => self.inner.api_test().report(s),
-            TransipCommand::Product(command) => self.execute_product(command, s),
-            TransipCommand::Sleep(timeout) => {
-                std::thread::sleep(Duration::from_secs(*timeout));
+            SubCommand::Ping => self.inner.api_test().report(s),
+            SubCommand::Product(command) => self.execute_product(command, s),
+            SubCommand::Sleep { number_of_seconds } => {
+                std::thread::sleep(Duration::from_secs(*number_of_seconds));
                 Ok(())
             }
-            TransipCommand::Vps(command) => self.execute_vps(command, s),
+            SubCommand::Vps(command) => self.execute_vps(command, s),
             _ => Ok(()),
         }
     }

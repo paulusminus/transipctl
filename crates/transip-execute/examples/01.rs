@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use transip::configuration_from_environment;
-use transip_command::TransipCommand;
+use transip_command::{SubCommand, TransipCommand};
 use transip_execute::Client;
 
 const COMMAND_DNS_LIST: &str = "dns list paulmin.nl";
@@ -31,7 +31,7 @@ macro_rules! execute_out {
 }
 
 impl Out {
-    fn execute(&self, client: &mut Client, command: &TransipCommand) {
+    fn execute(&self, client: &mut Client, command: &SubCommand) {
         match self {
             Out::Json => {
                 execute_out!(serde_json::Serializer::pretty, client, command, println);
@@ -50,10 +50,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let command_add_challenge = COMMAND_ADD_CHALLENGE.parse::<TransipCommand>()?;
     let command_delete_challenge = COMMAND_DELETE_CHALLENGE.parse::<TransipCommand>()?;
 
-    Out::Json.execute(&mut client, &command_dns_list);
-    Out::Yaml.execute(&mut client, &command_dns_list);
-    Out::Json.execute(&mut client, &command_delete_challenge);
-    Out::Json.execute(&mut client, &command_add_challenge);
+    Out::Json.execute(&mut client, &command_dns_list.command);
+    Out::Yaml.execute(&mut client, &command_dns_list.command);
+    Out::Json.execute(&mut client, &command_delete_challenge.command);
+    Out::Json.execute(&mut client, &command_add_challenge.command);
 
     Ok(())
 }

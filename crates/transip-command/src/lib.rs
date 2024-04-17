@@ -1,273 +1,205 @@
-#![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
+use std::str::FromStr;
 
-pub use dns::DnsCommand;
-pub use domain::DomainCommand;
-use error::ErrorExt;
-pub use invoice::{InvoiceAction, InvoiceCommand};
-pub use onerror::OnError;
-pub use product::ProductCommand;
-use std::{env::VarError, fmt::Display, str::FromStr};
-pub use vps::{VpsAction, VpsCommand};
+use clap::{Error, Parser, Subcommand, ValueEnum};
 
-pub use error::Error;
-pub type Result<T> = std::result::Result<T, Error>;
+#[derive(Clone, Debug, ValueEnum)]
+#[value(rename_all = "UPPER")]
+pub enum RecordType {
+    A,
+    AAAA,
+    CNAME,
+    MX,
+    NS,
+    TXT,
+    SRV,
+}
 
-mod dns;
-mod domain;
-mod email;
-mod error;
-mod invoice;
-mod onerror;
-mod product;
-mod str_extension;
-mod vps;
+#[derive(Clone, Debug, ValueEnum, PartialEq)]
+pub enum OnError {
+    Print,
+    Exit,
+}
 
-const AVAILABILITY_ZONES: &str = "availibility-zones";
-const COMMENT: &str = "#";
-const PING: &str = "ping";
-const DNS_COMMAND: &str = "dns ";
-const DOMAIN_COMMAND: &str = "domain ";
-const EMAIL_FORWARD: &str = "email-forward";
-const EMAIL_LIST: &str = "email-list";
-const EMAIL_BOX: &str = "email-box";
-const INVOICE_COMMAND: &str = "invoice ";
-const ONERROR_COMMAND: &str = "onerror ";
-const PRODUCT_COMMAND: &str = "product ";
-const SLEEP_COMMAND: &str = "sleep ";
-const VPS_COMMAND: &str = "vps ";
+#[derive(Clone, Debug, Parser)]
+pub struct DnsEntry {
+    pub domain: String,
+    pub name: String,
+    pub ttl: u32,
+    pub r#type: RecordType,
+    pub content: String,
+}
 
-#[derive(Debug, PartialEq)]
-pub enum TransipCommand {
+#[cfg(feature = "propagation")]
+#[derive(Debug, Subcommand)]
+pub enum DnsCommand {
+    AcmeValidationDelete { domain: String },
+    AcmeValidationSet { domain: String, challenge: String },
+    AcmeValidationCheck { domain: String, challenge: String },
+    Delete(DnsEntry),
+    Insert(DnsEntry),
+    List { domain: String },
+}
+
+#[cfg(not(feature = "propagation"))]
+#[derive(Debug, Subcommand)]
+pub enum DnsCommand {
+    AcmeValidationDelete { domain: String },
+    AcmeValidationSet { domain: String, challenge: String },
+    Delete(DnsEntry),
+    Insert(DnsEntry),
+    List,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum DomainCommand {
+    List,
+    Item { domain: String },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum InvoiceCommand {
+    List,
+    Item { number: String },
+    Pdf { number: String },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ProductCommand {
+    List,
+    Elements { name: String },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum EmailBoxCommand {
+    List {
+        domain: String,
+    },
+    Item {
+        domain: String,
+        id: String,
+    },
+    Delete {
+        domain: String,
+        id: String,
+    },
+    Insert {
+        domain: String,
+        username: String,
+        password: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum EmailForwardCommand {
+    List {
+        domain: String,
+    },
+    Item {
+        domain: String,
+        id: String,
+    },
+    Delete {
+        domain: String,
+        id: String,
+    },
+    Insert {
+        domain: String,
+        local_part: String,
+        forward_to: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum VpsCommand {
+    List,
+    Item { name: String },
+    Start { name: String },
+    Stop { name: String },
+    Reset { name: String },
+    Lock { name: String },
+    Unlock { name: String },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum SubCommand {
     AvailibilityZones,
-
-    /// # Example
-    ///
-    /// ```
-    /// use transip_command::TransipCommand;
-    ///
-    /// let commandline = "# lkasjkfiekf";
-    /// assert_eq!(
-    ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Comment(commandline.to_owned()),
-    /// );
-    /// ```
-    Comment(String),
-
-    Domain(domain::DomainCommand),
-
-    Dns(dns::DnsCommand),
-
-    EmailBox(email::EmailCommand<String>),
-
-    EmailForward(email::EmailCommand<String>),
-
-    EmailList(email::EmailCommand<u64>),
-
-    Invoice(invoice::InvoiceCommand),
-
-    OnError(OnError),
-
-    Product(product::ProductCommand),
-
-    Vps(vps::VpsCommand),
-
+    Comment {
+        text: String,
+    },
+    #[command(subcommand)]
+    Dns(DnsCommand),
+    #[command(subcommand)]
+    Domain(DomainCommand),
+    #[command(subcommand)]
+    EmailBox(EmailBoxCommand),
+    #[command(subcommand)]
+    EmailForward(EmailForwardCommand),
+    #[command(subcommand)]
+    Invoice(InvoiceCommand),
+    Onerror {
+        on_error: OnError,
+    },
     Ping,
+    #[command(subcommand)]
+    Product(ProductCommand),
+    Sleep {
+        number_of_seconds: u64,
+    },
+    #[command(subcommand)]
+    Vps(VpsCommand),
+}
 
-    /// # Example
-    ///
-    /// ```
-    /// use transip_command::TransipCommand;
-    ///
-    /// let commandline = "sleep 5";
-    /// assert_eq!(
-    ///     commandline.parse::<TransipCommand>().unwrap(),
-    ///     TransipCommand::Sleep(5),
-    /// );
-    /// ```
-    Sleep(u64),
+#[derive(Debug, Parser)]
+#[command(multicall = true)]
+pub struct TransipCommand {
+    #[command(subcommand)]
+    pub command: SubCommand,
+}
+
+fn command_line<S: AsRef<str>>(line: S) -> Vec<String> {
+    if line.as_ref().trim_start().starts_with("#") {
+        vec!["comment".to_owned(), line.as_ref().to_owned()]
+    } else {
+        shlex::split(line.as_ref()).unwrap()
+    }
 }
 
 impl FromStr for TransipCommand {
     type Err = Error;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        macro_rules! parse {
-            ($trimmed:expr, $command:expr, $sub_command_type:path, $map:path) => {
-                if let Some(sub_command) = $trimmed.strip_prefix($command) {
-                    return sub_command
-                        .trim()
-                        .parse::<$sub_command_type>()
-                        .err_into()
-                        .map($map);
-                }
-            };
-        }
-
-        if s.starts_with(COMMENT) {
-            return Ok(TransipCommand::Comment(s.to_owned()));
-        }
-        let trimmed = s.trim();
-        if trimmed == PING {
-            return Ok(TransipCommand::Ping);
-        }
-
-        if trimmed == AVAILABILITY_ZONES {
-            return Ok(TransipCommand::AvailibilityZones);
-        }
-
-        parse!(trimmed, SLEEP_COMMAND, u64, TransipCommand::Sleep);
-        parse!(trimmed, ONERROR_COMMAND, OnError, TransipCommand::OnError);
-
-        parse!(trimmed, DNS_COMMAND, DnsCommand, TransipCommand::Dns);
-        parse!(
-            trimmed,
-            DOMAIN_COMMAND,
-            DomainCommand,
-            TransipCommand::Domain
-        );
-        parse!(
-            trimmed,
-            INVOICE_COMMAND,
-            InvoiceCommand,
-            TransipCommand::Invoice
-        );
-        parse!(
-            trimmed,
-            PRODUCT_COMMAND,
-            ProductCommand,
-            TransipCommand::Product
-        );
-        parse!(trimmed, VPS_COMMAND, VpsCommand, TransipCommand::Vps);
-
-        Err(Error::ParseTransipCommand(s.to_owned()))
-    }
-}
-
-impl Display for TransipCommand {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TransipCommand::AvailibilityZones => write!(f, "{}", AVAILABILITY_ZONES),
-            TransipCommand::Comment(comment) => write!(f, "{}", comment),
-            TransipCommand::Dns(command) => write!(f, "{}{}", DNS_COMMAND, command),
-            TransipCommand::Domain(command) => write!(f, "{}{}", DOMAIN_COMMAND, command),
-            TransipCommand::EmailBox(command) => write!(f, "{}", EMAIL_BOX),
-            TransipCommand::EmailForward(command) => write!(f, "{}{}", EMAIL_FORWARD, command),
-            TransipCommand::EmailList(command) => write!(f, "{}", EMAIL_LIST),
-            TransipCommand::Invoice(command) => write!(f, "{}{}", INVOICE_COMMAND, command),
-            TransipCommand::OnError(onerror) => write!(f, "{}{}", ONERROR_COMMAND, onerror),
-            TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),
-            TransipCommand::Sleep(timeout) => write!(f, "{}{}", SLEEP_COMMAND, timeout),
-            TransipCommand::Vps(command) => write!(f, "{}{}", VPS_COMMAND, command),
-            TransipCommand::Ping => write!(f, "{}", PING),
-        }
-    }
-}
-
-fn check_environment(name: &str) -> std::result::Result<String, VarError> {
-    if name.starts_with("${") && name.ends_with('}') {
-        let s = name[2..name.len() - 1].trim();
-        std::env::var(s)
-    } else {
-        Ok(name.to_owned())
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TransipCommand::try_parse_from(command_line(s))
     }
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
+    use std::io::{BufRead, BufReader};
+
     use super::TransipCommand;
+    use clap::Parser;
 
-    #[test]
-    fn display() {
-        assert_eq!(
-            TransipCommand::Comment("# lksadjf".to_owned()).to_string(),
-            "# lksadjf".to_owned(),
-        );
+    const COMMANDS: &[u8] = include_bytes!("commands.txt");
 
-        assert_eq!(
-            TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned())).to_string(),
-            "dns list paulmin.nl".to_owned(),
-        );
-
-        assert_eq!(
-            TransipCommand::Domain(crate::DomainCommand::List).to_string(),
-            "domain list".to_owned(),
-        );
-
-        assert_eq!(
-            TransipCommand::Invoice(crate::InvoiceCommand::List).to_string(),
-            "invoice list".to_owned(),
-        );
-
-        assert_eq!(
-            TransipCommand::Product(crate::ProductCommand::List).to_string(),
-            "product list".to_owned(),
-        );
-
-        assert_eq!(
-            TransipCommand::OnError(crate::OnError::Exit).to_string(),
-            "onerror exit".to_owned(),
-        );
-
-        assert_eq!(
-            TransipCommand::OnError(crate::OnError::Print).to_string(),
-            "onerror print".to_owned(),
-        );
-
-        assert_eq!(TransipCommand::Sleep(45).to_string(), "sleep 45".to_owned(),);
-
-        assert_eq!(TransipCommand::Ping.to_string(), "ping".to_owned(),);
-
-        assert_eq!(
-            TransipCommand::AvailibilityZones.to_string(),
-            "availibility-zones".to_owned()
-        );
+    fn command_line<S: AsRef<str>>(line: S) -> Option<Vec<String>> {
+        if line.as_ref().trim_start().starts_with("#") {
+            None
+        } else {
+            shlex::split(line.as_ref())
+        }
     }
 
     #[test]
-    fn transip_command_from_str() {
-        assert_eq!(
-            "# alsjff".parse::<TransipCommand>().unwrap(),
-            TransipCommand::Comment("# alsjff".to_owned()),
-        );
-
-        assert_eq!(
-            "dns list paulmin.nl ".parse::<TransipCommand>().unwrap(),
-            TransipCommand::Dns(crate::DnsCommand::List("paulmin.nl".to_owned()))
-        );
-
-        assert_eq!(
-            "vps \treset paulusminus-vps2"
-                .parse::<TransipCommand>()
-                .unwrap(),
-            TransipCommand::Vps(crate::VpsCommand::Action(
-                "paulusminus-vps2".to_owned(),
-                crate::VpsAction::Reset,
-            ))
-        );
-
-        assert_eq!(
-            "sleep 3984".parse::<TransipCommand>().unwrap(),
-            TransipCommand::Sleep(3984),
-        );
-
-        assert_eq!(
-            "onerror print  ".parse::<TransipCommand>().unwrap(),
-            TransipCommand::OnError(crate::OnError::Print),
-        );
-
-        assert_eq!(
-            "onerror   exit".parse::<TransipCommand>().unwrap(),
-            TransipCommand::OnError(crate::OnError::Exit),
-        );
-
-        assert_eq!(
-            " ping ".parse::<TransipCommand>().unwrap(),
-            TransipCommand::Ping,
-        );
-
-        assert_eq!(
-            "availibility-zones ".parse::<TransipCommand>().unwrap(),
-            TransipCommand::AvailibilityZones,
-        );
+    fn try_command_lines() {
+        let lines = BufReader::new(COMMANDS).lines();
+        for args_option in lines.map_while(Result::ok).map(command_line) {
+            match args_option {
+                Some(args) => {
+                    let result = TransipCommand::try_parse_from(args).unwrap();
+                    println!("{:?}", &result.command);
+                }
+                None => println!("Comment received"),
+            }
+        }
     }
 }
