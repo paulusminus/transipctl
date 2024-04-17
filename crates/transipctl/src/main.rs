@@ -1,6 +1,8 @@
 // use input::Input;
 use std::{env::args, process::exit};
-use transip_execute::{configuration_from_environment, Client, SubCommand, TransipCommand};
+use transip_execute::{
+    configuration_from_environment, Client, ErrorKind, SubCommand, TransipCommand,
+};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
@@ -102,10 +104,16 @@ fn main() -> Result<()> {
         if !line.trim().is_empty() {
             match line.parse::<TransipCommand>() {
                 Ok(command) => output_format.execute(&mut client, &command.command),
-                Err(error) => handle_error(
-                    format!("Error {} parsing line {}", error, line_number + 1),
-                    client.exit_on_error(),
-                ),
+                Err(error) => {
+                    if error.kind() == ErrorKind::DisplayHelp {
+                        handle_error(format!("{}", error), client.exit_on_error())
+                    } else {
+                        handle_error(
+                            format!("Error {} parsing line {}", error, line_number + 1),
+                            client.exit_on_error(),
+                        )
+                    }
+                }
             }
         }
     }

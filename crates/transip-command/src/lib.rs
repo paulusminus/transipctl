@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+pub use clap::error::ErrorKind;
 use clap::{Error, Parser, Subcommand, ValueEnum};
 
 #[derive(Clone, Debug, ValueEnum)]

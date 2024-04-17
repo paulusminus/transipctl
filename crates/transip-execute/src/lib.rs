@@ -10,7 +10,7 @@ use transip_command::{
 };
 
 // reexport TransipCommand
-pub use transip_command::{SubCommand, TransipCommand};
+pub use transip_command::{ErrorKind, SubCommand, TransipCommand};
 
 pub struct Client {
     inner: transip::Client,

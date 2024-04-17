@@ -23,6 +23,6 @@ impl Iterator for FileReader {
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|r| r.map_err(Into::into))
+        self.0.next().map(|result| result.map_err(Into::into))
     }
 }
