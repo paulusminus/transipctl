@@ -9,7 +9,7 @@ version.workspace = true
 rust-version = "1.64.0"
 
 [dependencies]
-parse-display = "0.9.0"
+# parse-display = "0.9.0"
 strum = { version = "0.26.0", features = ["derive"] }
 thiserror = "1.0.50"
 

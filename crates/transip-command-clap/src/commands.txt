@@ -1,0 +1,34 @@
+  # This is a comment
+availibility-zones
+comment "dit is allemaal onzin"
+dns acme-validation-delete paulmin.nl
+dns acme-validation-set paulmin.nl kjdf
+dns delete paulmin.nl www 86400 A 283.54.567.32
+dns insert paulmin.nl www 86400 TXT "Ha daar gaan   wij weer"
+dns list
+domain list
+domain item paulmin.nl
+email-box list paulmin.nl
+email-box item paulmin.nl info@paulmin.nl
+email-box delete paulmin.nl info@paulmin.nl
+email-box insert paulmin.nl test password
+email-forward list paulmin.nl
+email-forward item paulmin.nl info@paulmin.nl
+email-forward delete paulmin.nl info@paulmin.nl
+email-forward insert paulmin.nl test info@paulmin.nl
+invoice list
+invoice item oiuwerlf
+invoice pdf iuowerl
+onerror exit
+onerror print
+ping
+product list
+product elements haip-basic-contract
+sleep 3984
+vps list
+vps item vps-paulusminus2
+vps start vps-paulusminus2
+vps stop vps-paulusminus2
+vps reset vps-paulusminus2
+vps lock vps-paulusminus2
+vps unlock vps-paulusminus2

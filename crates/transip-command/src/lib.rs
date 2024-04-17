@@ -57,11 +57,11 @@ pub enum TransipCommand {
 
     Dns(dns::DnsCommand),
 
-    EmailBox,
+    EmailBox(email::EmailCommand<String>),
 
-    EmailForward,
+    EmailForward(email::EmailCommand<String>),
 
-    EmailList,
+    EmailList(email::EmailCommand<u64>),
 
     Invoice(invoice::InvoiceCommand),
 
@@ -150,9 +150,9 @@ impl Display for TransipCommand {
             TransipCommand::Comment(comment) => write!(f, "{}", comment),
             TransipCommand::Dns(command) => write!(f, "{}{}", DNS_COMMAND, command),
             TransipCommand::Domain(command) => write!(f, "{}{}", DOMAIN_COMMAND, command),
-            TransipCommand::EmailBox => write!(f, "{}", EMAIL_BOX),
-            TransipCommand::EmailForward => write!(f, "{}", EMAIL_FORWARD),
-            TransipCommand::EmailList => write!(f, "{}", EMAIL_LIST),
+            TransipCommand::EmailBox(command) => write!(f, "{}", EMAIL_BOX),
+            TransipCommand::EmailForward(command) => write!(f, "{}{}", EMAIL_FORWARD, command),
+            TransipCommand::EmailList(command) => write!(f, "{}", EMAIL_LIST),
             TransipCommand::Invoice(command) => write!(f, "{}{}", INVOICE_COMMAND, command),
             TransipCommand::OnError(onerror) => write!(f, "{}{}", ONERROR_COMMAND, onerror),
             TransipCommand::Product(command) => write!(f, "{}{}", PRODUCT_COMMAND, command),

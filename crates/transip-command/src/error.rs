@@ -1,5 +1,5 @@
 use crate::Result;
-use std::{env::VarError, num::ParseIntError};
+use std::{convert::Infallible, env::VarError, num::ParseIntError};
 use strum::ParseError;
 
 #[derive(thiserror::Error, Debug)]
@@ -39,6 +39,30 @@ pub enum DnsCommandError {
 
     #[error("Invalid record type: {0}")]
     InvalidRecordType(ParseError),
+
+    #[error("Environment: {0}")]
+    Environment(#[from] VarError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum EmailCommandError {
+    #[error("Too many parameter for {0}")]
+    TooManyParameters(String),
+
+    #[error("Wrong subcommand {0}")]
+    WrongSubCommand(&'static str),
+
+    #[error("Missing subcommand")]
+    MissingSubCommand,
+
+    #[error("Missing domain name")]
+    MissingDomainName,
+
+    #[error("Missing id")]
+    MissingId,
+
+    #[error("Parsing action")]
+    ParsingAction(#[from] strum::ParseError),
 
     #[error("Environment: {0}")]
     Environment(#[from] VarError),
@@ -130,6 +154,9 @@ pub enum Error {
     #[error("Invoice: {0}")]
     Domain(#[from] DomainCommandError),
 
+    #[error("Email: {0}")]
+    Email(#[from] EmailCommandError),
+
     #[error("Strum: {0}")]
     Strum(#[from] ParseError),
 
@@ -159,6 +186,9 @@ pub enum Error {
 
     #[error("Parse: {0}")]
     ParseInt(#[from] ParseIntError),
+
+    #[error("Environment: {0}")]
+    Infallible(#[from] Infallible),
 }
 
 // #[derive(Debug, Error)]

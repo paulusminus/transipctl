@@ -165,7 +165,7 @@ impl Client {
                 Ok(())
             }
             TransipCommand::Vps(command) => self.execute_vps(command, s),
-            _ => Ok(())
+            _ => Ok(()),
         }
     }
 }
