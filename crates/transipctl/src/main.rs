@@ -1,6 +1,6 @@
 // use input::Input;
 use std::{env::args, process::exit};
-use transip_execute::{configuration_from_environment, Client, TransipCommand, SubCommand};
+use transip_execute::{configuration_from_environment, Client, SubCommand, TransipCommand};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
@@ -22,8 +22,8 @@ fn arg_version() {
     }
 }
 
+#[allow(dead_code)]
 enum Out {
-    #[allow(dead_code)]
     Json,
     Yaml,
 }
@@ -94,7 +94,7 @@ fn main() -> Result<()> {
         filename.as_ref().unwrap_or(&"tty".to_owned())
     );
 
-    let output_format = Out::Yaml;
+    let output_format = Out::Json;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
 
     for (line_number, line_result) in lines.enumerate() {

@@ -156,11 +156,11 @@ pub struct TransipCommand {
     pub command: SubCommand,
 }
 
-fn command_line<S: AsRef<str>>(line: S) -> Vec<String> {
+fn command_line<S: AsRef<str>>(line: S) -> Result<Vec<String>, clap::Error> {
     if line.as_ref().trim_start().starts_with("#") {
-        vec!["comment".to_owned(), line.as_ref().to_owned()]
+        Ok(vec!["comment".to_owned(), line.as_ref().to_owned()])
     } else {
-        shlex::split(line.as_ref()).unwrap()
+        shlex::split(line.as_ref()).ok_or(clap::Error::new(clap::error::ErrorKind::Format))
     }
 }
 
@@ -168,7 +168,7 @@ impl FromStr for TransipCommand {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        TransipCommand::try_parse_from(command_line(s))
+        command_line(s).and_then(TransipCommand::try_parse_from)
     }
 }
 
@@ -176,29 +176,21 @@ impl FromStr for TransipCommand {
 mod tests {
     use std::io::{BufRead, BufReader};
 
-    use super::TransipCommand;
+    use super::{command_line, TransipCommand};
     use clap::Parser;
 
     const COMMANDS: &[u8] = include_bytes!("commands.txt");
-
-    fn command_line<S: AsRef<str>>(line: S) -> Option<Vec<String>> {
-        if line.as_ref().trim_start().starts_with("#") {
-            None
-        } else {
-            shlex::split(line.as_ref())
-        }
-    }
 
     #[test]
     fn try_command_lines() {
         let lines = BufReader::new(COMMANDS).lines();
         for args_option in lines.map_while(Result::ok).map(command_line) {
             match args_option {
-                Some(args) => {
+                Ok(args) => {
                     let result = TransipCommand::try_parse_from(args).unwrap();
                     println!("{:?}", &result.command);
                 }
-                None => println!("Comment received"),
+                Err(error) => eprintln!("Error parsing line: {error}"),
             }
         }
     }

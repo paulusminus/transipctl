@@ -5,7 +5,8 @@ pub use transip::configuration_from_environment;
 use transip::Configuration;
 pub use transip::Error;
 use transip_command::{
-    DnsCommand, DomainCommand, InvoiceCommand, OnError, ProductCommand, VpsCommand
+    DnsCommand, DomainCommand, EmailBoxCommand, EmailForwardCommand, InvoiceCommand, OnError,
+    ProductCommand, VpsCommand,
 };
 
 // reexport TransipCommand
@@ -110,6 +111,34 @@ impl Client {
         }
     }
 
+    fn execute_email_box(
+        &mut self,
+        command: &EmailBoxCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
+        use transip::api::email::EmailApi;
+        match command {
+            EmailBoxCommand::Item { domain, id } => self.inner.mailbox_item(domain, id).report(s),
+            EmailBoxCommand::List { domain } => self.inner.mailbox_list(domain).report(s),
+            _ => Ok(()),
+        }
+    }
+
+    fn execute_email_forward(
+        &mut self,
+        command: &EmailForwardCommand,
+        s: impl Serializer,
+    ) -> Result<(), transip::Error> {
+        use transip::api::email::EmailApi;
+        match command {
+            EmailForwardCommand::Item { domain, id } => {
+                self.inner.mailforward_item(domain, id).report(s)
+            }
+            EmailForwardCommand::List { domain } => self.inner.mailforward_list(domain).report(s),
+            _ => Ok(()),
+        }
+    }
+
     fn execute_invoice(
         &mut self,
         command: &InvoiceCommand,
@@ -163,6 +192,8 @@ impl Client {
             SubCommand::Comment { text: _ } => Ok(()),
             SubCommand::Dns(command) => self.execute_dns(command, s),
             SubCommand::Domain(command) => self.execute_domain(command, s),
+            SubCommand::EmailBox(command) => self.execute_email_box(command, s),
+            SubCommand::EmailForward(command) => self.execute_email_forward(command, s),
             SubCommand::Invoice(command) => self.execute_invoice(command, s),
             SubCommand::Onerror { on_error } => {
                 self.onerror = on_error.clone();
@@ -175,7 +206,7 @@ impl Client {
                 Ok(())
             }
             SubCommand::Vps(command) => self.execute_vps(command, s),
-            _ => Ok(()),
+            // _ => Ok(()),
         }
     }
 }
