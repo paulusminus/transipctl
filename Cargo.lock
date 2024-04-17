@@ -1773,6 +1773,7 @@ dependencies = [
 [[package]]
 name = "transip"
 version = "0.3.0-dev.1"
+source = "git+https://github.com/paulusminus/transip#47f15c875c2f3ebacb3d5b8fddee1642ef89383b"
 dependencies = [
  "base64 0.22.0",
  "chrono",

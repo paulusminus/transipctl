@@ -14,7 +14,7 @@ propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
 [dependencies]
 acme-validation-propagation = { version = "0.1.5", optional = true }
 serde = "1.0.190"
-transip = { path = "/home/paul/Code/rust/transip/crates/transip" }
+transip = { git = "https://github.com/paulusminus/transip" }
 transip-command = { version = "0.4.0-dev.1", path = "../transip-command" }
 
 [dev-dependencies]
