@@ -1,5 +1,5 @@
-// use input::Input;
-use std::{env::args, process::exit};
+use rusty_lines::{FileLinesBuilder, TTYLinesBuilder};
+use std::{env::args, path::PathBuf, process::exit};
 use transip_execute::{
     configuration_from_environment, Client, ErrorKind, SubCommand, TransipCommand,
 };
@@ -7,11 +7,10 @@ use transip_execute::{
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 pub const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION"));
-const EXIT: &str = "exit";
-const QUIT: &str = "quit";
+const EXIT_ON: &[&str] = &["exit", "quit"];
+const PROMPT: &str = "tipctl";
 
 mod error;
-// mod input;
 mod log;
 
 fn arg_version() {
@@ -81,19 +80,21 @@ fn main() -> Result<()> {
     arg_version();
     log::setup_logging();
 
-    let filename = args().nth(1);
-    let history_filename = Some(log::log_dir().join("history.txt"));
-    let (_interactive, lines) = rusty_lines::lines(
-        "tipctl",
-        vec![EXIT, QUIT],
-        filename.as_ref(),
-        history_filename.as_ref(),
-    )?;
+    let lines = args()
+        .nth(1)
+        .map(PathBuf::from)
+        .map(|f| FileLinesBuilder::file(f).replace_variables().build())
+        .unwrap_or(
+            TTYLinesBuilder::prompt(PROMPT)
+                .exit_on(EXIT_ON)
+                .history(log::log_dir().join("history.txt"))
+                .build(),
+        )?;
 
     tracing::info!(
         "Running {} {}",
         VERSION,
-        filename.as_ref().unwrap_or(&"tty".to_owned())
+        args().nth(1).as_ref().unwrap_or(&"tty".to_owned())
     );
 
     let output_format = Out::Json;
@@ -106,7 +107,7 @@ fn main() -> Result<()> {
                 Ok(command) => output_format.execute(&mut client, &command.command),
                 Err(error) => {
                     if error.kind() == ErrorKind::DisplayHelp {
-                        handle_error(format!("{}", error), client.exit_on_error())
+                        handle_error(error.to_string(), client.exit_on_error())
                     } else {
                         handle_error(
                             format!("Error {} parsing line {}", error, line_number + 1),
@@ -121,7 +122,7 @@ fn main() -> Result<()> {
     tracing::info!(
         "Ending {} {}",
         VERSION,
-        filename.as_ref().unwrap_or(&"tty".to_owned())
+        args().nth(1).as_ref().unwrap_or(&"tty".to_owned())
     );
     Ok(())
 }

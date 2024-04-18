@@ -1,13 +1,14 @@
-use std::env::args;
-
 use itertools::Itertools;
-use rusty_lines::{lines, Result};
+use rusty_lines::{ReadlineError, TTYLinesBuilder};
 
-fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn((bool, I)) -> Result<()>
+const PROMPT: &str = "tip";
+const EXIT_ON: &[&str] = &["exit", "quit"];
+
+fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn(I) -> Result<(), ReadlineError>
 where
-    I: Iterator<Item = Result<String>>,
+    I: Iterator<Item = Result<String, ReadlineError>>,
 {
-    move |(_interactive, lines)| {
+    move |lines| {
         lines
             .filter_ok(|line| !line.trim().is_empty())
             .map_ok(f)
@@ -20,6 +21,8 @@ fn print(s: String) {
     println!("{}", s)
 }
 
-fn main() -> Result<()> {
-    lines("tip", vec!["exit", "quit"], args().nth(1).as_ref(), None).and_then(process(print))
+fn main() -> Result<(), ReadlineError> {
+    TTYLinesBuilder::<&str>::prompt(PROMPT)
+        .exit_on(EXIT_ON)
+        .build().and_then(process(print))
 }

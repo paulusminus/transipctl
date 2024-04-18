@@ -5,7 +5,7 @@
 
 # rusty-lines
 
- rusty-lines is a library that abstracts the way lines are read. It abstract the way input is read from a tty or from a file.
+ rusty-lines is a library that abstracts the way input is read from a tty or from a file.
 
  It uses [rustyline](https://crates.io/crates/rustyline) for reading from tty.
 

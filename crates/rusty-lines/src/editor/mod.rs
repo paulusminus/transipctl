@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 
 use rustyline::{
     highlight::Highlighter, hint::HistoryHinter, history::FileHistory, Completer, CompletionType,
@@ -18,14 +18,14 @@ pub struct MyHelper {
 
 impl Highlighter for MyHelper {}
 
-pub struct LineEditor {
+pub struct LineEditor<P: AsRef<Path>> {
     editor: Editor<MyHelper, FileHistory>,
     prompt: String,
-    exit_terms: Vec<&'static str>,
-    history_filename: Option<PathBuf>,
+    exit_terms: &'static [&'static str],
+    history_filename: Option<P>,
 }
 
-impl Iterator for LineEditor {
+impl<P: AsRef<Path>> Iterator for LineEditor<P> {
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -44,11 +44,11 @@ impl Iterator for LineEditor {
     }
 }
 
-impl LineEditor {
+impl<P: AsRef<Path>> LineEditor<P> {
     pub fn try_new(
         name: &str,
-        exit_terms: Vec<&'static str>,
-        history_filename: Option<&PathBuf>,
+        exit_terms: &'static [&'static str],
+        history_filename: Option<P>,
     ) -> Result<Self> {
         let config = Config::builder()
             .history_ignore_space(true)
@@ -57,9 +57,9 @@ impl LineEditor {
             .build();
         rustyline::Editor::<MyHelper, FileHistory>::with_config(config).and_then(|mut editor| {
             editor.set_helper(Some(MyHelper::default()));
-            if let Some(filename) = history_filename {
-                if filename.exists() {
-                    editor.load_history(filename)?;
+            if let Some(filename) = history_filename.as_ref() {
+                if filename.as_ref().exists() {
+                    editor.load_history(filename.as_ref())?;
                 }
             };
 
@@ -67,17 +67,17 @@ impl LineEditor {
                 exit_terms,
                 prompt: prompt(&mut editor, name),
                 editor,
-                history_filename: history_filename.cloned(),
+                history_filename,
             })
         })
     }
 }
 
-impl Drop for LineEditor {
+impl<P: AsRef<Path>> Drop for LineEditor<P> {
     fn drop(&mut self) {
         if let Some(filename) = self.history_filename.as_ref() {
             if let Err(error) = self.editor.save_history(&filename) {
-                tracing::error!("Error saving {:?}: {}", &filename, error);
+                tracing::error!("Error saving {:?}: {}", filename.as_ref(), error);
             }
         }
     }

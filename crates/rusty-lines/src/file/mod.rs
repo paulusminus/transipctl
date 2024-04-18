@@ -11,10 +11,11 @@ use std::{
 pub struct FileReader {
     lines: Lines<BufReader<File>>,
     re: Regex,
+    replace_variables: bool,
 }
 
 impl FileReader {
-    pub fn try_new<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn try_new<P: AsRef<Path>>(path: P, replace_variables: bool) -> Result<Self> {
         OpenOptions::new()
             .read(true)
             .open(path)
@@ -24,6 +25,7 @@ impl FileReader {
             .map(|lines| Self {
                 lines,
                 re: Regex::new(r#"\$\{([A-Z][A-Z_]*)}"#).unwrap(),
+                replace_variables,
             })
     }
 }
@@ -35,7 +37,14 @@ impl Iterator for FileReader {
         self.lines
             .next()
             .map(|result| result.map_err(Into::into))
-            .map(|result| result.map(|s| replace_enviroment_variables(s, &self.re)))
+            .map(|result| result.map(|s| {
+                if self.replace_variables {
+                    replace_enviroment_variables(s, &self.re)
+                }
+                else {
+                    s
+                }
+            }))
     }
 }
 
