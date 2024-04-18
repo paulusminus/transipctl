@@ -24,5 +24,6 @@ fn print(s: String) {
 fn main() -> Result<(), ReadlineError> {
     TTYLinesBuilder::<&str>::prompt(PROMPT)
         .exit_on(EXIT_ON)
-        .build().and_then(process(print))
+        .build()
+        .and_then(process(print))
 }

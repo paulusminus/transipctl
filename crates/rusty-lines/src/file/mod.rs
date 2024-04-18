@@ -37,14 +37,15 @@ impl Iterator for FileReader {
         self.lines
             .next()
             .map(|result| result.map_err(Into::into))
-            .map(|result| result.map(|s| {
-                if self.replace_variables {
-                    replace_enviroment_variables(s, &self.re)
-                }
-                else {
-                    s
-                }
-            }))
+            .map(|result| {
+                result.map(|s| {
+                    if self.replace_variables {
+                        replace_enviroment_variables(s, &self.re)
+                    } else {
+                        s
+                    }
+                })
+            })
     }
 }
 
