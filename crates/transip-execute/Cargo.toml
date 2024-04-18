@@ -15,7 +15,7 @@ propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
 acme-validation-propagation = { version = "0.1.5", optional = true }
 serde = "1.0.190"
 transip = { version = "0.3" }
-transip-command = { version = "0.4", path = "../transip-command" }
+transip-command = { version = "0.4.1", path = "../transip-command" }
 
 [dev-dependencies]
 serde_json = "1.0.108"
