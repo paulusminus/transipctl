@@ -41,6 +41,10 @@ transip-command is a library that can parse a string and turn it in a command. I
 ### Available on feature propagation
 - dns acme-validation-check \<domainname\> \<acme-validation\>
 
+## Quoting parameter values containing spaces
+
+Be sure to surround parameter values containing spaces with double quotes.
+
 ## Environment variable usage in scripts
 
 ### Examples

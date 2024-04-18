@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial support for querying mailboxes and mailforwards
 - Parsing commands with clap
+- Reïmplement environment variable usage in scripts
 
 # [0.3.14]
 

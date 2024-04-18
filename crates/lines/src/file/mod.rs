@@ -32,8 +32,10 @@ impl Iterator for FileReader {
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.lines.next().map(|result| result.map_err(Into::into)).map(|result| 
-        result.map(|s| replace_enviroment_variables(s, &self.re)))
+        self.lines
+            .next()
+            .map(|result| result.map_err(Into::into))
+            .map(|result| result.map(|s| replace_enviroment_variables(s, &self.re)))
     }
 }
 
@@ -55,18 +57,17 @@ fn replace_all<E>(
 }
 
 fn replace_enviroment_variables(haystack: String, re: &Regex) -> String {
-    let replacement =
-        |caps: &Captures| -> Result<String, VarError> { 
-            var(caps.get(1).unwrap().as_str()).map(|s| format!("\"{s}\""))
-        };
-    replace_all(&re, &haystack, &replacement).unwrap()
+    let replacement = |caps: &Captures| -> Result<String, VarError> {
+        var(caps.get(1).unwrap().as_str()).map(|s| format!("\"{s}\""))
+    };
+    replace_all(re, &haystack, replacement).unwrap()
 }
 
 #[cfg(test)]
 mod test {
-    use std::env::{var, VarError};
-    use regex::{Captures, Regex};
     use super::replace_all;
+    use regex::{Captures, Regex};
+    use std::env::{var, VarError};
 
     #[test]
     fn test() {

@@ -8,5 +8,5 @@ podman run \
     --secret transip-key \
     --name acme-validation-set \
     --rm \
-    localhost/paulusminus/transipctl \
+    docker.io/paulusminus/transipctl \
     acme-validation-set.transip
