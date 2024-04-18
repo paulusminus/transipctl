@@ -7,5 +7,5 @@ podman run \
     --secret transip-key \
     --name acme-validation-delete \
     --rm \
-    docker.io/paulusminus/transipctl \
+    localhost/paulusminus/transipctl \
     acme-validation-delete.transip

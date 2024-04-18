@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+regex = "1.10.4"
 rustyline = { version = "14.0.0", features = ["derive"] }
 thiserror = "1.0.58"
 tracing = "0.1.40"

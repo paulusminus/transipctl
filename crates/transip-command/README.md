@@ -19,7 +19,7 @@ transip-command is a library that can parse a string and turn it in a command. I
 - domain list
 - domain item \<domainname\>
 - email-box list \<domainname\>
-- email-box list \<domainname\> \<id\>
+- email-box item \<domainname\> \<id\>
 - email-forward list \<domainname\>
 - email-forward item \<domainname\> \<id\>
 - invoice list
@@ -41,9 +41,7 @@ transip-command is a library that can parse a string and turn it in a command. I
 ### Available on feature propagation
 - dns acme-validation-check \<domainname\> \<acme-validation\>
 
-## Environment variable usage
-
-You can use a enviroment variable to specify domainname, acme-validation or content.
+## Environment variable usage in scripts
 
 ### Examples
 
