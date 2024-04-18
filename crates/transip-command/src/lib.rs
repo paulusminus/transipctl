@@ -48,7 +48,7 @@ pub enum DnsCommand {
     AcmeValidationSet { domain: String, challenge: String },
     Delete(DnsEntry),
     Insert(DnsEntry),
-    List,
+    List { domain: String },
 }
 
 #[derive(Debug, Subcommand)]
