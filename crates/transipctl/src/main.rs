@@ -83,7 +83,7 @@ fn main() -> Result<()> {
 
     let filename = args().nth(1);
     let history_filename = Some(log::log_dir().join("history.txt"));
-    let (_interactive, lines) = lines::lines(
+    let (_interactive, lines) = rusty_lines::lines(
         "tipctl",
         vec![EXIT, QUIT],
         filename.as_ref(),

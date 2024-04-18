@@ -1,7 +1,7 @@
 use std::env::args;
 
 use itertools::Itertools;
-use lines::{lines, Result};
+use rusty_lines::{lines, Result};
 
 fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn((bool, I)) -> Result<()>
 where

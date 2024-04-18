@@ -821,17 +821,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lines"
-version = "0.1.0"
-dependencies = [
- "itertools",
- "regex",
- "rustyline",
- "thiserror",
- "tracing",
-]
-
-[[package]]
 name = "linked-hash-map"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1356,6 +1345,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "80af6f9131f277a45a3fba6ce8e2258037bb0477a67e610d3c1fe046ab31de47"
 
 [[package]]
+name = "rusty-lines"
+version = "0.1.0"
+dependencies = [
+ "itertools",
+ "regex",
+ "rustyline",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "rustyline"
 version = "14.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1816,7 +1816,7 @@ name = "transipctl"
 version = "0.3.11"
 dependencies = [
  "directories",
- "lines",
+ "rusty-lines",
  "serde",
  "serde_json",
  "serde_yaml",

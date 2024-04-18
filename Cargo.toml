@@ -3,7 +3,7 @@ members = [
     "crates/transipctl",
     "crates/transip-execute",
     "crates/transip-command",
-    "crates/lines",
+    "crates/rusty-lines",
     "crates/mdman",
     "crates/xtask-build-man",
 ]
