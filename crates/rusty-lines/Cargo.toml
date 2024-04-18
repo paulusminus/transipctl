@@ -1,11 +1,11 @@
 [package]
 name = "rusty-lines"
 authors.workspace = true
-description.workspace = true
+description = "Abstract reading lines from tty or File"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-version = "0.2.0"
+version = "0.2.1"
 
 [dependencies]
 regex = "1.10.4"
