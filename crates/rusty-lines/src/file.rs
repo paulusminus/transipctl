@@ -4,7 +4,7 @@ use crate::Result;
 use std::{
     env::{var, VarError},
     fs::{File, OpenOptions},
-    io::{BufRead, BufReader, Lines},
+    io::{BufRead, BufReader, Cursor, Lines, Read},
     path::Path,
 };
 
@@ -14,21 +14,21 @@ fn regex() -> Regex {
     Regex::new(CAPTURE).unwrap()
 }
 
-pub struct FileReader {
-    lines: Lines<BufReader<File>>,
+pub struct FileReader<R: Read> {
+    lines: Lines<BufReader<R>>,
     re: Regex,
     replace_variables: bool,
 }
 
-impl FileReader {
-    pub fn try_new<P: AsRef<Path>>(path: P, replace_variables: bool) -> Result<Self> {
+impl<R: Read> FileReader<R> {
+    pub fn try_new<P: AsRef<Path>>(path: P, replace_variables: bool) -> Result<FileReader<File>> {
         OpenOptions::new()
             .read(true)
             .open(path)
             .map_err(Into::into)
             .map(BufReader::new)
             .map(|reader| reader.lines())
-            .map(|lines| Self {
+            .map(|lines| FileReader::<File> {
                 lines,
                 re: regex(),
                 replace_variables,
@@ -36,7 +36,18 @@ impl FileReader {
     }
 }
 
-impl Iterator for FileReader {
+impl From<String> for FileReader<Cursor<String>> {
+    fn from(s: String) -> FileReader<Cursor<String>> {
+        let lines = BufReader::new(Cursor::new(s)).lines();
+        FileReader {
+            lines,
+            re: regex(),
+            replace_variables: true,
+        }
+    }
+}
+
+impl<R: Read> Iterator for FileReader<R> {
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -81,7 +92,7 @@ fn replace_enviroment_variables(haystack: String, re: &Regex) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::{regex, replace_all};
+    use super::{regex, replace_all, FileReader};
     use regex::Captures;
     use std::env::{set_var, var, VarError};
 
@@ -96,5 +107,24 @@ mod test {
             |caps: &Captures| -> Result<String, VarError> { var(caps.get(1).unwrap().as_str()) };
         let new = replace_all(&regex(), &haystack, &replacement).unwrap();
         assert_eq!(new, *"dns acme-validation-set GOOGLE.COM   lksjfoie9");
+    }
+
+    #[test]
+    fn variable_substition_in_iterator() {
+        set_var("CERTBOT_DOMAIN", "GOOGLE.COM");
+        set_var("CERTBOT_VALIDATION", "lksjfoie9");
+        set_var("DOMAIN", "paulmin.nl");
+
+        let lines =
+            "dns acme-validation-set ${CERTBOT_DOMAIN}   ${CERTBOT_VALIDATION}\ndns list ${DOMAIN}"
+                .to_owned();
+        let f = FileReader::from(lines);
+
+        let result = f.collect::<crate::Result<Vec<_>>>().unwrap();
+        assert_eq!(
+            result[0],
+            *"dns acme-validation-set \"GOOGLE.COM\"   \"lksjfoie9\""
+        );
+        assert_eq!(result[1], *"dns list \"paulmin.nl\"");
     }
 }
