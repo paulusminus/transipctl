@@ -1,6 +1,7 @@
 use regex::{Captures, Regex};
+use rustyline::error::ReadlineError;
 
-use crate::Result;
+use crate::{Error, Result};
 use std::{
     env::{var, VarError},
     fs::{File, OpenOptions},
@@ -25,7 +26,8 @@ impl<R: Read> FileReader<R> {
         OpenOptions::new()
             .read(true)
             .open(path)
-            .map_err(Into::into)
+            .map_err(ReadlineError::from)
+            .map_err(Error)
             .map(BufReader::new)
             .map(|reader| reader.lines())
             .map(|lines| FileReader::<File> {
@@ -53,7 +55,7 @@ impl<R: Read> Iterator for FileReader<R> {
     fn next(&mut self) -> Option<Self::Item> {
         self.lines
             .next()
-            .map(|result| result.map_err(Into::into))
+            .map(|result| result.map_err(ReadlineError::from).map_err(Error))
             .map(|result| {
                 result.map(|s| {
                     if self.replace_variables {

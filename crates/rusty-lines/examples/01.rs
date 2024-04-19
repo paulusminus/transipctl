@@ -1,12 +1,12 @@
 use itertools::Itertools;
-use rusty_lines::{ReadlineError, TTYLinesBuilder};
+use rusty_lines::{Error, TTYLinesBuilder};
 
 const PROMPT: &str = "tip";
 const EXIT_ON: &[&str] = &["exit", "quit"];
 
-fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn(I) -> Result<(), ReadlineError>
+fn process<I>(f: impl FnMut(String) + Copy) -> impl Fn(I) -> Result<(), Error>
 where
-    I: Iterator<Item = Result<String, ReadlineError>>,
+    I: Iterator<Item = Result<String, Error>>,
 {
     move |lines| {
         lines
@@ -21,7 +21,7 @@ fn print(s: String) {
     println!("{}", s)
 }
 
-fn main() -> Result<(), ReadlineError> {
+fn main() -> Result<(), Error> {
     TTYLinesBuilder::<&str>::prompt(PROMPT)
         .exit_on(EXIT_ON)
         .build()

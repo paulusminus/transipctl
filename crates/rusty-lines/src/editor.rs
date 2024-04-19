@@ -5,7 +5,7 @@ use rustyline::{
     Config, EditMode, Editor, Helper, Hinter, Validator,
 };
 
-use crate::{ReadlineError, Result};
+use crate::{Error, ReadlineError, Result};
 use prompt::prompt;
 
 #[derive(Default, Completer, Helper, Hinter, Validator)]
@@ -37,7 +37,7 @@ impl Iterator for LineEditor {
                 }
             }
             Err(ReadlineError::Eof) => None,
-            e @ Err(_) => Some(e),
+            e @ Err(_) => Some(e.map_err(Error)),
         }
     }
 }
@@ -47,7 +47,7 @@ impl LineEditor {
         name: &str,
         exit_terms: &'static [&'static str],
         history_filename: Option<P>,
-    ) -> Result<Self> {
+    ) -> Result<Self, ReadlineError> {
         let config = Config::builder()
             .history_ignore_space(true)
             .completion_type(CompletionType::List)

@@ -1,15 +1,36 @@
 #![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
 
-use std::{fs::File, path::Path};
+use std::{fmt::{Debug, Display}, fs::File, path::Path};
 
 use editor::LineEditor;
 use file::FileReader;
-pub use rustyline::error::ReadlineError;
+use rustyline::error::ReadlineError;
 
 mod editor;
 mod file;
 
-type Result<T, E = ReadlineError> = std::result::Result<T, E>;
+type Result<T, E = Error> = std::result::Result<T, E>;
+
+/// Wrapper for rustlyline ReadlineError
+pub struct Error(ReadlineError);
+
+impl std::fmt::Debug for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.0.source()
+    }
+}
 
 /// Builder for lines read from the tty or stdin
 pub struct TTYLinesBuilder<P: AsRef<Path>> {
@@ -49,7 +70,7 @@ impl<P: AsRef<Path>> TTYLinesBuilder<P> {
     /// Construct the line iterator
     pub fn build(self) -> Result<Box<dyn Iterator<Item = Result<String>>>> {
         let reader =
-            LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename)?;
+            LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename).map_err(Error)?;
         Ok(Box::new(reader))
     }
 }
@@ -78,7 +99,7 @@ impl<P: AsRef<Path>> FileLinesBuilder<P> {
     }
 
     /// construct the line iterator
-    pub fn build(self) -> Result<Box<dyn Iterator<Item = Result<String, ReadlineError>>>> {
+    pub fn build(self) -> Result<Box<dyn Iterator<Item = Result<String, Error>>>> {
         let reader = FileReader::<File>::try_new(self.filename, self.replace_variables)?;
         Ok(Box::new(reader))
     }

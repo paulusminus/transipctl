@@ -40,7 +40,7 @@ pub enum Error {
     Xdg(&'static str),
 
     #[error("Line: {0}")]
-    Line(#[from] rusty_lines::ReadlineError),
+    Line(#[from] rusty_lines::Error),
 }
 
 pub trait ErrorExt<T, E> {

@@ -5,7 +5,33 @@
 
 # rusty-lines
 
- rusty-lines is a library that abstracts the way lines are read from a tty or from a file.
+Rusty-lines is a library that abstracts the way lines are read from a tty or from a file.
+When using the file lines reader you can optionally replace environment variables names with their values.
 
- It uses [rustyline](https://crates.io/crates/rustyline) for reading from tty.
+It uses [rustyline](https://crates.io/crates/rustyline) for reading from tty.
 
+## Example using tty
+
+```no_run
+use rusty_lines::TTYLinesBuilder;
+
+fn main() {
+    let lines = TTYLinesBuilder::prompt("tip")
+        .exit_on(&["exit"])
+        .history("history.txt")
+        .build()
+        .unwrap();
+}
+```
+
+## Example using file
+
+```
+use rusty_lines::FileLinesBuilder;
+
+fn main() {
+    let lines = FileLinesBuilder::file("Cargo.toml")
+        .build()
+        .unwrap();
+}
+```
