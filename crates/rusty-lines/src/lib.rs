@@ -1,6 +1,10 @@
 #![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
 
-use std::{fmt::{Debug, Display}, fs::File, path::Path};
+use std::{
+    fmt::{Debug, Display},
+    fs::File,
+    path::Path,
+};
 
 use editor::LineEditor;
 use file::FileReader;
@@ -69,8 +73,8 @@ impl<P: AsRef<Path>> TTYLinesBuilder<P> {
 
     /// Construct the line iterator
     pub fn build(self) -> Result<Box<dyn Iterator<Item = Result<String>>>> {
-        let reader =
-            LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename).map_err(Error)?;
+        let reader = LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename)
+            .map_err(Error)?;
         Ok(Box::new(reader))
     }
 }
