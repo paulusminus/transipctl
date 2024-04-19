@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use rustyline::{
     highlight::Highlighter, hint::HistoryHinter, history::FileHistory, Completer, CompletionType,
@@ -18,14 +18,14 @@ pub struct MyHelper {
 
 impl Highlighter for MyHelper {}
 
-pub struct LineEditor<P: AsRef<Path>> {
+pub struct LineEditor {
     editor: Editor<MyHelper, FileHistory>,
     prompt: String,
     exit_terms: &'static [&'static str],
-    history_filename: Option<P>,
+    history_filename: Option<PathBuf>,
 }
 
-impl<P: AsRef<Path>> Iterator for LineEditor<P> {
+impl Iterator for LineEditor {
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -44,8 +44,8 @@ impl<P: AsRef<Path>> Iterator for LineEditor<P> {
     }
 }
 
-impl<P: AsRef<Path>> LineEditor<P> {
-    pub fn try_new(
+impl LineEditor {
+    pub fn try_new<P: AsRef<Path>>(
         name: &str,
         exit_terms: &'static [&'static str],
         history_filename: Option<P>,
@@ -67,17 +67,17 @@ impl<P: AsRef<Path>> LineEditor<P> {
                 exit_terms,
                 prompt: prompt(&mut editor, name),
                 editor,
-                history_filename,
+                history_filename: history_filename.map(|f| PathBuf::from(f.as_ref())),
             })
         })
     }
 }
 
-impl<P: AsRef<Path>> Drop for LineEditor<P> {
+impl Drop for LineEditor {
     fn drop(&mut self) {
         if let Some(filename) = self.history_filename.as_ref() {
             if let Err(error) = self.editor.save_history(&filename) {
-                tracing::error!("Error saving {:?}: {}", filename.as_ref(), error);
+                tracing::error!("Error saving {:?}: {}", &filename, error);
             }
         }
     }

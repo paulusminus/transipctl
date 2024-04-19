@@ -11,25 +11,6 @@ mod file;
 
 type Result<T, E = ReadlineError> = std::result::Result<T, E>;
 
-/// Line Iterator
-pub enum Input<P: AsRef<Path>> {
-    #[doc(hidden)]
-    File(FileReader),
-    #[doc(hidden)]
-    TTY(LineEditor<P>),
-}
-
-impl<P: AsRef<Path>> Iterator for Input<P> {
-    type Item = Result<String>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self {
-            Input::File(file) => file.next(),
-            Input::TTY(tty) => tty.next(),
-        }
-    }
-}
-
 /// Builder for lines read from the tty or stdin
 pub struct TTYLinesBuilder<P: AsRef<Path>> {
     exit_terms: &'static [&'static str],
@@ -66,9 +47,9 @@ impl<P: AsRef<Path>> TTYLinesBuilder<P> {
     }
 
     /// Construct the line iterator
-    pub fn build(self) -> Result<Input<P>> {
-        LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename)
-            .map(Input::TTY)
+    pub fn build(self) -> Result<Box<dyn Iterator<Item = Result<String>>>> {
+        let reader = LineEditor::try_new(&self.prompt_name, self.exit_terms, self.history_filename)?;
+        Ok(Box::new(reader))
     }
 }
 
@@ -96,8 +77,9 @@ impl<P: AsRef<Path>> FileLinesBuilder<P> {
     }
 
     /// construct the line iterator
-    pub fn build(self) -> Result<Input<P>> {
-        FileReader::try_new(self.filename, self.replace_variables).map(Input::File)
+    pub fn build(self) -> Result<Box< dyn Iterator<Item = Result<String, ReadlineError>>>> {
+        let reader = FileReader::try_new(self.filename, self.replace_variables)?;
+        Ok(Box::new(reader))
     }
 }
 
