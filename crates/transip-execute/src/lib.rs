@@ -2,8 +2,8 @@ use std::{mem::size_of, time::Duration};
 
 use serde::{Serialize, Serializer};
 pub use transip::configuration_from_environment;
-use transip::Configuration;
 pub use transip::Error;
+use transip::{api::email::MailForwardInsert, Configuration};
 use transip_command::{
     DnsCommand, DomainCommand, EmailBoxCommand, EmailForwardCommand, InvoiceCommand, OnError,
     ProductCommand, VpsCommand,
@@ -135,7 +135,18 @@ impl Client {
                 self.inner.mailforward_item(domain, id).report(s)
             }
             EmailForwardCommand::List { domain } => self.inner.mailforward_list(domain).report(s),
-            _ => Ok(()),
+            EmailForwardCommand::Insert {
+                domain,
+                local_part,
+                forward_to,
+            } => {
+                let mail_forward = MailForwardInsert {
+                    local_part: local_part.clone(),
+                    forward_to: forward_to.clone(),
+                };
+                self.inner.mailforward_insert(domain, mail_forward)
+            }
+            EmailForwardCommand::Delete { domain, id } => self.inner.mailforward_delete(domain, id),
         }
     }
 
