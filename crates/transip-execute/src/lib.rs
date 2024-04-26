@@ -120,7 +120,19 @@ impl Client {
         match command {
             EmailBoxCommand::Item { domain, id } => self.inner.mailbox_item(domain, id).report(s),
             EmailBoxCommand::List { domain } => self.inner.mailbox_list(domain).report(s),
-            _ => Ok(()),
+            EmailBoxCommand::Delete { domain, id } => self.inner.mailbox_delete(domain, id),
+            EmailBoxCommand::Insert {
+                domain,
+                username,
+                password,
+            } => {
+                let mailbox = transip::api::email::MailboxInsert {
+                    local_part: username.clone(),
+                    max_disk_usage: 0,
+                    password: password.clone(),
+                };
+                self.inner.mailbox_insert(domain, mailbox)
+            }
         }
     }
 
