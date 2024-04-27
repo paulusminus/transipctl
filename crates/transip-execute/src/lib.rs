@@ -125,10 +125,11 @@ impl Client {
                 domain,
                 username,
                 password,
+                mb_size,
             } => {
                 let mailbox = transip::api::email::MailboxInsert {
                     local_part: username.clone(),
-                    max_disk_usage: 0,
+                    max_disk_usage: *mb_size,
                     password: password.clone(),
                 };
                 self.inner.mailbox_insert(domain, mailbox)

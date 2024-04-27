@@ -87,6 +87,7 @@ pub enum EmailBoxCommand {
         domain: String,
         username: String,
         password: String,
+        mb_size: u64,
     },
 }
 

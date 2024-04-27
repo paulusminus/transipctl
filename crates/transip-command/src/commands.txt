@@ -12,11 +12,11 @@ domain item paulmin.nl
 email-box list paulmin.nl
 email-box item paulmin.nl info@paulmin.nl
 email-box delete paulmin.nl info@paulmin.nl
-email-box insert paulmin.nl test password
+email-box insert paulmin.nl test password 100
 email-forward list paulmin.nl
 email-forward item paulmin.nl info@paulmin.nl
 email-forward delete paulmin.nl info@paulmin.nl
-email-forward insert paulmin.nl test info@paulmin.nl
+email-forward insert paulmin.nl test info@paulmin.nl 
 invoice list
 invoice item oiuwerlf
 invoice pdf iuowerl
