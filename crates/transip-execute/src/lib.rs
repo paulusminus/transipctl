@@ -2,8 +2,8 @@ use std::{mem::size_of, time::Duration};
 
 use serde::{Serialize, Serializer};
 pub use transip::configuration_from_environment;
-pub use transip::Error;
 use transip::{api::email::MailForwardInsert, Configuration};
+pub use transip::{Error, Result};
 use transip_command::{
     DnsCommand, DomainCommand, EmailBoxCommand, EmailForwardCommand, InvoiceCommand, OnError,
     ProductCommand, VpsCommand,
@@ -24,11 +24,11 @@ impl Client {
 }
 
 trait Report {
-    fn report(self, s: impl Serializer) -> Result<(), transip::Error>;
+    fn report(self, s: impl Serializer) -> Result<()>;
 }
 
-impl<T: Serialize> Report for Result<T, transip::Error> {
-    fn report(self, s: impl Serializer) -> Result<(), transip::Error> {
+impl<T: Serialize> Report for Result<T> {
+    fn report(self, s: impl Serializer) -> Result<()> {
         self.map(|result| {
             if size_of::<T>() > 0 {
                 result.serialize(s).unwrap();
@@ -40,7 +40,7 @@ impl<T: Serialize> Report for Result<T, transip::Error> {
 impl TryFrom<Box<dyn Configuration>> for Client {
     type Error = transip::Error;
 
-    fn try_from(configuration: Box<dyn Configuration>) -> Result<Self, Self::Error> {
+    fn try_from(configuration: Box<dyn Configuration>) -> Result<Self> {
         transip::Client::try_from(configuration).map(|client| Client {
             inner: client,
             onerror: OnError::Print,
@@ -49,11 +49,7 @@ impl TryFrom<Box<dyn Configuration>> for Client {
 }
 
 impl Client {
-    fn execute_dns(
-        &mut self,
-        command: &DnsCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_dns(&mut self, command: &DnsCommand, s: impl Serializer) -> Result<()> {
         use transip::api::dns::{DnsApi, DnsEntry};
         match command {
             DnsCommand::AcmeValidationDelete { domain } => self
@@ -99,11 +95,7 @@ impl Client {
         }
     }
 
-    fn execute_domain(
-        &mut self,
-        command: &DomainCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_domain(&mut self, command: &DomainCommand, s: impl Serializer) -> Result<()> {
         use transip::api::domain::DomainApi;
         match command {
             DomainCommand::Item { domain } => self.inner.domain_item(domain).report(s),
@@ -111,11 +103,7 @@ impl Client {
         }
     }
 
-    fn execute_email_box(
-        &mut self,
-        command: &EmailBoxCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_email_box(&mut self, command: &EmailBoxCommand, s: impl Serializer) -> Result<()> {
         use transip::api::email::EmailApi;
         match command {
             EmailBoxCommand::Item { domain, id } => self.inner.mailbox_item(domain, id).report(s),
@@ -141,7 +129,7 @@ impl Client {
         &mut self,
         command: &EmailForwardCommand,
         s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    ) -> Result<()> {
         use transip::api::email::EmailApi;
         match command {
             EmailForwardCommand::Item { domain, id } => {
@@ -163,11 +151,7 @@ impl Client {
         }
     }
 
-    fn execute_invoice(
-        &mut self,
-        command: &InvoiceCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_invoice(&mut self, command: &InvoiceCommand, s: impl Serializer) -> Result<()> {
         use transip::api::account::AccountApi;
         match command {
             InvoiceCommand::Item { number } => self.inner.invoice(number).report(s),
@@ -176,11 +160,7 @@ impl Client {
         }
     }
 
-    fn execute_product(
-        &mut self,
-        command: &ProductCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_product(&mut self, command: &ProductCommand, s: impl Serializer) -> Result<()> {
         use transip::api::general::GeneralApi;
         match command {
             ProductCommand::Elements { name } => self.inner.product_elements(name).report(s),
@@ -188,11 +168,7 @@ impl Client {
         }
     }
 
-    fn execute_vps(
-        &mut self,
-        command: &VpsCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    fn execute_vps(&mut self, command: &VpsCommand, s: impl Serializer) -> Result<()> {
         use transip::api::vps::VpsApi;
         match command {
             VpsCommand::Item { name } => self.inner.vps(name).report(s),
@@ -205,11 +181,7 @@ impl Client {
         }
     }
 
-    pub fn execute(
-        &mut self,
-        command: &SubCommand,
-        s: impl Serializer,
-    ) -> Result<(), transip::Error> {
+    pub fn execute(&mut self, command: &SubCommand, s: impl Serializer) -> Result<()> {
         use transip::api::general::GeneralApi;
         match command {
             SubCommand::AvailibilityZones => self.inner.availability_zones().report(s),
