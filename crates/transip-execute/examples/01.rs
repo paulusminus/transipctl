@@ -10,7 +10,6 @@ const COMMAND_DELETE_CHALLENGE: &str = "dns acme-validation-delete paulmin.nl";
 
 enum Out {
     Json,
-    Yaml,
 }
 
 macro_rules! execute_out {
@@ -36,9 +35,6 @@ impl Out {
             Out::Json => {
                 execute_out!(serde_json::Serializer::pretty, client, command, println);
             }
-            Out::Yaml => {
-                execute_out!(serde_yaml::Serializer::new, client, command, print);
-            }
         }
     }
 }
@@ -51,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let command_delete_challenge = COMMAND_DELETE_CHALLENGE.parse::<TransipCommand>()?;
 
     Out::Json.execute(&mut client, &command_dns_list.command);
-    Out::Yaml.execute(&mut client, &command_dns_list.command);
+    Out::Json.execute(&mut client, &command_dns_list.command);
     Out::Json.execute(&mut client, &command_delete_challenge.command);
     Out::Json.execute(&mut client, &command_add_challenge.command);
 

@@ -26,7 +26,8 @@ fn arg_version() {
 #[allow(dead_code)]
 enum Out {
     Json,
-    Yaml,
+    // Yaml,
+    // Toml,
 }
 
 fn handle_error(msg: String, exit_on_error: bool) {
@@ -69,9 +70,12 @@ impl Out {
             Out::Json => {
                 execute_out!(serde_json::Serializer::pretty, client, command, true);
             }
-            Out::Yaml => {
-                execute_out!(serde_yaml::Serializer::new, client, command, false);
-            }
+            // Out::Toml => {
+            //     execute_out!(toml_edit::ser::ValueSerializer::new, client, command, true);
+            // }
+            // Out::Yaml => {
+            //     execute_out!(serde_yaml::Serializer::new, client, command, false);
+            // }
         }
     }
 }
