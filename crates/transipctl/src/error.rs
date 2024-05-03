@@ -29,7 +29,6 @@ pub enum Error {
 
     // #[error("Yaml: {0}")]
     // Yaml(#[from] serde_yaml::Error),
-
     #[error("IO: {0}")]
     IO(#[from] std::io::Error),
 

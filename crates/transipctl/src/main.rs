@@ -69,13 +69,12 @@ impl Out {
         match self {
             Out::Json => {
                 execute_out!(serde_json::Serializer::pretty, client, command, true);
-            }
-            // Out::Toml => {
-            //     execute_out!(toml_edit::ser::ValueSerializer::new, client, command, true);
-            // }
-            // Out::Yaml => {
-            //     execute_out!(serde_yaml::Serializer::new, client, command, false);
-            // }
+            } // Out::Toml => {
+              //     execute_out!(toml_edit::ser::ValueSerializer::new, client, command, true);
+              // }
+              // Out::Yaml => {
+              //     execute_out!(serde_yaml::Serializer::new, client, command, false);
+              // }
         }
     }
 }
