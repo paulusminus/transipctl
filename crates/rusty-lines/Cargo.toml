@@ -14,4 +14,4 @@ thiserror = "1.0.58"
 tracing = "0.1.40"
 
 [dev-dependencies]
-itertools = "0.12.0"
+itertools = "0.13.0"
