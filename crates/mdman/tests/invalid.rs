@@ -11,7 +11,8 @@ fn run(name: &str, expected_error: &str) {
             panic!("expected {} to fail", name);
         }
         Err(e) => {
-            snapbox::assert_data_eq!(expected_error, e.to_string());
+            #[allow(deprecated)]
+            snapbox::assert_eq(expected_error, e.to_string());
         }
     }
 }

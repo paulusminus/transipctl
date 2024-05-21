@@ -15,13 +15,11 @@ It uses [rustyline](https://crates.io/crates/rustyline) for reading from tty.
 ```no_run
 use rusty_lines::TTYLinesBuilder;
 
-fn main() {
-    let lines = TTYLinesBuilder::prompt("tip")
-        .exit_on(&["exit"])
-        .history("history.txt")
-        .build()
-        .unwrap();
-}
+let lines = TTYLinesBuilder::prompt("tip")
+    .exit_on(&["exit"])
+    .history("history.txt")
+    .build()
+    .unwrap();
 ```
 
 ## Example using file
@@ -29,9 +27,7 @@ fn main() {
 ```
 use rusty_lines::FileLinesBuilder;
 
-fn main() {
-    let lines = FileLinesBuilder::file("Cargo.toml")
-        .build()
-        .unwrap();
-}
+let lines = FileLinesBuilder::file("Cargo.toml")
+    .build()
+    .unwrap();
 ```
