@@ -28,7 +28,7 @@ pulldown-cmark = { version = "0.10.0", default-features = false, features = ["ht
 same-file = "1.0.6"
 serde_json = "1.0.114"
 snapbox = { version = "0.5.7", features = ["diff", "path", "term-svg"] }
-url = "2.5.0"
+url = "2.5.1"
 
 [workspace.lints.rust]
 rust_2018_idioms = "warn" # TODO: could this be removed?
