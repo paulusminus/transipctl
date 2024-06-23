@@ -1,17 +1,17 @@
-FROM alpine:3.19
+FROM alpine:latest
 
-ENV TRANSIP_API_PRIVATE_KEY=/run/secrets/transip-key
+ENV TRANSIP_API_PRIVATE_KEY=/etc/transip-key.pem
 ENV TRANSIP_API_LOG_DIR=/var/log/transip
-ENV TRANSIP_API_TOKEN_PATH=/token.txt
+ENV TRANSIP_API_TOKEN_PATH=/root/token.txt
 ENV TRANSIP_API_WHITELISTED_ONLY=true
 ENV TRANSIP_API_READONLY=false
 ENV TRANSIP_API_TOKEN_EXPIRATION="5 minutes"
 ENV RUST_LOG info
 
-WORKDIR /
+WORKDIR /root/
 
-COPY target/x86_64-unknown-linux-musl/release/transipctl /
-COPY crates/transipctl/scripts/acme-validation-delete.transip /
-COPY crates/transipctl/scripts/acme-validation-set.transip /
+COPY target/x86_64-unknown-linux-musl/release/transipctl /usr/bin/
+COPY crates/transipctl/scripts/acme-validation-delete.transip /usr/bin/
+COPY crates/transipctl/scripts/acme-validation-set.transip /usr/bin/
 
-ENTRYPOINT [ "/transipctl" ]
+ENTRYPOINT [ "/usr/bin/transipctl" ]
