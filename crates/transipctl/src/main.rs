@@ -82,6 +82,7 @@ impl Out {
 fn main() -> Result<()> {
     arg_version();
     log::setup_logging();
+    tracing::info!("Logging initialized");
 
     let lines = args()
         .nth(1)
@@ -102,16 +103,22 @@ fn main() -> Result<()> {
 
     let output_format = Out::Json;
     let mut client = configuration_from_environment().and_then(Client::try_from)?;
+    tracing::info!("Cliënt initialized");
 
     for (line_number, line_result) in lines.enumerate() {
         let line = line_result?;
         if !line.trim().is_empty() {
+            tracing::info!("Processing non empty line: {line}");
             match line.parse::<TransipCommand>() {
-                Ok(command) => output_format.execute(&mut client, &command.command),
+                Ok(command) => {
+                    tracing::info!("Processing command {:?}", command);
+                    output_format.execute(&mut client, &command.command)
+                },
                 Err(error) => {
                     if error.kind() == ErrorKind::DisplayHelp {
                         handle_error(error.to_string(), client.exit_on_error())
                     } else {
+                        tracing::error!("Failed to proccess command: {error}");
                         handle_error(
                             format!("Error {} parsing line {}", error, line_number + 1),
                             client.exit_on_error(),

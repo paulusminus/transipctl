@@ -1,13 +1,13 @@
 #!/usr/bin/sh
 
-podman run \
+docker run \
     -v transip-logs:/var/log/transip \
     --env CERTBOT_DOMAIN \
     --env CERTBOT_VALIDATION \
     --env TRANSIP_API_USERNAME \
-    --secret transip-key \
+    --mount type=bind,source=/etc/transip/home.pem,target=/etc/transip.pem,readonly \
     --name transipctl \
     -i \
     --tty \
     --rm \
-    docker.io/paulusminus/transipctl
+    paulusminus/transipctl
