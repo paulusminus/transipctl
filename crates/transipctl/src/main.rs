@@ -113,7 +113,7 @@ fn main() -> Result<()> {
                 Ok(command) => {
                     tracing::info!("Processing command {:?}", command);
                     output_format.execute(&mut client, &command.command)
-                },
+                }
                 Err(error) => {
                     if error.kind() == ErrorKind::DisplayHelp {
                         handle_error(error.to_string(), client.exit_on_error())
