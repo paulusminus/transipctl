@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+RUN apk add --update curl && rm -rf /var/cache/apk/*
+
 ENV TRANSIP_API_PRIVATE_KEY=/etc/transip.pem
 ENV TRANSIP_API_LOG_DIR=/var/log/transip
 ENV TRANSIP_API_TOKEN_PATH=/root/token.txt
