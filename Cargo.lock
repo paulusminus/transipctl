@@ -1755,7 +1755,7 @@ dependencies = [
 
 [[package]]
 name = "transip-execute"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "acme-validation-propagation",
  "serde",
@@ -1766,7 +1766,7 @@ dependencies = [
 
 [[package]]
 name = "transipctl"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "directories",
  "rusty-lines",
