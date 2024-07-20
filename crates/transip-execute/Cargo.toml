@@ -6,7 +6,7 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 version.workspace = true
-rust-version = "1.64.0"
+rust-version = "1.76.0"
 
 [features]
 propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
@@ -14,7 +14,7 @@ propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
 [dependencies]
 acme-validation-propagation = { version = "0.1.5", optional = true }
 serde = "1.0.190"
-transip = { version = "0.3" }
+transip = { version = "0.4" }
 transip-command = { version = "0.4.1", path = "../transip-command" }
 
 [dev-dependencies]
