@@ -4,11 +4,13 @@
 
 # transipctl
 
-transipctl is an executable that processes lines with transip api commands. It can take input from a file or stdin.
+transipctl is an executable that processes lines with transip api commands.
+It can take input from a file or stdin.
 
 It uses the [`transip-execute`] library crate.
 
-If you want to install transipctl for all users you can find a debian or rpm package on [`github-releases`].
+If you want to install transipctl for all users
+you can find a debian or rpm package on [`github-releases`].
 If you prefer containers, an image is available on [`docker-hub`].
 
 ## Examples of using transipctl in script files
@@ -60,6 +62,4 @@ dns acme-validation-set ${CERTBOT_DOMAIN} ${CERTBOT_VALIDATION}
 
 [`mit-badge`]: https://img.shields.io/badge/License-MIT-yellow.svg
 [`github-releases`]: https://github.com/paulusminus/transipctl/releases/latest/
-[`docker-hub`]: https://hub.docker.com/r/paulusminus/transipctl
-[`transip-command`]: https://crates.io/crates/transip-command
 [`transip-execute`]: https://crates.io/crates/transip-execute
