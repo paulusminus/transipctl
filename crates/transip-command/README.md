@@ -5,7 +5,8 @@
 
 # transip-command
 
-transip-command is a library that can parse a string and turn it in a command. It has one optional feature propagation.
+transip-command is a library that can parse a string and turn it in a command.
+It has one optional feature propagation.
 
 ## Commands
 
@@ -39,6 +40,7 @@ transip-command is a library that can parse a string and turn it in a command. I
 - vps unlock \<vpsname\>
 
 ### Available on feature propagation
+
 - dns acme-validation-check \<domainname\> \<acme-validation\>
 
 ## Quoting parameter values containing spaces
