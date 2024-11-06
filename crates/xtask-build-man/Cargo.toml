@@ -11,4 +11,4 @@ rust-version = "1.64.0"
 
 [dependencies]
 mdman = { git = "https://github.com/rust-lang/cargo", tag = "0.83.0" }
-anyhow = "1.0.91"
+anyhow = "1.0.93"
