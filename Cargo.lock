@@ -4,12 +4,12 @@ version = 3
 
 [[package]]
 name = "acme-validation-propagation"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "858c4fec9b117a7ae77f9d8c0e5462e6f71fe25e513cd420b150437536bca5b0"
+checksum = "697afc9dfd31e4cfa8ca8490613512700919a5cce826f996f88aa96aa6019c22"
 dependencies = [
  "hickory-resolver",
- "thiserror 1.0.68",
+ "thiserror 2.0.0",
  "tracing",
 ]
 
@@ -1822,7 +1822,7 @@ dependencies = [
 
 [[package]]
 name = "transipctl"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "directories",
  "rusty-lines",
