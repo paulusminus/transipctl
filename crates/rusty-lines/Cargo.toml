@@ -5,11 +5,11 @@ description = "Abstract reading lines from tty or File"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies]
 regex = "1.11.1"
-rustyline = { version = "14.0.0", features = ["derive"] }
+rustyline = { version = "15.0.0", features = ["derive"] }
 tracing = "0.1.40"
 
 [dev-dependencies]
