@@ -37,7 +37,7 @@ assets = [
 ]
 
 [dependencies]
-directories = "5.0.1"
+directories = "6.0.0"
 rusty-lines = { version = "0.3.1", path = "../rusty-lines" }
 serde = "1.0.214"
 serde_json = "1.0.132"
