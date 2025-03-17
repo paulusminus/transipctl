@@ -100,8 +100,10 @@ mod test {
 
     #[test]
     fn variable_substition() {
-        set_var("CERTBOT_DOMAIN", "GOOGLE.COM");
-        set_var("CERTBOT_VALIDATION", "lksjfoie9");
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { set_var("CERTBOT_DOMAIN", "GOOGLE.COM") };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { set_var("CERTBOT_VALIDATION", "lksjfoie9") };
 
         let haystack =
             "dns acme-validation-set ${CERTBOT_DOMAIN}   ${CERTBOT_VALIDATION}".to_owned();
@@ -113,9 +115,12 @@ mod test {
 
     #[test]
     fn variable_substition_in_iterator() {
-        set_var("CERTBOT_DOMAIN", "GOOGLE.COM");
-        set_var("CERTBOT_VALIDATION", "lksjfoie9");
-        set_var("DOMAIN", "paulmin.nl");
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { set_var("CERTBOT_DOMAIN", "GOOGLE.COM") };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { set_var("CERTBOT_VALIDATION", "lksjfoie9") };
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { set_var("DOMAIN", "paulmin.nl") };
 
         let lines =
             "dns acme-validation-set ${CERTBOT_DOMAIN}   ${CERTBOT_VALIDATION}\ndns list ${DOMAIN}"
