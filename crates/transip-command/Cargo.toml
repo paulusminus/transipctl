@@ -2,10 +2,10 @@
 name = "transip-command"
 authors.workspace = true
 description.workspace = true
-edition.workspace = true
+edition = "2021"
 license.workspace = true
 repository.workspace = true
-version = "0.4.1"
+version = "0.4.2"
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
