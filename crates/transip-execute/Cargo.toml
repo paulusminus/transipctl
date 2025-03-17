@@ -2,11 +2,10 @@
 name = "transip-execute"
 authors.workspace = true
 description = "execute commands on the Transip Api Endpoint"
-edition.workspace = true
+edition = "2021"
 license.workspace = true
 repository.workspace = true
 version.workspace = true
-rust-version = "1.76.0"
 
 [features]
 propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
