@@ -15,10 +15,10 @@ lto = true
 [workspace.package]
 authors = ["Paul Min"]
 description = "Tool for manipulating and querying records on Transip Api Endpoint"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/paulusminus/transipctl"
-version = "0.4.3"
+version = "0.4.4"
 
 [workspace.dependencies]
 anyhow = "1.0.80"

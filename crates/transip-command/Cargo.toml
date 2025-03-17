@@ -2,7 +2,7 @@
 name = "transip-command"
 authors.workspace = true
 description.workspace = true
-edition = "2024"
+edition.workspace = true
 license.workspace = true
 repository.workspace = true
 version = "0.4.2"
