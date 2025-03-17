@@ -6,7 +6,7 @@ members = [
   "crates/rusty-lines",
   "crates/xtask-build-man",
 ]
-resolver = "2"
+resolver = "3"
 
 [profile.release]
 strip = true
