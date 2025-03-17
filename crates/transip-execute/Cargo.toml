@@ -2,7 +2,7 @@
 name = "transip-execute"
 authors.workspace = true
 description = "execute commands on the Transip Api Endpoint"
-edition = "2021"
+edition = "2024"
 license.workspace = true
 repository.workspace = true
 version.workspace = true
