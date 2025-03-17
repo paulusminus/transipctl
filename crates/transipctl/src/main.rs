@@ -49,7 +49,7 @@ fn handle_ok(buffer: Vec<u8>, extra_newline: bool) {
 }
 
 macro_rules! execute_out {
-    ($ser:path, $client:ident, $command:ident, $extra_newline:expr) => {
+    ($ser:path, $client:ident, $command:ident, $extra_newline:expr_2021) => {
         let mut buffer: Vec<u8> = Vec::new();
         let mut ser = $ser(&mut buffer);
 
