@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
 use rustyline::{
-    highlight::Highlighter, hint::HistoryHinter, history::FileHistory, Completer, CompletionType,
-    Config, EditMode, Editor, Helper, Hinter, Validator,
+    Completer, CompletionType, Config, EditMode, Editor, Helper, Hinter, Validator,
+    highlight::Highlighter, hint::HistoryHinter, history::FileHistory,
 };
 
 use crate::{Error, ReadlineError, Result};
@@ -82,9 +82,9 @@ impl Drop for LineEditor {
 }
 
 mod prompt {
-    use std::io::{stdout, IsTerminal};
+    use std::io::{IsTerminal, stdout};
 
-    use rustyline::{config::Configurer, history::FileHistory, ColorMode, Editor};
+    use rustyline::{ColorMode, Editor, config::Configurer, history::FileHistory};
 
     use super::MyHelper;
 

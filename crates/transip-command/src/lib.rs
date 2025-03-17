@@ -178,7 +178,7 @@ impl FromStr for TransipCommand {
 mod tests {
     use std::io::{BufRead, BufReader};
 
-    use super::{command_line, TransipCommand};
+    use super::{TransipCommand, command_line};
     use clap::Parser;
 
     const COMMANDS: &[u8] = include_bytes!("commands.txt");

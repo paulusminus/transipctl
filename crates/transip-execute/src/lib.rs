@@ -2,7 +2,7 @@ use std::{mem::size_of, time::Duration};
 
 use serde::{Serialize, Serializer};
 pub use transip::configuration_from_environment;
-use transip::{api::email::MailForwardInsert, Configuration};
+use transip::{Configuration, api::email::MailForwardInsert};
 pub use transip::{Error, Result};
 use transip_command::{
     DnsCommand, DomainCommand, EmailBoxCommand, EmailForwardCommand, InvoiceCommand, OnError,

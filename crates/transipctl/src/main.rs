@@ -1,7 +1,7 @@
 use rusty_lines::{FileLinesBuilder, TTYLinesBuilder};
 use std::{env::args, path::PathBuf, process::exit};
 use transip_execute::{
-    configuration_from_environment, Client, ErrorKind, SubCommand, TransipCommand,
+    Client, ErrorKind, SubCommand, TransipCommand, configuration_from_environment,
 };
 
 pub type Result<T> = std::result::Result<T, error::Error>;

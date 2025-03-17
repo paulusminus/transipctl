@@ -3,7 +3,7 @@ use rustyline::error::ReadlineError;
 
 use crate::{Error, Result};
 use std::{
-    env::{var, VarError},
+    env::{VarError, var},
     fs::{File, OpenOptions},
     io::{BufRead, BufReader, Cursor, Lines, Read},
     path::Path,
@@ -94,9 +94,9 @@ fn replace_enviroment_variables(haystack: String, re: &Regex) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::{regex, replace_all, FileReader};
+    use super::{FileReader, regex, replace_all};
     use regex::Captures;
-    use std::env::{set_var, var, VarError};
+    use std::env::{VarError, set_var, var};
 
     #[test]
     fn variable_substition() {

@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 use tracing_log::LogTracer;
 use tracing_subscriber::{
-    filter::LevelFilter, fmt::time::LocalTime, prelude::__tracing_subscriber_SubscriberExt,
-    EnvFilter,
+    EnvFilter, filter::LevelFilter, fmt::time::LocalTime,
+    prelude::__tracing_subscriber_SubscriberExt,
 };
 
 use crate::error::{Error, ErrorExt};
