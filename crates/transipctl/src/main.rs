@@ -31,7 +31,7 @@ enum Out {
 }
 
 fn handle_error(msg: String, exit_on_error: bool) {
-    eprintln!("{}", msg);
+    eprintln!("{msg}");
     if exit_on_error {
         exit(1);
     }
@@ -41,9 +41,9 @@ fn handle_ok(buffer: Vec<u8>, extra_newline: bool) {
     let s = String::from_utf8(buffer).unwrap();
     if !s.is_empty() {
         if extra_newline {
-            println!("{}", s);
+            println!("{s}");
         } else {
-            print!("{}", s);
+            print!("{s}");
         }
     }
 }

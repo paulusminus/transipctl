@@ -93,9 +93,9 @@ mod prompt {
 
     pub fn prompt(editor: &mut Editor<MyHelper, FileHistory>, name: &str) -> String {
         if stdout().is_terminal() && editor.config_mut().color_mode() != ColorMode::Disabled {
-            format!("{}{}: {}", ANSI_PREFIX, name, ANSI_POSTFIX)
+            format!("{ANSI_PREFIX}{name}: {ANSI_POSTFIX}")
         } else {
-            format!("{}: ", name)
+            format!("{name}: ")
         }
     }
 }
