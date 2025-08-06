@@ -9,7 +9,7 @@ version = "0.3.3"
 
 [dependencies]
 regex = "1.11.1"
-rustyline = { version = "16.0.0", features = ["derive"] }
+rustyline = { version = "17.0.0", features = ["derive"] }
 tracing = "0.1.40"
 
 [dev-dependencies]
