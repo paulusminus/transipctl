@@ -56,9 +56,10 @@ impl LineEditor {
         rustyline::Editor::<MyHelper, FileHistory>::with_config(config).and_then(|mut editor| {
             editor.set_helper(Some(MyHelper::default()));
             if let Some(filename) = history_filename.as_ref()
-                && filename.as_ref().exists() {
-                    editor.load_history(filename.as_ref())?;
-                };
+                && filename.as_ref().exists()
+            {
+                editor.load_history(filename.as_ref())?;
+            };
 
             Ok(Self {
                 exit_terms,
@@ -73,9 +74,10 @@ impl LineEditor {
 impl Drop for LineEditor {
     fn drop(&mut self) {
         if let Some(filename) = self.history_filename.as_ref()
-            && let Err(error) = self.editor.save_history(&filename) {
-                tracing::error!("Error saving {:?}: {}", &filename, error);
-            }
+            && let Err(error) = self.editor.save_history(&filename)
+        {
+            tracing::error!("Error saving {:?}: {}", &filename, error);
+        }
     }
 }
 
