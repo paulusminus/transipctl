@@ -16,8 +16,7 @@ use std::path::Path;
 // use std::process;
 // use std::process::Command;
 
-const SOURCE_FILE: &str = "crates/transipctl/transipctl.man";
-// const DEST_PATH: &str = "crates/transipctl/docs/transipctl.1";
+const SOURCE_FILE: &str = "crates/transipctl/docs/transipctl.md";
 const DESTINATION_FILE: &str = "crates/transipctl/docs/transipctl.1";
 // const PKG_NAME: &str = "transipctl";
 

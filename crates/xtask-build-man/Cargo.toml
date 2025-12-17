@@ -9,5 +9,5 @@ version = "0.3.5"
 publish = false
 
 [dependencies]
-mdman = { git = "https://github.com/rust-lang/cargo", tag = "0.83.0" }
+mdman = { git = "https://github.com/rust-lang/cargo" }
 anyhow = "1.0.93"
