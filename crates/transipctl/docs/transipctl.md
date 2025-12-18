@@ -2,11 +2,11 @@
 
 ## NAME
 
-transipctl --- Parse lines into commands to be executed on Transip Api Endpoint
+transipctl - Parse lines into commands to be executed on Transip Api Endpoint
 
 ## SYNOPSIS
 
-`transipctl` [_options_]
+`transipctl` [_options_] `-v` _input_
 
 ## DESCRIPTION
 
@@ -16,18 +16,17 @@ list of available commands.
 
 ## OPTIONS
 
-<dl>
+{{#options}}
 
-<dt class="option-term" id="option-transipctl--v"><a class="option-anchor" href="#option-transipctl--v"></a><code>-v</code></dt>
-<dt class="option-term" id="option-transipctl---version"><a class="option-anchor" href="#option-transipctl---version"></a><code>--version</code></dt>
-<dd class="option-desc">Print version info and exit. This option cannot be combined with other options.</dd>
+{{#option "`-v`"}}
+Print version info and exit. This option cannot be combined with other options.
+{{/option}}
 
+{{#option "_input_"}}
+The source input filename. Stdin is used if no filename is provided.
+{{/option}}
 
-<dt class="option-term" id="option-transipctl-filename"><a class="option-anchor" href="#option-transipctl-filename"></a><code>&lt;filename&gt;</code></dt>
-<dd class="option-desc">Process the lines from &lt;filename&gt; and exit. This option cannot be combined with other options.</dd>
-
-
-</dl>
+{{/options}}
 
 ## EXAMPLES
 

@@ -3,7 +3,7 @@ name: Build rpm and deb package
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -14,20 +14,22 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
-    - uses: Swatinem/rust-cache@v2
-    - name: Install cargo-generate-rpm
-      run: cargo install cargo-generate-rpm
-    - name: Install cargo deb
-      run: cargo install cargo-deb
-    - name: Build man page
-      run: cargo build-man
-    - name: Build for x86_64
-      run: cargo build --release
-    - name: Generate rpm
-      run: cargo generate-rpm -p crates/transipctl
-    - name: Build debian package
-      run: cargo deb -p transipctl
-    - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "target/generate-rpm/*.rpm,target/debian/*.deb"
+      - name: Installation of mdman
+        run: cargo install mdman --git https://github.com/rust-lang/cargo --tag 0.93.0
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-generate-rpm
+        run: cargo install cargo-generate-rpm
+      - name: Install cargo deb
+        run: cargo install cargo-deb
+      - name: Build man page
+        run: mdman -t man -o crates/transipctl/docs/out/ crates/transipctl/docs/transipctl.md
+      - name: Build for x86_64
+        run: cargo build --release
+      - name: Generate rpm
+        run: cargo generate-rpm -p crates/transipctl
+      - name: Build debian package
+        run: cargo deb -p transipctl
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "target/generate-rpm/*.rpm,target/debian/*.deb"

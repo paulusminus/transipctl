@@ -20,7 +20,7 @@ assets = [
     "755",
   ],
   [
-    "docs/transipctl.1",
+    "docs/out/transipctl.1",
     "/usr/share/man/man1/",
     "644",
   ],
@@ -32,7 +32,7 @@ assets = [
   { source = "target/release/transipctl", dest = "/usr/bin/transipctl", mode = "755" },
   { source = "scripts/acme-validation-delete.transip", dest = "/usr/bin/acme-validation-delete.transip", mode = "755" },
   { source = "scripts/acme-validation-set.transip", dest = "/usr/bin/acme-validation-set.transip", mode = "755" },
-  { source = "docs/transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
+  { source = "docs/out/transipctl.1", dest = "/usr/share/man/man1/transipctl.1", mode = "644" },
 ]
 
 [dependencies]

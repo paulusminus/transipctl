@@ -4,7 +4,6 @@ members = [
   "crates/transip-execute",
   "crates/transip-command",
   "crates/rusty-lines",
-  "crates/xtask-build-man",
 ]
 resolver = "3"
 
