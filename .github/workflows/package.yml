@@ -24,6 +24,8 @@ jobs:
         run: cargo install cargo-deb
       - name: Build man page
         run: mdman -t man -o crates/transipctl/docs/out/ crates/transipctl/docs/transipctl.md
+      - name: Build extended description
+        run: mdman -t txt -o crates/transipctl/docs/out/ crates/transipctl/docs/transipctl.md
       - name: Build for x86_64
         run: cargo build --release
       - name: Generate rpm
