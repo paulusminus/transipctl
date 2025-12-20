@@ -14,10 +14,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Installation of mdman
-        run: cargo install mdman --git https://github.com/rust-lang/cargo --tag 0.93.0
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
+      - name: Installation of mdman
+        run: cargo install mdman --git https://github.com/rust-lang/cargo --tag 0.93.0
       - name: Install cargo-generate-rpm
         run: cargo install cargo-generate-rpm
       - name: Install cargo deb
