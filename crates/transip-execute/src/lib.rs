@@ -89,7 +89,7 @@ impl Client {
                 .report(s),
             #[cfg(feature = "propagation")]
             DnsCommand::AcmeValidationCheck { domain, challenge } => {
-                acme_validation_propagation::wait(domain, challenge)
+                acme_validation_propagation::wait_sync(domain.clone(), challenge.clone())
                     .map_err(|_| Error::AcmeChallege)
             }
         }
