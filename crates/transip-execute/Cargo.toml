@@ -11,7 +11,7 @@ version.workspace = true
 propagation = ["dep:acme-validation-propagation", "transip-command/propagation"]
 
 [dependencies]
-acme-validation-propagation = { version = "0.1.7", optional = true }
+acme-validation-propagation = { version = "0.2.0", optional = true }
 serde = "1.0.214"
 transip = { version = "0.4.0" }
 transip-command = { version = "0.4.2", path = "../transip-command" }
