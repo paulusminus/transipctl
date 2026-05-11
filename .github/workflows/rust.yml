@@ -11,15 +11,12 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - name: Format
-        run: cargo fmt --check
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-      - name: Run tests
-        run: cargo test --verbose
-      - name: Build for x86_64
-        run: cargo build --verbose
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      - uses: paulmin/rust-check@v6
+        with:
+          build: true

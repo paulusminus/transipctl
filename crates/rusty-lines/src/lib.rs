@@ -44,7 +44,7 @@ pub struct TTYLinesBuilder<P: AsRef<Path>> {
 }
 
 impl<P: AsRef<Path>> TTYLinesBuilder<P> {
-    /// prompt to display is using the tty as input
+    /// prompt to display if using the tty as input
     pub fn prompt(prompt: &str) -> Self {
         Self {
             prompt_name: prompt.to_owned(),
