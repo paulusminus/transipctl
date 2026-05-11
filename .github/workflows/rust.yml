@@ -17,6 +17,6 @@ jobs:
         with:
           toolchain: stable
           components: clippy, rustfmt
-      - uses: paulmin/rust-check@v6
+      - uses: paulusminus/rust-check@v6
         with:
           build: true
