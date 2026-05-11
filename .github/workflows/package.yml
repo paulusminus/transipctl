@@ -18,14 +18,13 @@ jobs:
         with:
           toolchain: stable
           components: clippy,rustfmt
+      - uses: cargo-bins/cargo-binstall@main
       - uses: actions/checkout@v6
       - uses: Swatinem/rust-cache@v2
       - name: Installation of mdman
         run: cargo install mdman --git https://github.com/rust-lang/cargo --tag 0.96.0
-      - name: Install cargo-generate-rpm
-        run: cargo install cargo-generate-rpm
-      - name: Install cargo deb
-        run: cargo install cargo-deb
+      - name: Install cargo-generate-rpm and cargo-deb
+        run: cargo binstall cargo-generate-rpm cargo-deb
       - name: Build man page
         run: mdman -t man -o crates/transipctl/docs/out/ crates/transipctl/docs/transipctl.md
       - name: Build extended description
