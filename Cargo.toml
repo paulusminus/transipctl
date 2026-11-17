@@ -29,6 +29,6 @@ private_intra_doc_links = "allow"
 all = { level = "allow", priority = -1 }
 dbg_macro = "warn"
 disallowed_methods = "warn"
-print_stderr = "warn"
-print_stdout = "warn"
+print_stderr = "allow"
+print_stdout = "allow"
 self_named_module_files = "warn"
