@@ -71,7 +71,7 @@ impl<R: Read> Iterator for FileReader<R> {
 fn replace_all<E>(
     re: &Regex,
     haystack: &str,
-    replacement: impl Fn(&Captures) -> Result<String, E>,
+    replacement: impl Fn(&Captures<'_>) -> Result<String, E>,
 ) -> Result<String, E> {
     let mut new = String::with_capacity(haystack.len());
     let mut last_match = 0;
@@ -86,7 +86,7 @@ fn replace_all<E>(
 }
 
 fn replace_enviroment_variables(haystack: String, re: &Regex) -> String {
-    let replacement = |caps: &Captures| -> Result<String, VarError> {
+    let replacement = |caps: &Captures<'_>| -> Result<String, VarError> {
         var(caps.get(1).unwrap().as_str()).map(|s| format!("\"{s}\""))
     };
     replace_all(re, &haystack, replacement).unwrap()
@@ -107,8 +107,9 @@ mod test {
 
         let haystack =
             "dns acme-validation-set ${CERTBOT_DOMAIN}   ${CERTBOT_VALIDATION}".to_owned();
-        let replacement =
-            |caps: &Captures| -> Result<String, VarError> { var(caps.get(1).unwrap().as_str()) };
+        let replacement = |caps: &Captures<'_>| -> Result<String, VarError> {
+            var(caps.get(1).unwrap().as_str())
+        };
         let new = replace_all(&regex(), &haystack, &replacement).unwrap();
         assert_eq!(new, *"dns acme-validation-set GOOGLE.COM   lksjfoie9");
     }

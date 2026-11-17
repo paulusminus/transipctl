@@ -51,3 +51,6 @@ tracing-subscriber = { version = "0.3.18", features = [
 transip-execute = { version = "0.4.0", path = "../transip-execute", features = [
   "propagation",
 ] }
+
+[lints]
+workspace = true
